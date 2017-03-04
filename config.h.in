@@ -1,0 +1,82 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Enable assertion. */
+#undef EXAFMM_ASSERT
+
+/* Count number of M2L and P2P kernel calls. */
+#undef EXAFMM_COUNT_KERNEL
+
+/* Count interaction list per cell. */
+#undef EXAFMM_COUNT_LIST
+
+/* Define to enable extra debugging options. */
+#undef EXAFMM_DEBUG
+
+/* Define to enable AVX optimizations. */
+#undef EXAFMM_HAVE_AVX
+
+/* Define to enable AVX2 optimizations. */
+#undef EXAFMM_HAVE_AVX2
+
+/* Define to enable AVX512 optimizations. */
+#undef EXAFMM_HAVE_AVX512
+
+/* Define to enable MIC optimizations. */
+#undef EXAFMM_HAVE_MIC
+
+/* Define if you have the MPI library. */
+#undef EXAFMM_HAVE_MPI
+
+/* Define to enable ARM NEON optimizations. */
+#undef EXAFMM_HAVE_NEON
+
+/* Use OpenMP */
+#undef EXAFMM_HAVE_OPENMP
+
+/* Define to enable SSE/SSE3 optimizations. */
+#undef EXAFMM_HAVE_SSE3
+
+/* Define to compile in single precision. */
+#undef EXAFMM_SINGLE
+
+/* Enable Kahan summation. */
+#undef EXAFMM_USE_KAHAN
+
+/* Enable PAPI performance counter. */
+#undef EXAFMM_USE_PAPI
+
+/* Disable SIMD optimizations. */
+#undef EXAFMM_USE_SIMD
+
+/* Enable thread tracing. */
+#undef EXAFMM_USE_TRACE
+
+/* Enable weight for partitioning. */
+#undef EXAFMM_USE_WEIGHT
+
+/* Define if OpenMP is enabled */
+#undef HAVE_OPENMP
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Version number of package */
+#undef VERSION
