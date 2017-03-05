@@ -145,10 +145,11 @@ namespace EXAFMM_NAMESPACE {
     }
 
     void P2P(C_iter Ci, C_iter Cj) {
-      B_iter Bi = Ci->BODY;
-      B_iter Bj = Cj->BODY;
-      int ni = Ci->NBODY;
-      int nj = Cj->NBODY;
+      // i -> Target, j -> Source
+      T_iter Bi = Ci->T_BODY;
+      S_iter Bj = Cj->S_BODY;
+      int ni = Ci->T_NBODY;
+      int nj = Cj->S_NBODY;
       for (int i=0; i<ni; i++) {
         kreal_t pot = 0;
         kreal_t ax = 0;
@@ -167,16 +168,17 @@ namespace EXAFMM_NAMESPACE {
             az += dX[2];
           }
         }
-        Bi[i].TRG[0] += pot;
-        Bi[i].TRG[1] -= ax;
-        Bi[i].TRG[2] -= ay;
-        Bi[i].TRG[3] -= az;
+        Bi[i].F[0] += pot;
+        Bi[i].F[1] -= ax;
+        Bi[i].F[2] -= ay;
+        Bi[i].F[3] -= az;
       }
     }
 
     void P2M(C_iter C) {
       complex_t Ynm[P*P], YnmTheta[P*P];
-      for (B_iter B=C->BODY; B!=C->BODY+C->NBODY; B++) {
+      // only sources involved, S_ prefix
+      for (S_iter B=C->S_BODY; B!=C->S_BODY+C->S_NBODY; B++) {
         vec3 dX = B->X - C->X;
         real_t rho, alpha, beta;
         cart2sph(dX, rho, alpha, beta);
@@ -298,7 +300,7 @@ namespace EXAFMM_NAMESPACE {
 
     void L2P(C_iter Ci) {
       complex_t Ynm[P*P], YnmTheta[P*P];
-      for (B_iter B=Ci->BODY; B!=Ci->BODY+Ci->NBODY; B++) {
+      for (T_iter B=Ci->T_BODY; B!=Ci->T_BODY+Ci->T_NBODY; B++) {
         vec3 dX = B->X - Ci->X + EPS;
         vec3 spherical = 0;
         vec3 cartesian = 0;
@@ -308,22 +310,22 @@ namespace EXAFMM_NAMESPACE {
         for (int n=0; n<P; n++) {
           int nm  = n * n + n;
           int nms = n * (n + 1) / 2;
-          B->TRG[0] += std::real(Ci->L[nms] * Ynm[nm]);
+          B->F[0] += std::real(Ci->L[nms] * Ynm[nm]);
           spherical[0] += std::real(Ci->L[nms] * Ynm[nm]) / r * n;
           spherical[1] += std::real(Ci->L[nms] * YnmTheta[nm]);
           for (int m=1; m<=n; m++) {
             nm  = n * n + n + m;
             nms = n * (n + 1) / 2 + m;
-            B->TRG[0] += 2 * std::real(Ci->L[nms] * Ynm[nm]);
+            B->F[0] += 2 * std::real(Ci->L[nms] * Ynm[nm]);
             spherical[0] += 2 * std::real(Ci->L[nms] * Ynm[nm]) / r * n;
             spherical[1] += 2 * std::real(Ci->L[nms] * YnmTheta[nm]);
             spherical[2] += 2 * std::real(Ci->L[nms] * Ynm[nm] * I) * m;
           }
         }
         sph2cart(r, theta, phi, spherical, cartesian);
-        B->TRG[1] += cartesian[0];
-        B->TRG[2] += cartesian[1];
-        B->TRG[3] += cartesian[2];
+        B->F[1] += cartesian[0];
+        B->F[2] += cartesian[1];
+        B->F[3] += cartesian[2];
       }
     }
   };

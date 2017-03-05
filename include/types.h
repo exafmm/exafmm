@@ -63,21 +63,21 @@ namespace EXAFMM_NAMESPACE {
   };
 
   //! Structure of bodies
-  struct Body : public Source {                                 //!< Base components of body structure
-    int     IBODY;                                              //!< Initial body numbering for sorting back
-    int     IRANK;                                              //!< Initial rank numbering for partitioning back
-    int64_t ICELL;                                              //!< Cell index
-    real_t  WEIGHT;                                             //!< Weight for partitioning
+  struct Target {      //!< Base components of body structure
+    vec3      X;                                                //!< Position
 #if EXAFMM_LAPLACE
-    kvec4   TRG;                                                //!< Scalar+vector3 real values
+    kvec4     F;                                                //!< Scalar+vector3 real values
 #elif EXAFMM_HELMHOLTZ
-    kcvec4  TRG;                                                //!< Scalar+vector3 complex values
+    kcvec4    F;                                                //!< Scalar+vector3 complex values
 #elif EXAFMM_BIOTSAVART
-    kvec4   TRG;                                                //!< Scalar+vector3 real values
+    kvec4     F;                                                //!< Scalar+vector3 real values
 #endif
   };
-  typedef std::vector<Body> Bodies;                             //!< Vector of bodies
-  typedef typename Bodies::iterator B_iter;                     //!< Iterator of body vector
+
+  typedef std::vector<Source> Sources;                           //!< Vector of bodies
+  typedef std::vector<Target> Targets;
+  typedef typename Sources::iterator S_iter;                     //!< Iterator of body vector
+  typedef typename Targets::iterator T_iter;
 
   /*
 #ifdef EXAFMM_PMAX
@@ -93,8 +93,11 @@ namespace EXAFMM_NAMESPACE {
     int IPARENT;                                                //!< Index of parent cell
     int ICHILD;                                                 //!< Index of first child cell
     int NCHILD;                                                 //!< Number of child cells
-    int IBODY;                                                  //!< Index of first body
-    int NBODY;                                                  //!< Number of descendant bodies
+    
+    int S_IBODY;                                                  //!< Index of first body
+    int T_IBODY;                                                  //!< Index of first body
+    int S_NBODY;                                                  //!< Number of descendant bodies
+    int T_NBODY;                                                  //!< Number of descendant bodies
 #if EXAFMM_COUNT_LIST
     int numP2P;                                                 //!< Size of P2P interaction list per cell
     int numM2L;                                                 //!< Size of M2L interaction list per cell
@@ -103,7 +106,8 @@ namespace EXAFMM_NAMESPACE {
     real_t   WEIGHT;                                            //!< Weight for partitioning
     vec3     X;                                                 //!< Cell center
     real_t   R;                                                 //!< Cell radius
-    B_iter   BODY;                                              //!< Iterator of first body
+    S_iter   S_BODY;                                              //!< Iterator of first body
+    T_iter   T_BODY;                                              //!< Iterator of first body
   };
   //! Structure of cells
   struct Cell : public CellBase {

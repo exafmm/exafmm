@@ -10,7 +10,12 @@ int main(int argc, char ** argv) {
   const real_t eps2 = 0.0;
   const complex_t wavek = complex_t(1.,.1) / real_t(2 * M_PI);
   Args args(argc, argv);
-  Bodies bodies(1), bodies2(1), jbodies(1);
+  // rewrite Bodies as Sources and Targets
+  // Bodies bodies(1), bodies2(1), jbodies(1);
+  // jbodies: source
+  // bodies: target
+  Targets bodies(1), bodies2(1);
+  Sources jbodies(1);
   Kernel kernel(args.P, eps2, wavek);
   logger::verbose = true;
 
@@ -29,8 +34,8 @@ int main(int argc, char ** argv) {
   Cj->X = 1;
   Cj->X[0] = 3;
   Cj->R = 1;
-  Cj->BODY = jbodies.begin();
-  Cj->NBODY = jbodies.size();
+  Cj->S_BODY = jbodies.begin();
+  Cj->S_NBODY = jbodies.size();
   Cj->M.resize(kernel.NTERM, 0.0);
   kernel.P2M(Cj);
 
@@ -69,24 +74,21 @@ int main(int argc, char ** argv) {
 
   bodies[0].X = 2;
   bodies[0].X[0] = -2;
-  bodies[0].Q = 1;
-  bodies[0].TRG = 0;
-  Ci->BODY = bodies.begin();
-  Ci->NBODY = bodies.size();
+  //bodies[0].Q = 1;
+  bodies[0].F = 0;
+  Ci->T_BODY = bodies.begin();
+  Ci->T_NBODY = bodies.size();
   kernel.L2P(Ci);
 
 
-  for (B_iter B=bodies2.begin(); B!=bodies2.end(); B++) {
+  for (T_iter B=bodies2.begin(); B!=bodies2.end(); B++) {
     *B = bodies[B-bodies2.begin()];
-    B->TRG = 0;
+    B->F = 0;
   }
-  Cj->NBODY = jbodies.size();
-  Ci->NBODY = bodies2.size();
-  Ci->BODY = bodies2.begin();
+  Cj->S_NBODY = jbodies.size();
+  Ci->T_NBODY = bodies2.size();
+  Ci->T_BODY = bodies2.begin();
   kernel.P2P(Ci, Cj);
-  for (B_iter B=bodies2.begin(); B!=bodies2.end(); B++) {
-    B->TRG /= B->Q;
-  }
 
   std::fstream file;
   file.open("kernel.dat", std::ios::out | std::ios::app);
