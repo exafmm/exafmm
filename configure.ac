@@ -180,7 +180,7 @@ AM_CONDITIONAL(EXAFMM_DEBUG, test "$enable_debug" = "yes")
 AX_COMPILER_VENDOR()
 AX_COMPILER_FLAGS()
 AC_LANG_PUSH([Fortran])
-AX_COMPILER_FLAGS()
+#AX_COMPILER_FLAGS()
 AC_LANG_POP([Fortran])
 
 AC_MSG_NOTICE([Vendor   : $ax_cv_cxx_compiler_vendor])
