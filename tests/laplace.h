@@ -175,11 +175,10 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void P2M(C_iter C, Coefs & M) {
+    void P2M(C_iter C, vec3 & X , Coefs & M) {
       complex_t Ynm[P*P], YnmTheta[P*P];
-      // only sources involved, S_ prefix
       for (S_iter B=C->S_BODY; B!=C->S_BODY+C->S_NBODY; B++) {
-        vec3 dX = B->X - C->X;
+        vec3 dX = B->X - X;
         real_t rho, alpha, beta;
         cart2sph(dX, rho, alpha, beta);
         evalMultipole(rho, alpha, -beta, Ynm, YnmTheta);
@@ -193,10 +192,10 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void M2M(C_iter Ci, C_iter C0, Coefs & Mi, Coefs & Mj) {
+    void M2M(C_iter Ci, vec3 & Xi, Coefs & Mi, C_iter C0, vec3 & Xj, Coefs & Mj) {
       complex_t Ynm[P*P], YnmTheta[P*P];
       for (C_iter Cj=C0+Ci->ICHILD; Cj!=C0+Ci->ICHILD+Ci->NCHILD; Cj++) {
-        vec3 dX = Ci->X - Cj->X;
+        vec3 dX = Xi - Xj;
         real_t rho, alpha, beta;
         cart2sph(dX, rho, alpha, beta);
         evalMultipole(rho, alpha, -beta, Ynm, YnmTheta);
@@ -231,9 +230,9 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void M2L(C_iter Ci, C_iter Cj, Coefs & Mj, Coefs & Li) {
+    void M2L(C_iter Ci, vec3 & Xi, Coefs & Li, C_iter Cj, vec3 & Xj, Coefs & Mj) {
       complex_t Ynm2[4*P*P];
-      vec3 dX = Ci->X - Cj->X - Xperiodic;
+      vec3 dX = Xi - Xj - Xperiodic;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
       evalLocal(rho, alpha, beta, Ynm2);
@@ -263,10 +262,10 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void L2L(C_iter Ci, C_iter C0, Coefs & Li, Coefs & Lj) {
+    void L2L(C_iter Ci, vec3 & Xi, Coefs & Li, C_iter C0, vec3 & Xj, Coefs & Lj) {
       complex_t Ynm[P*P], YnmTheta[P*P];
       C_iter Cj = C0 + Ci->IPARENT;
-      vec3 dX = Ci->X - Cj->X;
+      vec3 dX = Xi - Xj;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
       evalMultipole(rho, alpha, beta, Ynm, YnmTheta);
@@ -298,10 +297,10 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void L2P(C_iter Ci, Coefs & L) {
+    void L2P(C_iter Ci, vec3 & X, Coefs & L) {
       complex_t Ynm[P*P], YnmTheta[P*P];
       for (T_iter B=Ci->T_BODY; B!=Ci->T_BODY+Ci->T_NBODY; B++) {
-        vec3 dX = B->X - Ci->X + EPS;
+        vec3 dX = B->X - X + EPS;
         vec3 spherical = 0;
         vec3 cartesian = 0;
         real_t r, theta, phi;

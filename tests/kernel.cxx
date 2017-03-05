@@ -13,6 +13,8 @@ int main(int argc, char ** argv) {
   
   Targets bodies(1), bodies2(1);
   Sources jbodies(1);
+ 
+  vec3 XJ, Xj, XI, Xi;
   Coefs MJ, Mj, LI, Li;
 
   Kernel kernel(args.P, eps2, wavek);
@@ -30,45 +32,43 @@ int main(int argc, char ** argv) {
   jbodies[0].Q = 1;
 #endif
 
-
-
   C_iter Cj = cells.begin();
-  Cj->X = 1;
-  Cj->X[0] = 3;
+  Xj = 1;
+  Xj[0] = 3;
   Cj->R = 1;
   Cj->S_BODY = jbodies.begin();
   Cj->S_NBODY = jbodies.size();
   Mj.resize(kernel.NTERM, 0.0);
-  kernel.P2M(Cj, Mj);
+  kernel.P2M(Cj, Xj, Mj);
 
-#if 0
+#if 1
   C_iter CJ = cells.begin()+1;
   CJ->ICHILD = Cj-cells.begin();
   CJ->NCHILD = 1;
-  CJ->X = 0;
-  CJ->X[0] = 4;
+  XJ = 0;
+  XJ[0] = 4;
   CJ->R = 2;
   MJ.resize(kernel.NTERM, 0.0);
-  kernel.M2M(CJ, cells.begin(), MJ, Mj);
+  kernel.M2M(CJ, XJ, MJ, cells.begin(), Xj, Mj);
 
   C_iter CI = cells.begin()+2;
-  CI->X = 0;
-  CI->X[0] = -4;
+  XI = 0;
+  XI[0] = -4;
   CI->R = 2;
   LI.resize(kernel.NTERM, 0.0);
-  kernel.M2L(CI, CJ, MJ, LI);
+  kernel.M2L(CI, XI, LI, CJ, XJ, MJ);
 
   C_iter Ci = cells.begin()+3;
-  Ci->X = 1;
-  Ci->X[0] = -3;
+  Xi = 1;
+  Xi[0] = -3;
   Ci->R = 1;
   Ci->IPARENT = 2;
   Li.resize(kernel.NTERM, 0.0);
-  kernel.L2L(Ci, cells.begin(), Li, LI);
+  kernel.L2L(Ci, Xi, Li, cells.begin(), XI, LI);
 #else
   C_iter Ci = cells.begin()+3;
-  Ci->X = 1;
-  Ci->X[0] = -3;
+  Xi = 1;
+  Xi[0] = -3;
   Ci->R = 1;
   Li.resize(kernel.NTERM, 0.0);
   kernel.M2L(Ci, Cj, Mj, Li);
@@ -80,7 +80,7 @@ int main(int argc, char ** argv) {
   bodies[0].F = 0;
   Ci->T_BODY = bodies.begin();
   Ci->T_NBODY = bodies.size();
-  kernel.L2P(Ci, Li);
+  kernel.L2P(Ci, Xi, Li);
 
 
   for (T_iter B=bodies2.begin(); B!=bodies2.end(); B++) {
