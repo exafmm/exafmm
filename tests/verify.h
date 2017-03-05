@@ -28,9 +28,9 @@ namespace EXAFMM_NAMESPACE {
       double v = 0;                                             // Initialize difference
       for (B_iter B=bodies.begin(); B!=bodies.end(); B++) {     // Loop over bodies
 #if EXAFMM_LAPLACE
-	v += B->TRG[0] * B->SRC;                                //  Sum of scalar component for Laplace
+	v += B->TRG[0] * B->Q;                                //  Sum of scalar component for Laplace
 #elif EXAFMM_HELMHOLTZ
-	v += std::abs(B->TRG[0] * B->SRC);                      //  Sum of scalar component for Helmholtz
+	v += std::abs(B->TRG[0] * B->Q);                      //  Sum of scalar component for Helmholtz
 #elif EXAFMM_BIOTSAVART
 	v += B->TRG[0];                                         //  Sum of x component for Biot-Savart
 #endif

@@ -18,12 +18,12 @@ int main(int argc, char ** argv) {
   Verify verify;
   jbodies[0].X = 2;
 #if EXAFMM_BIOTSAVART
-  jbodies[0].SRC[0] = drand48();
-  jbodies[0].SRC[1] = drand48();
-  jbodies[0].SRC[2] = drand48();
-  jbodies[0].SRC[3] = 0.1;
+  jbodies[0].Q[0] = drand48();
+  jbodies[0].Q[1] = drand48();
+  jbodies[0].Q[2] = drand48();
+  jbodies[0].Q[3] = 0.1;
 #else
-  jbodies[0].SRC = 1;
+  jbodies[0].Q = 1;
 #endif
   C_iter Cj = cells.begin();
   Cj->X = 1;
@@ -69,7 +69,7 @@ int main(int argc, char ** argv) {
 
   bodies[0].X = 2;
   bodies[0].X[0] = -2;
-  bodies[0].SRC = 1;
+  bodies[0].Q = 1;
   bodies[0].TRG = 0;
   Ci->BODY = bodies.begin();
   Ci->NBODY = bodies.size();
@@ -85,7 +85,7 @@ int main(int argc, char ** argv) {
   Ci->BODY = bodies2.begin();
   kernel.P2P(Ci, Cj);
   for (B_iter B=bodies2.begin(); B!=bodies2.end(); B++) {
-    B->TRG /= B->SRC;
+    B->TRG /= B->Q;
   }
 
   std::fstream file;

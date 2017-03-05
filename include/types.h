@@ -54,11 +54,11 @@ namespace EXAFMM_NAMESPACE {
   struct Source {                                               //!< Base components of source structure
     vec3      X;                                                //!< Position
 #if EXAFMM_LAPLACE
-    real_t    SRC;                                              //!< Scalar real values
+    real_t    Q;                                              //!< Scalar real values
 #elif EXAFMM_HELMHOLTZ
-    complex_t SRC;                                              //!< Scalar complex values
+    complex_t Q;                                              //!< Scalar complex values
 #elif EXAFMM_BIOTSAVART
-    vec4      SRC;                                              //!< Vector real values
+    vec4      Q;                                              //!< Vector real values
 #endif
   };
 

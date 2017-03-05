@@ -159,7 +159,7 @@ namespace EXAFMM_NAMESPACE {
           real_t R2 = norm(dX) + eps2;
           if (R2 != 0) {
             real_t invR2 = 1.0 / R2;
-            real_t invR = Bj[j].SRC * sqrt(invR2);
+            real_t invR = Bj[j].Q * sqrt(invR2);
             dX *= invR2 * invR;
             pot += invR;
             ax += dX[0];
@@ -185,7 +185,7 @@ namespace EXAFMM_NAMESPACE {
           for (int m=0; m<=n; m++) {
             int nm  = n * n + n + m;
             int nms = n * (n + 1) / 2 + m;
-            C->M[nms] += B->SRC * Ynm[nm];
+            C->M[nms] += B->Q * Ynm[nm];
           }
         }
       }
