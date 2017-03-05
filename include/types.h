@@ -6,6 +6,7 @@
 #include "namespace.h"
 #include <stdint.h>
 #include <vector>
+#include <map>
 #include "vec.h"
 
 namespace EXAFMM_NAMESPACE {
@@ -37,18 +38,6 @@ namespace EXAFMM_NAMESPACE {
 #endif
   typedef vec<4,kreal_t> kvec4;                                 //!< Vector of 4 real types with Kahan summaiton
   typedef vec<4,kcomplex_t> kcvec4;                             //!< Vector of 4 complex types with Kahan summaiton
-
-  //! Center and radius of bounding box
-  struct Box {
-    vec3   X;                                                   //!< Box center
-    real_t R;                                                   //!< Box radius
-  };
-
-  //! Min & max bounds of bounding box
-  struct Bounds {
-    vec3 Xmin;                                                  //!< Minimum value of coordinates
-    vec3 Xmax;                                                  //!< Maximum value of coordinates
-  };
 
   //! Structure of aligned source for SIMD
   struct Source {                                               //!< Base components of source structure
@@ -109,6 +98,10 @@ namespace EXAFMM_NAMESPACE {
     S_iter   S_BODY;                                              //!< Iterator of first body
     T_iter   T_BODY;                                              //!< Iterator of first body
   };
+  
+  typedef std::vector<complex_t> Coefs;
+  typedef std::map<uint64_t, Coefs> CoefMap;
+  
   //! Structure of cells
   struct Cell : public CellBase {
     std::vector<complex_t> M;                                   //!< Multipole expansion coefs

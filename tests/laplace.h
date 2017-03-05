@@ -175,7 +175,7 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void P2M(C_iter C) {
+    void P2M(C_iter C, Coefs & M) {
       complex_t Ynm[P*P], YnmTheta[P*P];
       // only sources involved, S_ prefix
       for (S_iter B=C->S_BODY; B!=C->S_BODY+C->S_NBODY; B++) {
@@ -187,13 +187,13 @@ namespace EXAFMM_NAMESPACE {
           for (int m=0; m<=n; m++) {
             int nm  = n * n + n + m;
             int nms = n * (n + 1) / 2 + m;
-            C->M[nms] += B->Q * Ynm[nm];
+            M[nms] += B->Q * Ynm[nm];
           }
         }
       }
     }
 
-    void M2M(C_iter Ci, C_iter C0) {
+    void M2M(C_iter Ci, C_iter C0, Coefs & Mi, Coefs & Mj) {
       complex_t Ynm[P*P], YnmTheta[P*P];
       for (C_iter Cj=C0+Ci->ICHILD; Cj!=C0+Ci->ICHILD+Ci->NCHILD; Cj++) {
         vec3 dX = Ci->X - Cj->X;
@@ -211,7 +211,7 @@ namespace EXAFMM_NAMESPACE {
                   int jnkm  = (j - n) * (j - n) + j - n + k - m;
                   int jnkms = (j - n) * (j - n + 1) / 2 + k - m;
                   int nm    = n * n + n + m;
-                  M += Cj->M[jnkms] * std::pow(I,real_t(m-abs(m))) * Ynm[nm]
+                  M += Mj[jnkms] * std::pow(I,real_t(m-abs(m))) * Ynm[nm]
                     * real_t(oddOrEven(n) * Anm[nm] * Anm[jnkm] / Anm[jk]);
                 }
               }
@@ -220,18 +220,18 @@ namespace EXAFMM_NAMESPACE {
                   int jnkm  = (j - n) * (j - n) + j - n + k - m;
                   int jnkms = (j - n) * (j - n + 1) / 2 - k + m;
                   int nm    = n * n + n + m;
-                  M += std::conj(Cj->M[jnkms]) * Ynm[nm]
+                  M += std::conj(Mj[jnkms]) * Ynm[nm]
                     * real_t(oddOrEven(k+n+m) * Anm[nm] * Anm[jnkm] / Anm[jk]);
                 }
               }
             }
-            Ci->M[jks] += M * EPS;
+            Mi[jks] += M * EPS;
           }
         }
       }
     }
 
-    void M2L(C_iter Ci, C_iter Cj) {
+    void M2L(C_iter Ci, C_iter Cj, Coefs & Mj, Coefs & Li) {
       complex_t Ynm2[4*P*P];
       vec3 dX = Ci->X - Cj->X - Xperiodic;
       real_t rho, alpha, beta;
@@ -248,22 +248,22 @@ namespace EXAFMM_NAMESPACE {
               int nms  = n * (n + 1) / 2 - m;
               int jknm = jk * P * P + nm;
               int jnkm = (j + n) * (j + n) + j + n + m - k;
-              L += std::conj(Cj->M[nms]) * Cnm[jknm] * Ynm2[jnkm];
+              L += std::conj(Mj[nms]) * Cnm[jknm] * Ynm2[jnkm];
             }
             for (int m=0; m<=n; m++) {
               int nm   = n * n + n + m;
               int nms  = n * (n + 1) / 2 + m;
               int jknm = jk * P * P + nm;
               int jnkm = (j + n) * (j + n) + j + n + m - k;
-              L += Cj->M[nms] * Cnm[jknm] * Ynm2[jnkm];
+              L += Mj[nms] * Cnm[jknm] * Ynm2[jnkm];
             }
           }
-          Ci->L[jks] += L;
+          Li[jks] += L;
         }
       }
     }
 
-    void L2L(C_iter Ci, C_iter C0) {
+    void L2L(C_iter Ci, C_iter C0, Coefs & Li, Coefs & Lj) {
       complex_t Ynm[P*P], YnmTheta[P*P];
       C_iter Cj = C0 + Ci->IPARENT;
       vec3 dX = Ci->X - Cj->X;
@@ -280,7 +280,7 @@ namespace EXAFMM_NAMESPACE {
               int jnkm = (n - j) * (n - j) + n - j + m - k;
               int nm   = n * n + n - m;
               int nms  = n * (n + 1) / 2 - m;
-              L += std::conj(Cj->L[nms]) * Ynm[jnkm]
+              L += std::conj(Lj[nms]) * Ynm[jnkm]
                 * real_t(oddOrEven(k) * Anm[jnkm] * Anm[jk] / Anm[nm]);
             }
             for (int m=0; m<=n; m++) {
@@ -288,17 +288,17 @@ namespace EXAFMM_NAMESPACE {
                 int jnkm = (n - j) * (n - j) + n - j + m - k;
                 int nm   = n * n + n + m;
                 int nms  = n * (n + 1) / 2 + m;
-                L += Cj->L[nms] * std::pow(I,real_t(m-k-abs(m-k)))
+                L += Lj[nms] * std::pow(I,real_t(m-k-abs(m-k)))
                   * Ynm[jnkm] * Anm[jnkm] * Anm[jk] / Anm[nm];
               }
             }
           }
-          Ci->L[jks] += L * EPS;
+          Li[jks] += L * EPS;
         }
       }
     }
 
-    void L2P(C_iter Ci) {
+    void L2P(C_iter Ci, Coefs & L) {
       complex_t Ynm[P*P], YnmTheta[P*P];
       for (T_iter B=Ci->T_BODY; B!=Ci->T_BODY+Ci->T_NBODY; B++) {
         vec3 dX = B->X - Ci->X + EPS;
@@ -310,16 +310,16 @@ namespace EXAFMM_NAMESPACE {
         for (int n=0; n<P; n++) {
           int nm  = n * n + n;
           int nms = n * (n + 1) / 2;
-          B->F[0] += std::real(Ci->L[nms] * Ynm[nm]);
-          spherical[0] += std::real(Ci->L[nms] * Ynm[nm]) / r * n;
-          spherical[1] += std::real(Ci->L[nms] * YnmTheta[nm]);
+          B->F[0] += std::real(L[nms] * Ynm[nm]);
+          spherical[0] += std::real(L[nms] * Ynm[nm]) / r * n;
+          spherical[1] += std::real(L[nms] * YnmTheta[nm]);
           for (int m=1; m<=n; m++) {
             nm  = n * n + n + m;
             nms = n * (n + 1) / 2 + m;
-            B->F[0] += 2 * std::real(Ci->L[nms] * Ynm[nm]);
-            spherical[0] += 2 * std::real(Ci->L[nms] * Ynm[nm]) / r * n;
-            spherical[1] += 2 * std::real(Ci->L[nms] * YnmTheta[nm]);
-            spherical[2] += 2 * std::real(Ci->L[nms] * Ynm[nm] * I) * m;
+            B->F[0] += 2 * std::real(L[nms] * Ynm[nm]);
+            spherical[0] += 2 * std::real(L[nms] * Ynm[nm]) / r * n;
+            spherical[1] += 2 * std::real(L[nms] * YnmTheta[nm]);
+            spherical[2] += 2 * std::real(L[nms] * Ynm[nm] * I) * m;
           }
         }
         sph2cart(r, theta, phi, spherical, cartesian);

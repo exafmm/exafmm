@@ -10,12 +10,11 @@ int main(int argc, char ** argv) {
   const real_t eps2 = 0.0;
   const complex_t wavek = complex_t(1.,.1) / real_t(2 * M_PI);
   Args args(argc, argv);
-  // rewrite Bodies as Sources and Targets
-  // Bodies bodies(1), bodies2(1), jbodies(1);
-  // jbodies: source
-  // bodies: target
+  
   Targets bodies(1), bodies2(1);
   Sources jbodies(1);
+  Coefs MJ, Mj, LI, Li;
+
   Kernel kernel(args.P, eps2, wavek);
   logger::verbose = true;
 
@@ -30,46 +29,49 @@ int main(int argc, char ** argv) {
 #else
   jbodies[0].Q = 1;
 #endif
+
+
+
   C_iter Cj = cells.begin();
   Cj->X = 1;
   Cj->X[0] = 3;
   Cj->R = 1;
   Cj->S_BODY = jbodies.begin();
   Cj->S_NBODY = jbodies.size();
-  Cj->M.resize(kernel.NTERM, 0.0);
-  kernel.P2M(Cj);
+  Mj.resize(kernel.NTERM, 0.0);
+  kernel.P2M(Cj, Mj);
 
-#if 1
+#if 0
   C_iter CJ = cells.begin()+1;
   CJ->ICHILD = Cj-cells.begin();
   CJ->NCHILD = 1;
   CJ->X = 0;
   CJ->X[0] = 4;
   CJ->R = 2;
-  CJ->M.resize(kernel.NTERM, 0.0);
-  kernel.M2M(CJ, cells.begin());
+  MJ.resize(kernel.NTERM, 0.0);
+  kernel.M2M(CJ, cells.begin(), MJ, Mj);
 
   C_iter CI = cells.begin()+2;
   CI->X = 0;
   CI->X[0] = -4;
   CI->R = 2;
-  CI->L.resize(kernel.NTERM, 0.0);
-  kernel.M2L(CI, CJ);
+  LI.resize(kernel.NTERM, 0.0);
+  kernel.M2L(CI, CJ, MJ, LI);
 
   C_iter Ci = cells.begin()+3;
   Ci->X = 1;
   Ci->X[0] = -3;
   Ci->R = 1;
   Ci->IPARENT = 2;
-  Ci->L.resize(kernel.NTERM, 0.0);
-  kernel.L2L(Ci, cells.begin());
+  Li.resize(kernel.NTERM, 0.0);
+  kernel.L2L(Ci, cells.begin(), Li, LI);
 #else
   C_iter Ci = cells.begin()+3;
   Ci->X = 1;
   Ci->X[0] = -3;
   Ci->R = 1;
-  Ci->L.resize(kernel.NTERM, 0.0);
-  kernel.M2L(Ci, Cj);
+  Li.resize(kernel.NTERM, 0.0);
+  kernel.M2L(Ci, Cj, Mj, Li);
 #endif
 
   bodies[0].X = 2;
@@ -78,7 +80,7 @@ int main(int argc, char ** argv) {
   bodies[0].F = 0;
   Ci->T_BODY = bodies.begin();
   Ci->T_NBODY = bodies.size();
-  kernel.L2P(Ci);
+  kernel.L2P(Ci, Li);
 
 
   for (T_iter B=bodies2.begin(); B!=bodies2.end(); B++) {
