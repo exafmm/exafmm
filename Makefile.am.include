@@ -1,5 +1,5 @@
 # Optimization flags
-AM_CPPFLAGS = -I../tests -I../utils -I../include
+AM_CPPFLAGS = -I../tests -I../utils -I../include -I../src/kernels
 if EXAFMM_HAVE_BG
 AM_CXXFLAGS = -qarch=qp -qtune=qp -O3 -qhot
 AM_FCFLAGS = -qarch=qp -qtune=qp -O3 -qhot

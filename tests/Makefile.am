@@ -24,7 +24,7 @@ run_vec: vec
 	./$<
 
 bin_PROGRAMS += laplace_kernel helmholtz_kernel biotsavart_kernel
-laplace_kernel_SOURCES = kernel.cxx
+laplace_kernel_SOURCES = kernel.cxx ../src/kernels/laplace.cxx
 laplace_kernel_CPPFLAGS = $(laplace_CPPFLAGS)
 helmholtz_kernel_SOURCES = kernel.cxx
 helmholtz_kernel_CPPFLAGS = $(helmholtz_CPPFLAGS)

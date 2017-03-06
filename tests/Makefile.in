@@ -190,7 +190,9 @@ helmholtz_mpi_LDADD = $(LDADD)
 am_laplace_OBJECTS = laplace-fmm.$(OBJEXT)
 laplace_OBJECTS = $(am_laplace_OBJECTS)
 laplace_LDADD = $(LDADD)
-am_laplace_kernel_OBJECTS = laplace_kernel-kernel.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_laplace_kernel_OBJECTS = laplace_kernel-kernel.$(OBJEXT) \
+	../src/kernels/laplace_kernel-laplace.$(OBJEXT)
 laplace_kernel_OBJECTS = $(am_laplace_kernel_OBJECTS)
 laplace_kernel_LDADD = $(LDADD)
 am__laplace_mpi_SOURCES_DIST = fmm_mpi.cxx
@@ -389,10 +391,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Optimization flags
-AM_CPPFLAGS = -I../tests -I../utils -I../include $(am__append_5) \
-	$(am__append_8) $(am__append_9) $(am__append_17) \
-	$(am__append_18) $(am__append_19) $(am__append_21) \
-	$(am__append_22) $(am__append_23) $(am__append_24)
+AM_CPPFLAGS = -I../tests -I../utils -I../include -I../src/kernels \
+	$(am__append_5) $(am__append_8) $(am__append_9) \
+	$(am__append_17) $(am__append_18) $(am__append_19) \
+	$(am__append_21) $(am__append_22) $(am__append_23) \
+	$(am__append_24)
 @EXAFMM_HAVE_BG_FALSE@@EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_FX_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@@EXAFMM_HAVE_SX_FALSE@AM_CXXFLAGS = $(am__append_6) \
 @EXAFMM_HAVE_BG_FALSE@@EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_FX_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@@EXAFMM_HAVE_SX_FALSE@	$(am__append_10) \
 @EXAFMM_HAVE_BG_FALSE@@EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_FX_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@@EXAFMM_HAVE_SX_FALSE@	$(am__append_11) \
@@ -528,7 +531,7 @@ tree_SOURCES = tree.cxx
 tree_CPPFLAGS = $(laplace_CPPFLAGS)
 vec_SOURCES = vec.cxx
 vec_CPPFLAGS = $(laplace_CPPFLAGS)
-laplace_kernel_SOURCES = kernel.cxx
+laplace_kernel_SOURCES = kernel.cxx ../src/kernels/laplace.cxx
 laplace_kernel_CPPFLAGS = $(laplace_CPPFLAGS)
 helmholtz_kernel_SOURCES = kernel.cxx
 helmholtz_kernel_CPPFLAGS = $(helmholtz_CPPFLAGS)
@@ -650,6 +653,15 @@ helmholtz_mpi$(EXEEXT): $(helmholtz_mpi_OBJECTS) $(helmholtz_mpi_DEPENDENCIES) $
 laplace$(EXEEXT): $(laplace_OBJECTS) $(laplace_DEPENDENCIES) $(EXTRA_laplace_DEPENDENCIES) 
 	@rm -f laplace$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(laplace_OBJECTS) $(laplace_LDADD) $(LIBS)
+../src/kernels/$(am__dirstamp):
+	@$(MKDIR_P) ../src/kernels
+	@: > ../src/kernels/$(am__dirstamp)
+../src/kernels/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../src/kernels/$(DEPDIR)
+	@: > ../src/kernels/$(DEPDIR)/$(am__dirstamp)
+../src/kernels/laplace_kernel-laplace.$(OBJEXT):  \
+	../src/kernels/$(am__dirstamp) \
+	../src/kernels/$(DEPDIR)/$(am__dirstamp)
 
 laplace_kernel$(EXEEXT): $(laplace_kernel_OBJECTS) $(laplace_kernel_DEPENDENCIES) $(EXTRA_laplace_kernel_DEPENDENCIES) 
 	@rm -f laplace_kernel$(EXEEXT)
@@ -669,10 +681,12 @@ vec$(EXEEXT): $(vec_OBJECTS) $(vec_DEPENDENCIES) $(EXTRA_vec_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../src/kernels/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart-fmm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart_kernel-kernel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart_mpi-fmm_mpi.Po@am__quote@
@@ -827,6 +841,20 @@ laplace_kernel-kernel.obj: kernel.cxx
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='laplace_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+
+../src/kernels/laplace_kernel-laplace.o: ../src/kernels/laplace.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/kernels/laplace_kernel-laplace.o -MD -MP -MF ../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Tpo -c -o ../src/kernels/laplace_kernel-laplace.o `test -f '../src/kernels/laplace.cxx' || echo '$(srcdir)/'`../src/kernels/laplace.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Tpo ../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/kernels/laplace.cxx' object='../src/kernels/laplace_kernel-laplace.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/kernels/laplace_kernel-laplace.o `test -f '../src/kernels/laplace.cxx' || echo '$(srcdir)/'`../src/kernels/laplace.cxx
+
+../src/kernels/laplace_kernel-laplace.obj: ../src/kernels/laplace.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/kernels/laplace_kernel-laplace.obj -MD -MP -MF ../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Tpo -c -o ../src/kernels/laplace_kernel-laplace.obj `if test -f '../src/kernels/laplace.cxx'; then $(CYGPATH_W) '../src/kernels/laplace.cxx'; else $(CYGPATH_W) '$(srcdir)/../src/kernels/laplace.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Tpo ../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/kernels/laplace.cxx' object='../src/kernels/laplace_kernel-laplace.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/kernels/laplace_kernel-laplace.obj `if test -f '../src/kernels/laplace.cxx'; then $(CYGPATH_W) '../src/kernels/laplace.cxx'; else $(CYGPATH_W) '$(srcdir)/../src/kernels/laplace.cxx'; fi`
 
 laplace_mpi-fmm_mpi.o: fmm_mpi.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_mpi-fmm_mpi.o -MD -MP -MF $(DEPDIR)/laplace_mpi-fmm_mpi.Tpo -c -o laplace_mpi-fmm_mpi.o `test -f 'fmm_mpi.cxx' || echo '$(srcdir)/'`fmm_mpi.cxx
@@ -985,6 +1013,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../src/kernels/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../src/kernels/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -994,7 +1024,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../src/kernels/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1040,7 +1070,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../src/kernels/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
