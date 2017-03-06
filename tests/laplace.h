@@ -144,12 +144,7 @@ namespace EXAFMM_NAMESPACE {
       }                                                         // End loop over in j in Cjknm
     }
 
-    void P2P(C_iter Ci, C_iter Cj) {
-      // i -> Target, j -> Source
-      T_iter Bi = Ci->T_BODY;
-      S_iter Bj = Cj->S_BODY;
-      int ni = Ci->T_NBODY;
-      int nj = Cj->S_NBODY;
+    void P2P(Target* Bi, int ni, Source* Bj, int nj) {
       for (int i=0; i<ni; i++) {
         kreal_t pot = 0;
         kreal_t ax = 0;
@@ -175,10 +170,10 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void P2M(C_iter C, vec3 & X , Coefs & M) {
+    void P2M(vec3 & X, Coefs & M, Source* B, int nj) {
       complex_t Ynm[P*P], YnmTheta[P*P];
-      for (S_iter B=C->S_BODY; B!=C->S_BODY+C->S_NBODY; B++) {
-        vec3 dX = B->X - X;
+      for (int j=0; j<nj; j++) {
+        vec3 dX = B[j].X - X;
         real_t rho, alpha, beta;
         cart2sph(dX, rho, alpha, beta);
         evalMultipole(rho, alpha, -beta, Ynm, YnmTheta);
@@ -186,51 +181,49 @@ namespace EXAFMM_NAMESPACE {
           for (int m=0; m<=n; m++) {
             int nm  = n * n + n + m;
             int nms = n * (n + 1) / 2 + m;
-            M[nms] += B->Q * Ynm[nm];
+            M[nms] += B[j].Q * Ynm[nm];
           }
         }
       }
     }
 
-    void M2M(C_iter Ci, vec3 & Xi, Coefs & Mi, C_iter C0, vec3 & Xj, Coefs & Mj) {
+    void M2M(vec3 & Xi, Coefs & Mi, vec3 & Xj, Coefs & Mj) {
       complex_t Ynm[P*P], YnmTheta[P*P];
-      for (C_iter Cj=C0+Ci->ICHILD; Cj!=C0+Ci->ICHILD+Ci->NCHILD; Cj++) {
-        vec3 dX = Xi - Xj;
-        real_t rho, alpha, beta;
-        cart2sph(dX, rho, alpha, beta);
-        evalMultipole(rho, alpha, -beta, Ynm, YnmTheta);
-        for (int j=0; j<P; j++) {
-          for (int k=0; k<=j; k++) {
-            int jk = j * j + j + k;
-            int jks = j * (j + 1) / 2 + k;
-            complex_t M = 0;
-            for (int n=0; n<=j; n++) {
-              for (int m=-n; m<=std::min(k-1,n); m++) {
-                if (j-n >= k-m) {
-                  int jnkm  = (j - n) * (j - n) + j - n + k - m;
-                  int jnkms = (j - n) * (j - n + 1) / 2 + k - m;
-                  int nm    = n * n + n + m;
-                  M += Mj[jnkms] * std::pow(I,real_t(m-abs(m))) * Ynm[nm]
-                    * real_t(oddOrEven(n) * Anm[nm] * Anm[jnkm] / Anm[jk]);
-                }
-              }
-              for (int m=k; m<=n; m++) {
-                if (j-n >= m-k) {
-                  int jnkm  = (j - n) * (j - n) + j - n + k - m;
-                  int jnkms = (j - n) * (j - n + 1) / 2 - k + m;
-                  int nm    = n * n + n + m;
-                  M += std::conj(Mj[jnkms]) * Ynm[nm]
-                    * real_t(oddOrEven(k+n+m) * Anm[nm] * Anm[jnkm] / Anm[jk]);
-                }
+      vec3 dX = Xi - Xj;
+      real_t rho, alpha, beta;
+      cart2sph(dX, rho, alpha, beta);
+      evalMultipole(rho, alpha, -beta, Ynm, YnmTheta);
+      for (int j=0; j<P; j++) {
+        for (int k=0; k<=j; k++) {
+          int jk = j * j + j + k;
+          int jks = j * (j + 1) / 2 + k;
+          complex_t M = 0;
+          for (int n=0; n<=j; n++) {
+            for (int m=-n; m<=std::min(k-1,n); m++) {
+              if (j-n >= k-m) {
+                int jnkm  = (j - n) * (j - n) + j - n + k - m;
+                int jnkms = (j - n) * (j - n + 1) / 2 + k - m;
+                int nm    = n * n + n + m;
+                M += Mj[jnkms] * std::pow(I,real_t(m-abs(m))) * Ynm[nm]
+                   * real_t(oddOrEven(n) * Anm[nm] * Anm[jnkm] / Anm[jk]);
               }
             }
-            Mi[jks] += M * EPS;
+            for (int m=k; m<=n; m++) {
+              if (j-n >= m-k) {
+                int jnkm  = (j - n) * (j - n) + j - n + k - m;
+                int jnkms = (j - n) * (j - n + 1) / 2 - k + m;
+                int nm    = n * n + n + m;
+                M += std::conj(Mj[jnkms]) * Ynm[nm]
+                   * real_t(oddOrEven(k+n+m) * Anm[nm] * Anm[jnkm] / Anm[jk]);
+              }
+            }
           }
+          Mi[jks] += M * EPS;
         }
       }
     }
 
-    void M2L(C_iter Ci, vec3 & Xi, Coefs & Li, C_iter Cj, vec3 & Xj, Coefs & Mj) {
+    void M2L(vec3 & Xi, Coefs & Li, vec3 & Xj, Coefs & Mj) {
       complex_t Ynm2[4*P*P];
       vec3 dX = Xi - Xj - Xperiodic;
       real_t rho, alpha, beta;
@@ -262,9 +255,8 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void L2L(C_iter Ci, vec3 & Xi, Coefs & Li, C_iter C0, vec3 & Xj, Coefs & Lj) {
+    void L2L(vec3 & Xi, Coefs & Li, vec3 & Xj, Coefs & Lj) {
       complex_t Ynm[P*P], YnmTheta[P*P];
-      C_iter Cj = C0 + Ci->IPARENT;
       vec3 dX = Xi - Xj;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
@@ -297,10 +289,10 @@ namespace EXAFMM_NAMESPACE {
       }
     }
 
-    void L2P(C_iter Ci, vec3 & X, Coefs & L) {
+    void L2P(Target* B, int ni, vec3 & X, Coefs & L) {
       complex_t Ynm[P*P], YnmTheta[P*P];
-      for (T_iter B=Ci->T_BODY; B!=Ci->T_BODY+Ci->T_NBODY; B++) {
-        vec3 dX = B->X - X + EPS;
+      for (int i=0; i<ni; i++) {
+        vec3 dX = B[i].X - X + EPS;
         vec3 spherical = 0;
         vec3 cartesian = 0;
         real_t r, theta, phi;
@@ -309,22 +301,22 @@ namespace EXAFMM_NAMESPACE {
         for (int n=0; n<P; n++) {
           int nm  = n * n + n;
           int nms = n * (n + 1) / 2;
-          B->F[0] += std::real(L[nms] * Ynm[nm]);
+          B[i].F[0] += std::real(L[nms] * Ynm[nm]);
           spherical[0] += std::real(L[nms] * Ynm[nm]) / r * n;
           spherical[1] += std::real(L[nms] * YnmTheta[nm]);
           for (int m=1; m<=n; m++) {
             nm  = n * n + n + m;
             nms = n * (n + 1) / 2 + m;
-            B->F[0] += 2 * std::real(L[nms] * Ynm[nm]);
+            B[i].F[0] += 2 * std::real(L[nms] * Ynm[nm]);
             spherical[0] += 2 * std::real(L[nms] * Ynm[nm]) / r * n;
             spherical[1] += 2 * std::real(L[nms] * YnmTheta[nm]);
             spherical[2] += 2 * std::real(L[nms] * Ynm[nm] * I) * m;
           }
         }
         sph2cart(r, theta, phi, spherical, cartesian);
-        B->F[1] += cartesian[0];
-        B->F[2] += cartesian[1];
-        B->F[3] += cartesian[2];
+        B[i].F[1] += cartesian[0];
+        B[i].F[2] += cartesian[1];
+        B[i].F[3] += cartesian[2];
       }
     }
   };

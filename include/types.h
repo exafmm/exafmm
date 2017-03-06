@@ -65,52 +65,11 @@ namespace EXAFMM_NAMESPACE {
 
   typedef std::vector<Source> Sources;                           //!< Vector of bodies
   typedef std::vector<Target> Targets;
+  
   typedef typename Sources::iterator S_iter;                     //!< Iterator of body vector
   typedef typename Targets::iterator T_iter;
-
-  /*
-#ifdef EXAFMM_PMAX
-  const int Pmax = EXAFMM_PMAX;                                 //!< Max order of expansions
-#else
-  const int Pmax = 10;                                          //!< Max order of expansions
-#endif
-  const int Pmin = 4;                                           //!< Min order of expansions
-  */
-
-  //! Base components of cells
-  struct CellBase {
-    int IPARENT;                                                //!< Index of parent cell
-    int ICHILD;                                                 //!< Index of first child cell
-    int NCHILD;                                                 //!< Number of child cells
-    
-    int S_IBODY;                                                  //!< Index of first body
-    int T_IBODY;                                                  //!< Index of first body
-    int S_NBODY;                                                  //!< Number of descendant bodies
-    int T_NBODY;                                                  //!< Number of descendant bodies
-#if EXAFMM_COUNT_LIST
-    int numP2P;                                                 //!< Size of P2P interaction list per cell
-    int numM2L;                                                 //!< Size of M2L interaction list per cell
-#endif
-    uint64_t ICELL;                                             //!< Cell index
-    real_t   WEIGHT;                                            //!< Weight for partitioning
-    vec3     X;                                                 //!< Cell center
-    real_t   R;                                                 //!< Cell radius
-    S_iter   S_BODY;                                              //!< Iterator of first body
-    T_iter   T_BODY;                                              //!< Iterator of first body
-  };
   
   typedef std::vector<complex_t> Coefs;
   typedef std::map<uint64_t, Coefs> CoefMap;
-  
-  //! Structure of cells
-  struct Cell : public CellBase {
-    std::vector<complex_t> M;                                   //!< Multipole expansion coefs
-    std::vector<complex_t> L;                                   //!< Local expansion coefs
-    using CellBase::operator=;
-  };
-  typedef std::vector<Cell> Cells;                              //!< Vector of cells
-  typedef std::vector<CellBase> CellBases;                      //!< Vector of cell bases
-  typedef typename Cells::iterator C_iter;                      //!< Iterator of cell vector
-  typedef typename CellBases::iterator CB_iter;                 //!< Iterator of cell vector
-}
+ }
 #endif
