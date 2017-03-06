@@ -1,0 +1,3 @@
+- remove the usage of "bodies" in verify.h
+- add the loop over child cells in M2M back
+- fix inter-character space (before and after *, &)
