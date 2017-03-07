@@ -1,9 +1,10 @@
-#include "args.h"
 #include <fstream>
+#include <vector>
+#include "args.h"
 #include "kernel.h"
 #include "namespace.h"
-#include <vector>
 #include "verify.h"
+
 using namespace EXAFMM_NAMESPACE;
 
 int main(int argc, char ** argv) {

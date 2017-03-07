@@ -1,3 +1,4 @@
+#include <cmath>
 #include "laplace.h"
 
 namespace EXAFMM_NAMESPACE {
