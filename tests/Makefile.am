@@ -1,4 +1,4 @@
-include ../Makefile.am.include
+include $(top_srcdir)/Makefile.am.include
 
 bin_PROGRAMS = laplace helmholtz biotsavart tree vec
 laplace_SOURCES = fmm.cxx

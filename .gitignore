@@ -15,4 +15,5 @@ config.h.in~
 config.log
 config.status
 Makefile
+Makefile.in
 stamp-h1
