@@ -11,8 +11,8 @@ int main(int argc, char ** argv) {
   const complex_t wavek = complex_t(1.,.1) / real_t(2 * M_PI);
   Args args(argc, argv);
   
-  Targets bodies(1), bodies2(1);
-  Sources jbodies(1);
+  Targets targets(1), targets2(1);
+  Sources sources(1);
  
   vec3 XJ, Xj, XI, Xi;
   Coefs MJ, Mj, LI, Li;
@@ -21,19 +21,19 @@ int main(int argc, char ** argv) {
   logger::verbose = true;
 
   Verify verify;
-  jbodies[0].X = 2;
+  sources[0].X = 2;
 #if EXAFMM_BIOTSAVART
-  jbodies[0].Q[0] = drand48();
-  jbodies[0].Q[1] = drand48();
-  jbodies[0].Q[2] = drand48();
-  jbodies[0].Q[3] = 0.1;
+  sources[0].Q[0] = drand48();
+  sources[0].Q[1] = drand48();
+  sources[0].Q[2] = drand48();
+  sources[0].Q[3] = 0.1;
 #else
-  jbodies[0].Q = 1;
+  sources[0].Q = 1;
 #endif
 
   Xj = 1;
   Xj[0] = 3;
-  Source* Bj = &jbodies[0];
+  Source* Bj = &sources[0];
   int nj = 1;
   Mj.resize(kernel.NTERM, 0.0);
   kernel.P2M(Xj, Mj, Bj, nj);
@@ -60,25 +60,25 @@ int main(int argc, char ** argv) {
   kernel.M2L(Xi, Li, Xj, Mj);
 #endif
 
-  bodies[0].X = 2;
-  bodies[0].X[0] = -2;
-  bodies[0].F = 0;
+  targets[0].X = 2;
+  targets[0].X[0] = -2;
+  targets[0].F = 0;
  
-  bodies2 = bodies;
+  targets2 = targets;
 
-  Target* Bi = &bodies[0];
+  Target* Bi = &targets[0];
   int ni = 1;
   kernel.L2P(Bi, ni, Xi, Li);
 
-  Bi = &bodies2[0];
+  Bi = &targets2[0];
   kernel.P2P(Bi, ni, Bj, nj);
 
   std::fstream file;
   file.open("kernel.dat", std::ios::out | std::ios::app);
-  double potDif = verify.getDifScalar(bodies, bodies2);
-  double potNrm = verify.getNrmScalar(bodies);
-  double accDif = verify.getDifVector(bodies, bodies2);
-  double accNrm = verify.getNrmVector(bodies);
+  double potDif = verify.getDifScalar(targets, targets2);
+  double potNrm = verify.getNrmScalar(targets);
+  double accDif = verify.getDifVector(targets, targets2);
+  double accNrm = verify.getNrmVector(targets);
   std::cout << args.P << " " << std::sqrt(potDif/potNrm) << "  " << std::sqrt(accDif/accNrm) << std::endl;
   double potRel = std::sqrt(potDif/potNrm);
   double accRel = std::sqrt(accDif/accNrm);
