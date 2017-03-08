@@ -97,7 +97,7 @@ namespace EXAFMM_NAMESPACE {
     for (int n=0; n<2*P; n++) {                               // Loop over n in Anm
       for (int m=-n; m<=n; m++) {                             //  Loop over m in Anm
         int nm = n*n+n+m;                                     //   Index of Anm
-        int nabsm = abs(m);                                   //   |m|
+        int nabsm = std::abs(m);                                   //   |m|
         real_t fnmm = EPS;                                    //   Initialize (n - m)!
         for (int i=1; i<=n-m; i++) fnmm *= i;                 //   (n - m)!
         real_t fnpm = EPS;                                    //   Initialize (n + m)!
@@ -115,7 +115,7 @@ namespace EXAFMM_NAMESPACE {
         for (int n=0, nm=0; n<P; n++) {                       //   Loop over n in Cjknm
           for (int m=-n; m<=n; m++, nm++, jknm++) {           //    Loop over m in Cjknm
             const int jnkm = (j+n)*(j+n)+j+n+m-k;             //     Index C_{j+n}^{m-k}
-            Cnm[jknm] = std::pow(I,real_t(abs(k-m)-abs(k)-abs(m)))//     Cjknm
+            Cnm[jknm] = std::pow(I,real_t(std::abs(k-m)-std::abs(k)-std::abs(m)))//     Cjknm
               * real_t(oddOrEven(j)*Anm[nm]*Anm[jk]/Anm[jnkm]) * EPS;
           }                                                   //    End loop over m in Cjknm
         }                                                     //   End loop over n in Cjknm
@@ -183,7 +183,7 @@ namespace EXAFMM_NAMESPACE {
               int jnkm  = (j - n) * (j - n) + j - n + k - m;
               int jnkms = (j - n) * (j - n + 1) / 2 + k - m;
               int nm    = n * n + n + m;
-              M += Mj[jnkms] * std::pow(I,real_t(m-abs(m))) * Ynm[nm]
+              M += Mj[jnkms] * std::pow(I,real_t(m-std::abs(m))) * Ynm[nm]
                  * real_t(oddOrEven(n) * Anm[nm] * Anm[jnkm] / Anm[jk]);
             }
           }
@@ -254,11 +254,11 @@ namespace EXAFMM_NAMESPACE {
               * real_t(oddOrEven(k) * Anm[jnkm] * Anm[jk] / Anm[nm]);
           }
           for (int m=0; m<=n; m++) {
-            if (n-j >= abs(m-k)) {
+            if (n-j >= std::abs(m-k)) {
               int jnkm = (n - j) * (n - j) + n - j + m - k;
               int nm   = n * n + n + m;
               int nms  = n * (n + 1) / 2 + m;
-              L += Lj[nms] * std::pow(I,real_t(m-k-abs(m-k)))
+              L += Lj[nms] * std::pow(I,real_t(m-k-std::abs(m-k)))
                 * Ynm[jnkm] * Anm[jnkm] * Anm[jk] / Anm[nm];
             }
           }
