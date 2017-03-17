@@ -582,7 +582,7 @@ PACKAGE_STRING='exaFMM 2.0'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_unique_file="tests/kernel.cxx"
+ac_unique_file="tests/"
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
