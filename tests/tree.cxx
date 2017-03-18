@@ -59,8 +59,8 @@ void permutate(T & vec, std::vector<int> permutation) {
 
 
 int main(int argc, char ** argv) {
-  const int N = 100;
-  int level = 3;
+  const int N = 500;
+  int level = 5;
   int nx = 1 << level;          // number of leafs in each dimension
   int nleaf = nx * nx * nx;     // number of leafs if full
   int i, l, d;                  // iterator in loops
@@ -79,7 +79,7 @@ int main(int argc, char ** argv) {
       iX2[d] = (int) (sources[i].X[d] * nx);
     }
     targets[i].F = 0;
-    sources[i].Q = 1/N;
+    sources[i].Q = 1.0/N;
     targetKeys[i] = getKey(iX, level);
     sourceKeys[i] = getKey(iX2, level);
   }
@@ -177,5 +177,27 @@ int main(int argc, char ** argv) {
                                       << sourceLevelOffset[l] << std::endl;
 #endif
 
-}
+  // P2M
+  int j, count=0;
+  std::vector<double> M(sourceNonEmpty[level]+sourceLevelOffset[level], 0.0);
+  for (i=0; i<sourceNonEmpty[level]; i++) {                // i: nonempty source cell index
+    for (j=sourceOffset[i]; j<sourceOffset[i+1]; j++) {    // j: source index
+      M[i+sourceLevelOffset[level]] += sources[j].Q;
+      count++;
+    }
+  }
 
+  // M2M
+  for (l=level; l>0; l--) {                 // l: current level
+    for (i=0; i<sourceNonEmpty[l]; i++) {   // i: nonempty source cell index in level l
+      key = sourceIndex2Key[l][i];          // key: i's Morton key
+      M[sourceKey2Index[l-1][key/8]+sourceLevelOffset[l-1]] += M[i+sourceLevelOffset[l]];
+    }
+  }
+  
+  // check monopole of root
+#ifdef CHECK_MONOPOLE
+  std::cout << "monopole of root: " << M[0] << std::endl;
+  return 0;
+#endif
+}
