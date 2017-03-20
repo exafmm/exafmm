@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <fstream>
 #include <vector>
@@ -6,6 +7,8 @@
 #include "kernel.h"
 #include "namespace.h"
 #include "verify.h"
+
+#define CHECK_MONOPOLE
 
 using namespace EXAFMM_NAMESPACE;
 
@@ -57,9 +60,16 @@ void permutate(T & vec, std::vector<int> permutation) {
   for (int i=0; i<vec.size(); i++) vec[i] = vec2[i];
 }
 
+// given two iX, return if they are neighbors
+inline bool isNeighbor(ivec3 iX, ivec3 jX) {
+  return (std::abs(iX[0]-jX[0]) <= 1) && 
+         (std::abs(iX[1]-jX[1]) <= 1) && 
+         (std::abs(iX[2]-jX[2]) <= 1); 
+}
+
 
 int main(int argc, char ** argv) {
-  const int N = 500;
+  const int N = 5000;
   int level = 5;
   int nx = 1 << level;          // number of leafs in each dimension
   int nleaf = nx * nx * nx;     // number of leafs if full
@@ -68,7 +78,7 @@ int main(int argc, char ** argv) {
   Targets targets(N);
   Sources sources(N);
   std::vector<int> targetKeys(N), sourceKeys(N);
-  ivec3 iX, iX2;
+  ivec3 iX, jX;
 
   // generate rand X and key for targets and sources
   for (i=0; i<N; i++) {
@@ -76,12 +86,12 @@ int main(int argc, char ** argv) {
       targets[i].X[d] = drand48();
       sources[i].X[d] = drand48();
       iX[d] = (int) (targets[i].X[d] * nx);
-      iX2[d] = (int) (sources[i].X[d] * nx);
+      jX[d] = (int) (sources[i].X[d] * nx);
     }
     targets[i].F = 0;
     sources[i].Q = 1.0/N;
     targetKeys[i] = getKey(iX, level);
-    sourceKeys[i] = getKey(iX2, level);
+    sourceKeys[i] = getKey(jX, level);
   }
 
   // sort targets and sources based on Morton keys
@@ -176,14 +186,15 @@ int main(int argc, char ** argv) {
   for (l=0; l<level+1; l++) std::cout << sourceNonEmpty[l] << " " 
                                       << sourceLevelOffset[l] << std::endl;
 #endif
+  
+  std::vector<real_t> M(sourceNonEmpty[level]+sourceLevelOffset[level], 0.0);
+  std::vector<real_t> L(targetNonEmpty[level]+targetLevelOffset[level], 0.0);
 
   // P2M
-  int j, count=0;
-  std::vector<double> M(sourceNonEmpty[level]+sourceLevelOffset[level], 0.0);
-  for (i=0; i<sourceNonEmpty[level]; i++) {                // i: nonempty source cell index
-    for (j=sourceOffset[i]; j<sourceOffset[i+1]; j++) {    // j: source index
+  int j;
+   for (i=0; i<sourceNonEmpty[level]; i++) {              // i: nonempty source cell index
+    for (j=sourceOffset[i]; j<sourceOffset[i+1]; j++) {   // j: source index
       M[i+sourceLevelOffset[level]] += sources[j].Q;
-      count++;
     }
   }
 
@@ -200,4 +211,69 @@ int main(int argc, char ** argv) {
   std::cout << "monopole of root: " << M[0] << std::endl;
   return 0;
 #endif
+
+  // M2L
+  int count=0;
+  for (l=2; l<=level; l++) {                // l: current level
+    nx = 1 << l;                            // nx: number of cells in one-axis in level l
+    for (i=0; i<targetNonEmpty[l]; i++) {   // i: nonempty target cell index in level l
+      getIX(iX, targetIndex2Key[l][i]);     // i -> key -> iX
+      for (j=0; j<sourceNonEmpty[l]; j++) { // j: nonempty source cell index in level l
+        getIX(jX, sourceIndex2Key[l][j]);   // j -> key -> jX
+        if (isNeighbor(iX/2, jX/2)) {       // if i,j's parents are neighbor
+          if (!isNeighbor(iX, jX)) {        // and i,j are non-neighbor
+            count++;
+            real_t dx = (real_t) (iX[0] - jX[0]) / nx;
+            real_t dy = (real_t) (iX[1] - jX[1]) / nx;
+            real_t dz = (real_t) (iX[2] - jX[2]) / nx;
+            real_t r = std::sqrt(dx*dx + dy*dy + dz*dz);
+            L[i+targetLevelOffset[l]] += M[j+sourceLevelOffset[l]] / r;
+          }         
+        }
+      }
+    }
+  }
+
+  // L2L
+  for (l=3; l<=level; l++) {                // l: current level
+    for (i=0; i<targetNonEmpty[l]; i++) {   // i: nonempty target cell index in level l
+      key = targetIndex2Key[l][i];          // key: i's Morton key 
+      L[i+targetLevelOffset[l]] += L[targetKey2Index[l-1][key/8]+targetLevelOffset[l-1]];
+    }
+  }
+
+  // L2P
+  for (i=0; i<targetNonEmpty[level]; i++) {
+    for (j=targetOffset[i]; j<targetOffset[i+1]; j++) {
+      targets[j].F += L[i+targetLevelOffset[level]];
+    }
+  }
+
+  // P2P
+  for (int ic=0; ic<targetNonEmpty[level]; ic++) {
+    getIX(iX, targetIndex2Key[level][ic]);
+    for (int jc=0; jc<sourceNonEmpty[level]; jc++) {
+      getIX(jX, sourceIndex2Key[level][jc]);
+      if (isNeighbor(iX, jX)) {
+        for (i=targetOffset[ic]; i<targetOffset[ic+1]; i++) {
+          for (j=sourceOffset[jc]; j<sourceOffset[jc+1]; j++) {
+          vec3 dX = targets[i].X - sources[j].X;
+          real_t r = std::sqrt(norm(dX));
+          if (r!=0) targets[i].F += sources[j].Q / r;
+          }
+        }
+      }
+    }
+  }
+  
+  // check answer
+  for (i=0; i<N; i++) {
+    real_t Fi = 0;
+    for (j=0; j<N; j++) {
+      vec3 dX = targets[i].X - sources[j].X;
+      real_t r = std::sqrt(norm(dX));
+      if (r!=0) Fi += sources[j].Q / r;
+    }
+    std::cout << i << " " << targets[i].F << " " << Fi << std::endl;
+  }
 }
