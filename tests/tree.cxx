@@ -3,10 +3,8 @@
 #include <fstream>
 #include <vector>
 #include "args.h"
-#include "kernel.h"
 #include "namespace.h"
 #include "tree.h"
-#include "verify.h"
 
 #define CHECK_MONOPOLE
 
