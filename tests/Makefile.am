@@ -1,7 +1,7 @@
 include $(top_srcdir)/Makefile.am.include
 
 bin_PROGRAMS = laplace helmholtz biotsavart tree vec
-laplace_SOURCES = fmm.cxx
+laplace_SOURCES = fmm.cxx ../src/kernels/laplace.cxx ../src/tree.cxx
 laplace_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_LAPLACE -DEXAFMM_PMAX=10
 helmholtz_SOURCES = fmm.cxx
 helmholtz_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_HELMHOLTZ -DEXAFMM_PMAX=20

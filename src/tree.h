@@ -7,6 +7,7 @@
 namespace EXAFMM_NAMESPACE {
   uint64_t getKey(ivec3 iX, int level);
   void getIX(ivec3 & iX, uint64_t key);
+  void getX(vec3 & X, uint64_t key, int level);
   void sortKey(std::vector<int> keys, std::vector<int> & permutation);
   
   template<typename T>
