@@ -200,7 +200,7 @@ am__laplace_mpi_SOURCES_DIST = fmm_mpi.cxx
 @EXAFMM_HAVE_MPI_TRUE@	laplace_mpi-fmm_mpi.$(OBJEXT)
 laplace_mpi_OBJECTS = $(am_laplace_mpi_OBJECTS)
 laplace_mpi_LDADD = $(LDADD)
-am_tree_OBJECTS = tree-tree.$(OBJEXT)
+am_tree_OBJECTS = tree-tree.$(OBJEXT) ../src/tree-tree.$(OBJEXT)
 tree_OBJECTS = $(am_tree_OBJECTS)
 tree_LDADD = $(LDADD)
 am_vec_OBJECTS = vec-vec.$(OBJEXT)
@@ -393,11 +393,11 @@ top_srcdir = @top_srcdir@
 
 # Optimization flags
 AM_CPPFLAGS = -I$(top_srcdir)/tests -I$(top_srcdir)/utils \
-	-I$(top_srcdir)/include -I$(top_srcdir)/src/kernels \
-	$(am__append_5) $(am__append_8) $(am__append_9) \
-	$(am__append_17) $(am__append_18) $(am__append_19) \
-	$(am__append_21) $(am__append_22) $(am__append_23) \
-	$(am__append_24)
+	-I$(top_srcdir)/include -I$(top_srcdir)/src \
+	-I$(top_srcdir)/src/kernels $(am__append_5) $(am__append_8) \
+	$(am__append_9) $(am__append_17) $(am__append_18) \
+	$(am__append_19) $(am__append_21) $(am__append_22) \
+	$(am__append_23) $(am__append_24)
 @EXAFMM_HAVE_BG_FALSE@@EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_FX_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@@EXAFMM_HAVE_SX_FALSE@AM_CXXFLAGS = $(am__append_6) \
 @EXAFMM_HAVE_BG_FALSE@@EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_FX_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@@EXAFMM_HAVE_SX_FALSE@	$(am__append_10) \
 @EXAFMM_HAVE_BG_FALSE@@EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_FX_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@@EXAFMM_HAVE_SX_FALSE@	$(am__append_11) \
@@ -529,7 +529,7 @@ helmholtz_SOURCES = fmm.cxx
 helmholtz_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_HELMHOLTZ -DEXAFMM_PMAX=20
 biotsavart_SOURCES = fmm.cxx
 biotsavart_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_BIOTSAVART -DEXAFMM_PMAX=10
-tree_SOURCES = tree.cxx
+tree_SOURCES = tree.cxx ../src/tree.cxx
 tree_CPPFLAGS = $(laplace_CPPFLAGS)
 vec_SOURCES = vec.cxx
 vec_CPPFLAGS = $(laplace_CPPFLAGS)
@@ -672,6 +672,14 @@ laplace_kernel$(EXEEXT): $(laplace_kernel_OBJECTS) $(laplace_kernel_DEPENDENCIES
 laplace_mpi$(EXEEXT): $(laplace_mpi_OBJECTS) $(laplace_mpi_DEPENDENCIES) $(EXTRA_laplace_mpi_DEPENDENCIES) 
 	@rm -f laplace_mpi$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(laplace_mpi_OBJECTS) $(laplace_mpi_LDADD) $(LIBS)
+../src/$(am__dirstamp):
+	@$(MKDIR_P) ../src
+	@: > ../src/$(am__dirstamp)
+../src/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../src/$(DEPDIR)
+	@: > ../src/$(DEPDIR)/$(am__dirstamp)
+../src/tree-tree.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 
 tree$(EXEEXT): $(tree_OBJECTS) $(tree_DEPENDENCIES) $(EXTRA_tree_DEPENDENCIES) 
 	@rm -f tree$(EXEEXT)
@@ -683,11 +691,13 @@ vec$(EXEEXT): $(vec_OBJECTS) $(vec_DEPENDENCIES) $(EXTRA_vec_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../src/*.$(OBJEXT)
 	-rm -f ../src/kernels/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/tree-tree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/kernels/$(DEPDIR)/laplace_kernel-laplace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart-fmm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart_kernel-kernel.Po@am__quote@
@@ -886,6 +896,20 @@ tree-tree.obj: tree.cxx
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tree-tree.obj `if test -f 'tree.cxx'; then $(CYGPATH_W) 'tree.cxx'; else $(CYGPATH_W) '$(srcdir)/tree.cxx'; fi`
 
+../src/tree-tree.o: ../src/tree.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/tree-tree.o -MD -MP -MF ../src/$(DEPDIR)/tree-tree.Tpo -c -o ../src/tree-tree.o `test -f '../src/tree.cxx' || echo '$(srcdir)/'`../src/tree.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/tree-tree.Tpo ../src/$(DEPDIR)/tree-tree.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/tree.cxx' object='../src/tree-tree.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/tree-tree.o `test -f '../src/tree.cxx' || echo '$(srcdir)/'`../src/tree.cxx
+
+../src/tree-tree.obj: ../src/tree.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/tree-tree.obj -MD -MP -MF ../src/$(DEPDIR)/tree-tree.Tpo -c -o ../src/tree-tree.obj `if test -f '../src/tree.cxx'; then $(CYGPATH_W) '../src/tree.cxx'; else $(CYGPATH_W) '$(srcdir)/../src/tree.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/tree-tree.Tpo ../src/$(DEPDIR)/tree-tree.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/tree.cxx' object='../src/tree-tree.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/tree-tree.obj `if test -f '../src/tree.cxx'; then $(CYGPATH_W) '../src/tree.cxx'; else $(CYGPATH_W) '$(srcdir)/../src/tree.cxx'; fi`
+
 vec-vec.o: vec.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(vec_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT vec-vec.o -MD -MP -MF $(DEPDIR)/vec-vec.Tpo -c -o vec-vec.o `test -f 'vec.cxx' || echo '$(srcdir)/'`vec.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/vec-vec.Tpo $(DEPDIR)/vec-vec.Po
@@ -1015,6 +1039,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../src/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../src/$(am__dirstamp)
 	-rm -f ../src/kernels/$(DEPDIR)/$(am__dirstamp)
 	-rm -f ../src/kernels/$(am__dirstamp)
 
@@ -1026,7 +1052,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../src/kernels/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../src/$(DEPDIR) ../src/kernels/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1072,7 +1098,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../src/kernels/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ../src/$(DEPDIR) ../src/kernels/$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

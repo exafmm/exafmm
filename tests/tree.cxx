@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
@@ -6,71 +5,16 @@
 #include "args.h"
 #include "kernel.h"
 #include "namespace.h"
+#include "tree.h"
 #include "verify.h"
 
 #define CHECK_MONOPOLE
 
 using namespace EXAFMM_NAMESPACE;
 
-// interleave iX into Morton key
-uint64_t getKey(ivec3 iX, int level) {
-  // uint64_t index = ((1 << 3 * level) - 1) / 7;          // Level offset
-  uint64_t key = 0;
-  for (int l=0; l<level; l++) {
-    for (int d=0; d<3; d++) { 
-      key += (iX[d] & 1) << (3 * l + d);
-      iX[d] >>= 1;
-    }
-  } 
-  return key;
-}
-
-// deinterleave Morton key into iX
-void getIX(ivec3 & iX, uint64_t key) {
-  iX = 0;
-  int l = 0;
-  while (key > 0) {
-    for (int d=0; d<3; d++) {
-      iX[d] += (key & 1) << l;
-      key >>= 1;
-    }
-    l++;
-  }
-}
-
-// bucket sort, return permutation indices
-void sortKey(std::vector<int> keys, std::vector<int> & permutation) {
-  int iMax = * std::max_element(keys.begin(), keys.end());
-  std::vector<int> buckets(iMax+1, 0);
-  int i, inew;
-  for (i=0; i<keys.size(); i++) buckets[keys[i]]++;
-  for (i=1; i<buckets.size(); i++) buckets[i] += buckets[i-1];
-  for (i=keys.size()-1; i>=0; i--) {
-    buckets[keys[i]]--;
-    inew = buckets[keys[i]];
-    permutation[i] = inew;
-  }
-}
-
-// permutate a vector according to its permutation
-template<typename T>
-void permutate(T & vec, std::vector<int> permutation) {
-  T vec2(vec.size());
-  for (int i=0; i<vec.size(); i++) vec2[permutation[i]] = vec[i];
-  for (int i=0; i<vec.size(); i++) vec[i] = vec2[i];
-}
-
-// given two iX, return if they are neighbors
-inline bool isNeighbor(ivec3 iX, ivec3 jX) {
-  return (std::abs(iX[0]-jX[0]) <= 1) && 
-         (std::abs(iX[1]-jX[1]) <= 1) && 
-         (std::abs(iX[2]-jX[2]) <= 1); 
-}
-
-
 int main(int argc, char ** argv) {
-  const int N = 5000;
-  int level = 5;
+  const int N = 10000;
+  int level = 4;
   int nx = 1 << level;          // number of leafs in each dimension
   int nleaf = nx * nx * nx;     // number of leafs if full
   int i, l, d;                  // iterator in loops
@@ -265,7 +209,8 @@ int main(int argc, char ** argv) {
       }
     }
   }
-  
+
+#ifdef PRINT_RESULT
   // check answer
   for (i=0; i<N; i++) {
     real_t Fi = 0;
@@ -276,4 +221,5 @@ int main(int argc, char ** argv) {
     }
     std::cout << i << " " << targets[i].F << " " << Fi << std::endl;
   }
+#endif
 }

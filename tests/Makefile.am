@@ -7,7 +7,7 @@ helmholtz_SOURCES = fmm.cxx
 helmholtz_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_HELMHOLTZ -DEXAFMM_PMAX=20
 biotsavart_SOURCES = fmm.cxx
 biotsavart_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_BIOTSAVART -DEXAFMM_PMAX=10
-tree_SOURCES = tree.cxx
+tree_SOURCES = tree.cxx ../src/tree.cxx
 tree_CPPFLAGS = $(laplace_CPPFLAGS)
 vec_SOURCES = vec.cxx
 vec_CPPFLAGS = $(laplace_CPPFLAGS)
