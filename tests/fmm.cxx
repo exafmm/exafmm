@@ -20,13 +20,13 @@ int main(int argc, char ** argv) {
   logger::verbose = true;
   Verify verify;
 
-  const int N = 50000;
-  int level = 5;
+  const int N = 1000;
+  int level = 3;
   int nx = 1 << level;          // number of leafs in each dimension
   int nleaf = nx * nx * nx;     // number of leafs if full
   int i, l, d;                  // iterator in loops
 
-  Targets targets(N);
+  Targets targets(N), targets2(N);
   Sources sources(N);
   std::vector<int> targetKeys(N), sourceKeys(N);
   ivec3 iX, jX;
@@ -56,6 +56,8 @@ int main(int argc, char ** argv) {
   permutate< std::vector<int> >(targetKeys, targetPermutation);
   permutate< std::vector<int> >(sourceKeys, sourcePermutation);
   
+  targets2 = targets;
+
 #if 0
   for (i=0; i<N; i++) {
     std::cout << i << " " << targetKeys[i] << " " << targets[i].X << std::endl;
@@ -70,10 +72,6 @@ int main(int argc, char ** argv) {
                                                    std::vector<int>(nleaf, 0) );
   std::vector< std::vector<int> > sourceIndex2Key( level+1,
                                                    std::vector<int>(nleaf, 0) );
-  std::vector< std::vector<int> > targetKey2Index( level+1,    // key2Index[level][key] -> index at non-empty cells' list
-                                                   std::vector<int>(nleaf, 0) );
-  std::vector< std::vector<int> > sourceKey2Index( level+1,
-                                                   std::vector<int>(nleaf, 0) );
   
   // key level offset (for global key)
   std::vector<int> keyLevelOffset(level+1, 0);
@@ -83,12 +81,11 @@ int main(int argc, char ** argv) {
   CoefMap M, L;
   
   // leaf level
-  int key = -1;
+  uint64_t key = -1;
   for (i=0; i<N; i++) {              // i: current particle index
     if (key != targetKeys[i]) {      // if previous key != current key (found a new nonempty cell)
       key = targetKeys[i];           // store the current key
       targetIndex2Key[level][targetNonEmpty[level]] = key;   // map nonempty counter -> new key
-      targetKey2Index[level][key] = targetNonEmpty[level];   // map new key -> nonempty counter
       targetOffset[targetNonEmpty[level]] = i;               // record the first target index of this new cell
       targetNonEmpty[level]++;       // increase the counter of nonempty cells at leaf level
       L[key+keyLevelOffset[level]].resize(kernel.NTERM, 0.0);
@@ -101,7 +98,6 @@ int main(int argc, char ** argv) {
     if (key != sourceKeys[i]) {      // if previous key != current key (found a new nonempty cell)
       key = sourceKeys[i];           // store the current key
       sourceIndex2Key[level][sourceNonEmpty[level]] = key;   // map nonempty counter -> new key
-      sourceKey2Index[level][key] = sourceNonEmpty[level];   // map new key -> nonempty counter
       sourceOffset[sourceNonEmpty[level]] = i;               // record the first target index of this new cell
       sourceNonEmpty[level]++;       // increase the counter of nonempty cells at leaf level
       M[key+keyLevelOffset[level]].resize(kernel.NTERM, 0.0);
@@ -116,7 +112,6 @@ int main(int argc, char ** argv) {
       if (key != targetIndex2Key[l][i]/8) {                // if previous key != i's parent key 
         key = targetIndex2Key[l][i]/8;                     // store i's parent key
         targetIndex2Key[l-1][targetNonEmpty[l-1]] = key;   // map nonempty counter -> new parent key 
-        targetKey2Index[l-1][key] = targetNonEmpty[l-1];   // map new parent key -> nonempty counter
         targetNonEmpty[l-1]++;                             // 
         L[key+keyLevelOffset[l-1]].resize(kernel.NTERM, 0.0);
       }
@@ -128,7 +123,6 @@ int main(int argc, char ** argv) {
       if (key != sourceIndex2Key[l][i]/8) {                // if previous key != i's parent key 
         key = sourceIndex2Key[l][i]/8;                     // store i's parent key
         sourceIndex2Key[l-1][sourceNonEmpty[l-1]] = key;   // map nonempty counter -> new parent key 
-        sourceKey2Index[l-1][key] = sourceNonEmpty[l-1];   // map new parent key -> nonempty counter
         sourceNonEmpty[l-1]++;                             // 
         M[key+keyLevelOffset[l-1]].resize(kernel.NTERM, 0.0);
       }
@@ -142,23 +136,17 @@ int main(int argc, char ** argv) {
     sourceLevelOffset[l+1] = sourceLevelOffset[l] + sourceNonEmpty[l];
   }
 
-#ifdef CHECK_LEVEL_OFFSET 
-  for (l=0; l<level+1; l++) std::cout << targetNonEmpty[l] << " " 
-                                      << targetLevelOffset[l] << std::endl;
-  for (l=0; l<level+1; l++) std::cout << sourceNonEmpty[l] << " " 
-                                      << sourceLevelOffset[l] << std::endl;
-  for (l=0; l<level+1; l++) std::cout << keyLevelOffset[l] << " " << std::endl;
-#endif
-  
   int ic, jc, j;
   int ni, nj;
   vec3 Xi, Xj, XI, XJ;
+  Target* Ti;
+  Source* Sj;
 
   // P2M
   for (jc=0; jc<sourceNonEmpty[level]; jc++) {              // jc: nonempty source cell loop counter
     key = sourceIndex2Key[level][jc];
     getX(Xj, key, level);
-    Source* Sj = &sources[sourceOffset[jc]];
+    Sj = &sources[sourceOffset[jc]];
     nj = sourceOffset[jc+1] - sourceOffset[jc];
     kernel.P2M(Xj, M[key+keyLevelOffset[level]], Sj, nj);
   }
@@ -179,70 +167,76 @@ int main(int argc, char ** argv) {
 #endif
 
   // M2L
-  for (l=2; l<=level; l++) {                // l: current level
-    for (ic=0; ic<targetNonEmpty[l]; ic++) {   // i: nonempty target cell index in level l
-      getIX(iX, targetIndex2Key[l][ic]);     // i -> key -> iX
-      for (jc=0; jc<sourceNonEmpty[l]; jc++) { // j: nonempty source cell index in level l
-        getIX(jX, sourceIndex2Key[l][jc]);   // j -> key -> jX
-        if (isNeighbor(iX/2, jX/2)) {       // if i,j's parents are neighbor
-          if (!isNeighbor(iX, jX)) {        // and i,j are non-neighbor
-            count++;
-            real_t dx = (real_t) (iX[0] - jX[0]) / nx;
-            real_t dy = (real_t) (iX[1] - jX[1]) / nx;
-            real_t dz = (real_t) (iX[2] - jX[2]) / nx;
-            real_t r = std::sqrt(dx*dx + dy*dy + dz*dz);
-            L[i+targetLevelOffset[l]] += M[j+sourceLevelOffset[l]] / r;
+  uint64_t keyi, keyj;
+  for (l=2; l<=level; l++) {                  // l: current level
+    for (ic=0; ic<targetNonEmpty[l]; ic++) {  // ic: nonempty target cell index in level l
+      keyi = targetIndex2Key[l][ic];
+      getIX(iX, keyi);                        // ic -> keyi -> iX
+      for (jc=0; jc<sourceNonEmpty[l]; jc++) {// jc: nonempty source cell index in level l
+        keyj = sourceIndex2Key[l][jc];
+        getIX(jX, keyj);                      // jc -> keyj -> jX
+        if (isNeighbor(iX/2, jX/2)) {         // if ic,jc's parents are neighbor
+          if (!isNeighbor(iX, jX)) {          // and ic,jc are non-neighbor
+            getX(Xi, iX, l);
+            getX(Xj, jX, l);
+            kernel.M2L(Xi, L[keyi+keyLevelOffset[l]], Xj, M[keyj+keyLevelOffset[l]]);
           }         
         }
       }
     }
   }
   
-  /*
-
   // L2L
-  for (l=3; l<=level; l++) {                // l: current level
-    for (i=0; i<targetNonEmpty[l]; i++) {   // i: nonempty target cell index in level l
-      key = targetIndex2Key[l][i];          // key: i's Morton key 
-      L[i+targetLevelOffset[l]] += L[targetKey2Index[l-1][key/8]+targetLevelOffset[l-1]];
+  for (l=3; l<=level; l++) {                  // l: current level
+    for (ic=0; ic<targetNonEmpty[l]; ic++) {  // ic: nonempty target cell index in level l
+      key = targetIndex2Key[l][ic];           // key: i's Morton key
+      getX(Xi, key, l);                       // Xi: child cell center
+      getX(XI, key/8, l-1);                   // XI: parent cell center
+      kernel.L2L(Xi, L[key+keyLevelOffset[l]], XI, L[key/8+keyLevelOffset[l-1]]);
     }
   }
 
   // L2P
-  for (i=0; i<targetNonEmpty[level]; i++) {
-    for (j=targetOffset[i]; j<targetOffset[i+1]; j++) {
-      targets[j].F += L[i+targetLevelOffset[level]];
-    }
+  for (ic=0; ic<targetNonEmpty[level]; ic++) {
+    key = targetIndex2Key[level][ic];
+    getX(Xi, key, level);
+    Ti = &targets[targetOffset[ic]];
+    ni = targetOffset[ic+1] - targetOffset[ic];
+    kernel.L2P(Ti, ni, Xi, L[key+keyLevelOffset[level]]);
   }
 
   // P2P
-  for (int ic=0; ic<targetNonEmpty[level]; ic++) {
+  for (ic=0; ic<targetNonEmpty[level]; ic++) {
     getIX(iX, targetIndex2Key[level][ic]);
-    for (int jc=0; jc<sourceNonEmpty[level]; jc++) {
+    for (jc=0; jc<sourceNonEmpty[level]; jc++) {
       getIX(jX, sourceIndex2Key[level][jc]);
       if (isNeighbor(iX, jX)) {
-        for (i=targetOffset[ic]; i<targetOffset[ic+1]; i++) {
-          for (j=sourceOffset[jc]; j<sourceOffset[jc+1]; j++) {
-          vec3 dX = targets[i].X - sources[j].X;
-          real_t r = std::sqrt(norm(dX));
-          if (r!=0) targets[i].F += sources[j].Q / r;
-          }
-        }
+        Ti = &targets[targetOffset[ic]];
+        Sj = &sources[sourceOffset[jc]];
+        ni = targetOffset[ic+1] - targetOffset[ic];
+        nj = sourceOffset[jc+1] - sourceOffset[jc];
+        kernel.P2P(Ti, ni, Sj, nj);
       }
     }
   }
+  
+  // verify
+  Ti = &targets2[0];
+  Sj = &sources[0];
+  kernel.P2P(Ti, N, Sj, N);
 
-#ifdef PRINT_RESULT
-  // check answer
-  for (i=0; i<N; i++) {
-    real_t Fi = 0;
-    for (j=0; j<N; j++) {
-      vec3 dX = targets[i].X - sources[j].X;
-      real_t r = std::sqrt(norm(dX));
-      if (r!=0) Fi += sources[j].Q / r;
-    }
-    std::cout << i << " " << targets[i].F << " " << Fi << std::endl;
-  }
-#endif
-  */
+  std::fstream file;
+  file.open("kernel.dat", std::ios::out | std::ios::app);
+  double potDif = verify.getDifScalar(targets, targets2);
+  double potNrm = verify.getNrmScalar(targets);
+  double accDif = verify.getDifVector(targets, targets2);
+  double accNrm = verify.getNrmVector(targets);
+  std::cout << args.P << " " << std::sqrt(potDif/potNrm) << "  " << std::sqrt(accDif/accNrm) << std::endl;
+  double potRel = std::sqrt(potDif/potNrm);
+  double accRel = std::sqrt(accDif/accNrm);
+  verify.print("Rel. L2 Error (pot)",potRel);
+  verify.print("Rel. L2 Error (acc)",accRel);
+  file << args.P << " " << std::sqrt(potDif/potNrm) << "  " << std::sqrt(accDif/accNrm) << std::endl;
+  file.close();
+  return 0;
 }

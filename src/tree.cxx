@@ -38,6 +38,14 @@ namespace EXAFMM_NAMESPACE {
     }
   }
 
+  // compute cell's center given iX and level
+  void getX(vec3 & X, ivec3 iX, int level) {
+    int nx = 1 << level;
+    for (int d=0; d<3; d++) {
+      X[d] = 1.0 / nx * (iX[d] + 0.5);
+    }
+  }
+
   // bucket sort, return permutation indices
   void sortKey(std::vector<int> keys, std::vector<int> & permutation) {
     int iMax = * std::max_element(keys.begin(), keys.end());
