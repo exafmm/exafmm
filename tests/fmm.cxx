@@ -15,7 +15,7 @@ int main(int argc, char ** argv) {
   const real_t eps2 = 0.0;
   const complex_t wavek = complex_t(1.,.1) / real_t(2 * M_PI);
   Args args(argc, argv);
-
+  args.P = 20;
   Kernel kernel(args.P, eps2, wavek);
   logger::verbose = true;
   Verify verify;
@@ -24,7 +24,12 @@ int main(int argc, char ** argv) {
   int level = 3;
   int nx = 1 << level;          // number of leafs in each dimension
   int nleaf = nx * nx * nx;     // number of leafs if full
-  int i, l, d;                  // iterator in loops
+  int i, j, l, d;               // loop counter
+  int ic, jc;                   // cell's loop counter
+  int ni, nj;                   // number of particles in a cell
+  vec3 Xi, Xj, XI, XJ;          // cell's center
+  Target* Ti;
+  Source* Sj;
 
   Targets targets(N), targets2(N);
   Sources sources(N);
@@ -136,12 +141,7 @@ int main(int argc, char ** argv) {
     sourceLevelOffset[l+1] = sourceLevelOffset[l] + sourceNonEmpty[l];
   }
 
-  int ic, jc, j;
-  int ni, nj;
-  vec3 Xi, Xj, XI, XJ;
-  Target* Ti;
-  Source* Sj;
-
+  
   // P2M
   for (jc=0; jc<sourceNonEmpty[level]; jc++) {              // jc: nonempty source cell loop counter
     key = sourceIndex2Key[level][jc];
@@ -189,7 +189,7 @@ int main(int argc, char ** argv) {
   // L2L
   for (l=3; l<=level; l++) {                  // l: current level
     for (ic=0; ic<targetNonEmpty[l]; ic++) {  // ic: nonempty target cell index in level l
-      key = targetIndex2Key[l][ic];           // key: i's Morton key
+      key = targetIndex2Key[l][ic];           // key: ic's Morton key
       getX(Xi, key, l);                       // Xi: child cell center
       getX(XI, key/8, l-1);                   // XI: parent cell center
       kernel.L2L(Xi, L[key+keyLevelOffset[l]], XI, L[key/8+keyLevelOffset[l-1]]);

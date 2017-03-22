@@ -34,10 +34,10 @@ int main(int argc, char ** argv) {
 
   Xj = 1;
   Xj[0] = 3;
-  Source* Bj = &sources[0];
+  Source* Sj = &sources[0];
   int nj = 1;
   Mj.resize(kernel.NTERM, 0.0);
-  kernel.P2M(Xj, Mj, Bj, nj);
+  kernel.P2M(Xj, Mj, Sj, nj);
 
 #if 1
   XJ = 0;
@@ -67,12 +67,12 @@ int main(int argc, char ** argv) {
  
   targets2 = targets;
 
-  Target* Bi = &targets[0];
+  Target* Ti = &targets[0];
   int ni = 1;
-  kernel.L2P(Bi, ni, Xi, Li);
+  kernel.L2P(Ti, ni, Xi, Li);
 
-  Bi = &targets2[0];
-  kernel.P2P(Bi, ni, Bj, nj);
+  Ti = &targets2[0];
+  kernel.P2P(Ti, ni, Sj, nj);
 
   std::fstream file;
   file.open("kernel.dat", std::ios::out | std::ios::app);
