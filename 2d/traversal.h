@@ -8,8 +8,10 @@ namespace exafmm {
   //! Recursive call for upward pass
   void upwardPass(Cell * Ci) {
     for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) { // Loop over child cells
+#pragma omp task untied if(Cj->NBODY > 100)                     //  Start OpenMP task if large enough task
       upwardPass(Cj);                                           //  Recursive call
     }                                                           // End loop over child cells
+#pragma omp taskwait                                            // Synchronize OpenMP tasks
     Ci->M.resize(P, 0);                                         // Allocate and initialize multipole coefs
     Ci->L.resize(P, 0);                                         // Allocate and initialize local coefs
     if (Ci->NCHILD == 0) P2M(Ci);                               // P2M kernel
@@ -43,8 +45,10 @@ namespace exafmm {
     L2L(Cj);                                                    // L2L kernel
     if (Cj->NCHILD == 0) L2P(Cj);                               // L2P kernel
     for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; Ci++) { // Loop over child cells
+#pragma omp task untied if(Ci->NBODY > 100)                     //  Start OpenMP task if large enough task
       downwardPass(Ci);                                         //  Recursive call
     }                                                           // End loop over child cells
+#pragma omp taskwait                                            // Synchronize OpenMP tasks
   }
 
   //! Direct summation
