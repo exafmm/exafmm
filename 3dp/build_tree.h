@@ -64,8 +64,8 @@ namespace exafmm {
       for (int d=0; d<3; d++) x[d] = bodies[i].X[d];            //  Position of body
       int octant = (x[0] > X[0]) + ((x[1] > X[1]) << 1) + ((x[2] > X[2]) << 2);// Which octant body belongs to`
       for (int d=0; d<3; d++) buffer[counter[octant]].X[d] = bodies[i].X[d];// Permute bodies coordinates out-of-place according to octant
-      buffer[counter[octant]].q = bodies[i].q;                //  Permute bodies sources out-of-place according to octant
-      counter[octant]++;                                      //  Increment body count in octant
+      buffer[counter[octant]].q = bodies[i].q;                  //  Permute bodies sources out-of-place according to octant
+      counter[octant]++;                                        //  Increment body count in octant
     }                                                           // End loop over bodies
     //! Loop over children and recurse
     real_t Xchild[3];                                           // Coordinates of children
@@ -87,12 +87,12 @@ namespace exafmm {
   }
 
   Cell * buildTree(Bodies & bodies) {
-    real_t R0, X0[3];                                             // Radius and center root cell
-    getBounds(bodies, R0, X0);                                    // Get bounding box from bodies
-    Bodies buffer = bodies;                                       // Copy bodies to buffer
-    Cell * cells = new Cell();                                    // Create root cell
+    real_t R0, X0[3];                                           // Radius and center root cell
+    getBounds(bodies, R0, X0);                                  // Get bounding box from bodies
+    Bodies buffer = bodies;                                     // Copy bodies to buffer
+    Cell * cells = new Cell();                                  // Create root cell
     buildCells(&bodies[0], &buffer[0], 0, bodies.size(), cells, X0, R0);// Build tree recursively
-    return cells;                                                 // Return pointer of root cell
+    return cells;                                               // Return pointer of root cell
   }
 }
 

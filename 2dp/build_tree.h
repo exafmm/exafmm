@@ -87,12 +87,12 @@ namespace exafmm {
   }
 
   Cell * buildTree(Bodies & bodies) {
-    real_t R0, X0[2];                                             // Radius and center root cell
-    getBounds(bodies, R0, X0);                                    // Get bounding box from bodies
-    Bodies buffer = bodies;                                       // Copy bodies to buffer
-    Cell * cells = new Cell();                                    // Create root cell
+    real_t R0, X0[2];                                           // Radius and center root cell
+    getBounds(bodies, R0, X0);                                  // Get bounding box from bodies
+    Bodies buffer = bodies;                                     // Copy bodies to buffer
+    Cell * cells = new Cell();                                  // Create root cell
     buildCells(&bodies[0], &buffer[0], 0, bodies.size(), cells, X0, R0);// Build tree recursively
-    return cells;                                                 // Return pointer of root cell
+    return cells;                                               // Return pointer of root cell
   }
 }
 

@@ -19,7 +19,7 @@ namespace exafmm {
     for (int i=0; i<Ci->NBODY; i++) {                           // Loop over target bodies
       real_t p = 0, F[2] = {0, 0};                              //  Initialize potential, force
       for (int j=0; j<Cj->NBODY; j++) {                         //  Loop over source bodies
-        for (int d=0; d<2; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d];// Calculate distance vector
+        for (int d=0; d<2; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d];//   Calculate distance vector
         real_t R2 = norm(dX);                                   //   Calculate distance squared
         if (R2 != 0) {                                          //   If not the same point
           real_t invR = 1 / sqrt(R2);                           //    1 / R
