@@ -19,7 +19,6 @@ namespace exafmm {
 
   //! Dual tree traversal for a single pair of cells
   void traversal(Cell * Ci, Cell * Cj) {
-    real_t dX[2];                                               // Distance vector
     for (int d=0; d<2; d++) dX[d] = Ci->X[d] - Cj->X[d] - Xperiodic[d];// Distance vector from source to target
     real_t R2 = norm(dX) * theta * theta;                       // Scalar distance squared
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {               // If distance is far enough
@@ -117,6 +116,7 @@ namespace exafmm {
     for (int i=0; i<images; i++) {                              // Loop over periodic image sublevels
       prange += int(powf(3.,i));                                //  Accumulate range of periodic images
     }                                                           // End loop over perioidc image sublevels
+#pragma omp parallel for
     for (int ix=-prange; ix<=prange; ix++) {                    // Loop over x periodic direction
       for (int iy=-prange; iy<=prange; iy++) {                  //  Loop over y periodic direction
         Xperiodic[0] = ix * cycle;                              //   Coordinate shift for x periodic direction

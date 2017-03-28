@@ -20,7 +20,6 @@ namespace exafmm {
 
   //! Dual tree traversal for a single pair of cells
   void traversal(Cell * Ci, Cell * Cj) {
-    real_t dX[2];                                               // Distance vector
     for (int d=0; d<2; d++) dX[d] = Ci->X[d] - Cj->X[d];        // Distance vector from source to target
     real_t R2 = norm(dX) * theta * theta;                       // Scalar distance squared
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {               // If distance is far enough

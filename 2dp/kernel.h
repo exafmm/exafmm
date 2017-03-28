@@ -29,8 +29,12 @@ namespace exafmm {
           for (int d=0; d<2; d++) F[d] += dX[d] * Bj[j].q / R2; //    Force
         }                                                       //   End if for same point
       }                                                         //  End loop over source points
+#pragma omp atomic                                              //  OpenMP atomic add
       Bi[i].p += p;                                             //  Accumulate potential
-      for (int d=0; d<2; d++) Bi[i].F[d] -= F[d];               //  Accumulate force
+      for (int d=0; d<2; d++) {                                 //  Loop over dimensions
+#pragma omp atomic                                              //   OpenMP atomic add
+        Bi[i].F[d] -= F[d];                                     //   Accumulate force
+      }                                                         //  End loop over dimensions
     }                                                           // End loop over target bodies
   }
 
