@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "kernel2.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
