@@ -40,6 +40,7 @@ namespace exafmm {
   int P;                                                        //!< Order of expansions
   int ncrit;                                                    //!< Number of bodies per leaf cell
   int images;                                                   //!< Number of periodic image sublevels
+  real_t cycle;                                                 //!< Cycle of periodic boundary condition
   real_t theta;                                                 //!< Multipole acceptance criterion
   real_t dX[2];                                                 //!< Distance vector
   real_t Xperiodic[2];                                          //!< Periodic coordinate offset

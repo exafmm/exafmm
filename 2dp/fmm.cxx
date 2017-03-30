@@ -10,9 +10,9 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   const int numBodies = 10000;                                  // Number of bodies
-  const real_t cycle = 2 * M_PI;                                // Cycle of periodic boundary condition
   P = 10;                                                       // Order of expansions
   ncrit = 8;                                                    // Number of bodies per leaf cell
+  cycle = 2 * M_PI;                                             // Cycle of periodic boundary condition
   theta = 0.4;                                                  // Multipole acceptance criterion
   images = 3;                                                   // 3^images * 3^images * 3^images periodic images
 
@@ -47,7 +47,7 @@ int main(int argc, char ** argv) {
   upwardPass(cells);                                            // Upward pass for P2M, M2M
   stop("P2M & M2M");                                            // Stop timer
   start("M2L & P2P");                                           // Start timer
-  horizontalPass(cells, cells, cycle);                          // Horizontal pass for M2L, P2P
+  horizontalPass(cells, cells);                                 // Horizontal pass for M2L, P2P
   stop("M2L & P2P");                                            // Stop timer
   start("L2L & L2P");                                           // Start timer
   downwardPass(cells);                                          // Downward pass for L2L, L2P
@@ -67,7 +67,7 @@ int main(int argc, char ** argv) {
     bodies[b].p = 0;                                            //  Clear potential
     for (int d=0; d<2; d++) bodies[b].F[d] = 0;                 //  Clear force
   }                                                             // End loop over bodies
-  direct(bodies, jbodies, cycle);                               // Direct N-Body
+  direct(bodies, jbodies);                                      // Direct N-Body
   stop("Direct N-Body");                                        // Stop timer
 
   //! Verify result

@@ -11,9 +11,9 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   const int numBodies = 1000;                                   // Number of bodies
-  const real_t cycle = 2 * M_PI;                                // Cycle of periodic boundary condition
   P = 10;                                                       // Order of expansions
   ncrit = 64;                                                   // Number of bodies per leaf cell
+  cycle = 2 * M_PI;                                             // Cycle of periodic boundary condition
   theta = 0.4;                                                  // Multipole acceptance criterion
   images = 4;                                                   // 3^images * 3^images * 3^images periodic images
 
@@ -54,7 +54,7 @@ int main(int argc, char ** argv) {
   upwardPass(cells);                                            // Upward pass for P2M, M2M
   stop("P2M & M2M");                                            // Stop timer
   start("M2L & P2P");                                           // Start timer
-  horizontalPass(cells, cells, cycle);                          // Horizontal pass for M2L, P2P
+  horizontalPass(cells, cells);                                 // Horizontal pass for M2L, P2P
   stop("M2L & P2P");                                            // Stop timer
   start("L2L & L2P");                                           // Start timer
   downwardPass(cells);                                          // Downward pass for L2L, L2P
@@ -86,10 +86,10 @@ int main(int argc, char ** argv) {
   Cells  jcells = buildTree(jbodies);                           // Build tree
   stop("Build tree");                                           // Stop timer
   start("Wave part");                                           // Start timer
-  wavePart(bodies, jbodies, cycle);                             // Ewald wave part
+  wavePart(bodies, jbodies);                                    // Ewald wave part
   stop("Wave part");                                            // Stop timer
   start("Real part");                                           // Start timer
-  realPart(&cells[0], &jcells[0], cycle);                       // Ewald real part
+  realPart(&cells[0], &jcells[0]);                              // Ewald real part
   selfTerm(bodies);                                             // Ewald self term
   stop("Real part");                                            // Stop timer
 

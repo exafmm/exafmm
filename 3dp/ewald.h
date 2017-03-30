@@ -51,7 +51,7 @@ namespace exafmm {
   }
 
   //! Initialize wave vector
-  Waves initWaves(real_t cycle) {
+  Waves initWaves() {
     for (int d=0; d<3; d++) scale[d]= 2 * M_PI / cycle;         // Scale conversion
     Waves waves;                                                // Initialzie wave vector
     int kmaxsq = ksize * ksize;                                 // kmax squared
@@ -79,7 +79,7 @@ namespace exafmm {
   }
 
   //! Ewald real part P2P kernel
-  void realPart(Cell * Ci, Cell * Cj) {
+  void realP2P(Cell * Ci, Cell * Cj) {
     for (Body * Bi=Ci->BODY; Bi!=Ci->BODY+Ci->NBODY; Bi++) {    // Loop over target bodies
       for (Body * Bj=Cj->BODY; Bj!=Cj->BODY+Cj->NBODY; Bj++) {  //  Loop over source bodies
         for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - Xperiodic[d];//   Distance vector from source to target
@@ -101,7 +101,7 @@ namespace exafmm {
     }                                                           // End loop over target bodies
   }
 
-  void neighbor(Cell * Ci, Cell * Cj, real_t cycle) {           // Traverse tree to find neighbor
+  void neighbor(Cell * Ci, Cell * Cj) {                         // Traverse tree to find neighbor
     for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d];        //  Distance vector from source to target
     for (int d=0; d<3; d++) {                                   //  Loop over dimensions
       if(dX[d] < -cycle / 2) dX[d] += cycle;                    //   Wrap around positive
@@ -110,24 +110,24 @@ namespace exafmm {
     for (int d=0; d<3; d++) Xperiodic[d] = Ci->X[d] - Cj->X[d] - dX[d];//  Coordinate offset for periodic B.C.
     real_t R = std::sqrt(dX[0] * dX[0] + dX[1] * dX[1] + dX[2] * dX[2]);//  Scalar distance
     if (R - Ci->R - Cj->R < sqrtf(3) * cutoff) {                //  If cells are close
-      if(Cj->NCHILD == 0) realPart(Ci, Cj);                     //   Ewald real part
+      if(Cj->NCHILD == 0) realP2P(Ci, Cj);                      //   Ewald real part
       for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {// Loop over cell's children
-        neighbor(Ci, cj, cycle);                                //    Instantiate recursive functor
+        neighbor(Ci, cj);                                       //    Instantiate recursive functor
       }                                                         //   End loop over cell's children
     }                                                           //  End if for far cells
   }                                                             // End overload operator()
 
   //! Ewald real part
-  void realPart(Cell * Ci, Cell * Cj, real_t cycle) {
-    if (Ci->NCHILD == 0) neighbor(Ci, Cj, cycle);               // If target cell is leaf, find neighbors
+  void realPart(Cell * Ci, Cell * Cj) {
+    if (Ci->NCHILD == 0) neighbor(Ci, Cj);                      // If target cell is leaf, find neighbors
     for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) { // Loop over target child cells
-      realPart(ci, Cj, cycle);                                  //  Recursively subdivide target cells
+      realPart(ci, Cj);                                         //  Recursively subdivide target cells
     }                                                           // End loop over target cells
   }
 
   //! Ewald wave part
-  void wavePart(Bodies & bodies, Bodies & jbodies, real_t cycle) {
-    Waves waves = initWaves(cycle);                             // Initialize wave vector
+  void wavePart(Bodies & bodies, Bodies & jbodies) {
+    Waves waves = initWaves();                                  // Initialize wave vector
     dft(waves,jbodies);                                         // Apply DFT to bodies to get waves
     real_t coef = 2 / sigma / cycle / cycle / cycle;            // First constant
     real_t coef2 = 1 / (4 * alpha * alpha);                     // Second constant

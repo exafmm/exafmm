@@ -1,6 +1,3 @@
-types.h > exafmm.h
-make cycle a global variable
-
 Use periodic index (efficient loop)
 OpenMP with loops
 Choose between eager/lazy

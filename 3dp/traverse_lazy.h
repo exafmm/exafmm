@@ -104,7 +104,7 @@ namespace exafmm {
   }
 
   //! Horizontal pass interface
-  void horizontalPass(Cells & icells, Cells & jcells, real_t cycle) {
+  void horizontalPass(Cells & icells, Cells & jcells) {
     if (images == 0) {                                          // If non-periodic boundary condition
       getList(&icells[0], &jcells[0]);                          //  Pass root cell to recursive call
       evaluate(icells);                                         //  Evaluate M2L & P2P kernels
@@ -147,7 +147,7 @@ namespace exafmm {
   }
 
   //! Direct summation
-  void direct(Bodies & bodies, Bodies & jbodies, real_t cycle) {
+  void direct(Bodies & bodies, Bodies & jbodies) {
     Cells cells(2);                                             // Define a pair of cells to pass to P2P kernel
     Cell * Ci = &cells[0];                                      // Allocate single target
     Cell * Cj = &cells[1];                                      // Allocate single source
