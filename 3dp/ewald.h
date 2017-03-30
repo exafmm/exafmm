@@ -1,6 +1,6 @@
 #ifndef ewald_h
 #define ewald_h
-#include "types.h"
+#include "exafmm.h"
 
 namespace exafmm {
   //! Wave structure for Ewald summation
@@ -11,12 +11,12 @@ namespace exafmm {
   };
   typedef std::vector<Wave> Waves;                              //!< Vector of Wave types
 
-  int ksize;                                                    //!< Number of waves in Ewald summation
-  real_t alpha;                                                 //!< Scaling parameter for Ewald summation
-  real_t sigma;                                                 //!< Scaling parameter for Ewald summation
-  real_t cutoff;                                                //!< Cutoff distance
-  real_t K[3];                                                  //!< Wave number vector
-  real_t scale[3];                                              //!< Scale vector
+  static int ksize;                                             //!< Number of waves in Ewald summation
+  static real_t alpha;                                          //!< Scaling parameter for Ewald summation
+  static real_t sigma;                                          //!< Scaling parameter for Ewald summation
+  static real_t cutoff;                                         //!< Cutoff distance
+  static real_t K[3];                                           //!< Wave number vector
+  static real_t scale[3];                                       //!< Scale vector
 
   //! Forward DFT
   void dft(Waves & waves, Bodies & bodies) {

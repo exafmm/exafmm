@@ -1,6 +1,6 @@
 #ifndef kernel_h
 #define kernel_h
-#include "types.h"
+#include "exafmm.h"
 
 namespace exafmm {
   const complex_t I(0.,1.);                                     //!< Imaginary unit

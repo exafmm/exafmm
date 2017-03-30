@@ -1,6 +1,6 @@
 #ifndef kernel_h
 #define kernel_h
-#include "types.h"
+#include "exafmm.h"
 
 namespace exafmm {
   //!< L2 norm of vector X

@@ -1,5 +1,5 @@
-#ifndef types_h
-#define types_h
+#ifndef exafmm_h
+#define exafmm_h
 #include <complex>
 #include <cstdlib>
 #include <cstdio>

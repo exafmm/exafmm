@@ -1,6 +1,5 @@
-Define global variables in types.h
-make cycle a global variable
 types.h > exafmm.h
+make cycle a global variable
 
 Use periodic index (efficient loop)
 OpenMP with loops

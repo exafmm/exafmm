@@ -4,8 +4,8 @@
 #include <sys/time.h>
 
 namespace exafmm {
-  timeval t;                                                    //!< Time value
-  std::map<std::string,timeval> timer;                          //!< Map of timer event name to time value
+  static timeval t;                                             //!< Time value
+  static std::map<std::string,timeval> timer;                   //!< Map of timer event name to time value
 
   //! Start timer for given event
   void start(std::string event) {

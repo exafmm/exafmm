@@ -1,6 +1,6 @@
 #ifndef buildtree_h
 #define buildtree_h
-#include "types.h"
+#include "exafmm.h"
 
 namespace exafmm {
   //! Get bounding box of bodies
