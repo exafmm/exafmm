@@ -1,7 +1,7 @@
 #include "build_tree.h"
 #include "kernel.h"
 #include "timer.h"
-#include "traversal.h"
+#include "traversal2.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
@@ -46,6 +46,9 @@ int main(int argc, char ** argv) {
     start("Traversal");                                         // Start timer
     traversal(cells, cells);                                    // Traversal for M2L, P2P
     stop("Traversal");                                          // Stop timer
+    start("Evaluate");                                          // Start timer
+    evaluate();                                                 // Evaluate M2L, P2P
+    stop("Evaluate");                                           // Stop timer
     start("Downward pass");                                     // Start timer
     downwardPass(cells);                                        // Downward pass for L2L, L2P
     stop("Downward pass");                                      // Stop timer

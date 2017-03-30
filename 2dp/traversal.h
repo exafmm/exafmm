@@ -116,7 +116,7 @@ namespace exafmm {
     for (int i=0; i<images; i++) {                              // Loop over periodic image sublevels
       prange += int(powf(3.,i));                                //  Accumulate range of periodic images
     }                                                           // End loop over perioidc image sublevels
-#pragma omp parallel for
+#pragma omp parallel for collapse(2)
     for (int ix=-prange; ix<=prange; ix++) {                    // Loop over x periodic direction
       for (int iy=-prange; iy<=prange; iy++) {                  //  Loop over y periodic direction
         Xperiodic[0] = ix * cycle;                              //   Coordinate shift for x periodic direction

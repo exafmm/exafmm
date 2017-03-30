@@ -1,5 +1,9 @@
-Jenkins tests
-tree.cxx
-list.cxx
 List based traversal
 OpenMP with loops
+
+Jenkins tests
+Helmholtz
+Stokes
+MPI
+precomputation, BLAS
+GPU
