@@ -1,14 +1,11 @@
-#ifndef traversal_h
-#define traversal_h
+#ifndef traverse_lazy_h
+#define traverse_lazy_h
 #include "types.h"
 
 namespace exafmm {
   real_t theta;                                                 //!< Multipole acceptance criterion
-  std::multimap<Cell*,Cell*> listM2L;                           //!< M2L interaction list
-  std::multimap<Cell*,Cell*> listP2P;                           //!< P2P interaction list
-  typedef std::multimap<Cell*,Cell*>::iterator M_iter;          //!< Iterator of multimap
 
-  //! Recursive call for upward pass
+  //! Recursive call to post-order tree traversal for upward pass
   void upwardPass(Cell * Ci) {
     for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) { // Loop over child cells
 #pragma omp task untied if(Cj->NBODY > 100)                     //  Start OpenMP task if large enough task
@@ -21,36 +18,52 @@ namespace exafmm {
     M2M(Ci);                                                    // M2M kernel
   }
 
-  //! Dual tree traversal for a single pair of cells
-  void traversal(Cell * Ci, Cell * Cj) {
+  //! Upward pass interface
+  void upwardPass(Cells & cells) {
+#pragma omp parallel                                            // Start OpenMP
+#pragma omp single nowait                                       // Start OpenMP single region with nowait
+    upwardPass(&cells[0]);                                      // Pass root cell to recursive call
+  }
+
+  //! Recursive call to dual tree traversal for list construction
+  void getList(Cell * Ci, Cell * Cj) {
     for (int d=0; d<2; d++) dX[d] = Ci->X[d] - Cj->X[d];        // Distance vector from source to target
     real_t R2 = norm(dX) * theta * theta;                       // Scalar distance squared
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {               // If distance is far enough
-      listM2L.insert(std::pair<Cell*,Cell*>(Ci, Cj));           //  Add to M2L list
+      Ci->listM2L.push_back(Cj);                                //  Add to M2L list
     } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {            // Else if both cells are leafs
-      listP2P.insert(std::pair<Cell*,Cell*>(Ci, Cj));           //  Add to P2P list
+      Ci->listP2P.push_back(Cj);                                //  Add to P2P list
     } else if (Cj->NCHILD == 0 || (Ci->R >= Cj->R && Ci->NCHILD != 0)) {// Else if Cj is leaf or Ci is larger
       for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {// Loop over Ci's children
-        traversal(ci, Cj);                                      //   Traverse a single pair of cells
+        getList(ci, Cj);                                        //   Recursive call to target child cells
       }                                                         //  End loop over Ci's children
     } else {                                                    // Else if Ci is leaf or Cj is larger
       for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {//  Loop over Cj's children
-        traversal(Ci, cj);                                      //  Traverse a single pair of cells
+        getList(Ci, cj);                                        //   Recursive call to source child cells
       }                                                         //  End loop over Cj's children
     }                                                           // End if for leafs and Ci Cj size
   }
 
   //! Evaluate M2L, P2P kernels
-  void evaluate() {
-    for (M_iter M=listM2L.begin(); M!=listM2L.end(); M++) {     // Loop over all M2L lists
-      M2L(M->first,M->second);                                  //  M2L kernel
-    }                                                           // End loop over all M2L lists
-    for (M_iter M=listP2P.begin(); M!=listP2P.end(); M++) {     // Loop over all P2P lists
-      P2P(M->first,M->second);                                  //  P2P kernel
-    }                                                           // End loop over all P2P lists
+  void evaluate(Cells & cells) {
+#pragma omp parallel for schedule(dynamic)
+    for (size_t i=0; i<cells.size(); i++) {                     // Loop over cells
+      for (size_t j=0; j<cells[i].listM2L.size(); j++) {        //  Loop over M2L list
+        M2L(&cells[i],cells[i].listM2L[j]);                     //   M2L kernel
+      }                                                         //  End loop over M2L list
+      for (size_t j=0; j<cells[i].listP2P.size(); j++) {        //  Loop over P2P list
+        P2P(&cells[i],cells[i].listP2P[j]);                     //   P2P kernel
+      }                                                         //  End loop over P2P list
+    }                                                           // End loop over cells
   }
 
-  //! Recursive call for downward pass
+  //! Horizontal pass interface
+  void horizontalPass(Cells & icells, Cells & jcells) {
+    getList(&icells[0], &jcells[0]);                            // Pass root cell to recursive call
+    evaluate(icells);                                           // Evaluate M2L & P2P kernels
+  }
+
+  //! Recursive call to pre-order traversal for downward pass
   void downwardPass(Cell * Cj) {
     L2L(Cj);                                                    // L2L kernel
     if (Cj->NCHILD == 0) L2P(Cj);                               // L2P kernel
@@ -59,6 +72,13 @@ namespace exafmm {
       downwardPass(Ci);                                         //  Recursive call
     }                                                           // End loop over child cells
 #pragma omp taskwait                                            // Synchronize OpenMP tasks
+  }
+
+  //! Downward pass interface
+  void downwardPass(Cells & cells) {
+#pragma omp parallel                                            // Start OpenMP
+#pragma omp single nowait                                       // Start OpenMP single region with nowait
+    downwardPass(&cells[0]);                                    // Pass root cell to recursive call
   }
 
   //! Direct summation

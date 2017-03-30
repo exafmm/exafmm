@@ -1,7 +1,8 @@
 #include "build_tree.h"
 #include "kernel.h"
 #include "timer.h"
-#include "traversal.h"
+//#include "traverse_eager.h"
+#include "traverse_lazy.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
@@ -37,22 +38,15 @@ int main(int argc, char ** argv) {
   stop("Build tree");                                           // Stop timer
 
   //! FMM evaluation
-#pragma omp parallel                                            // Start OpenMP
-#pragma omp single nowait                                       // Start OpenMP single region with nowait
-  {
-    start("Upward pass");                                       // Start timer
-    upwardPass(&cells[0]);                                      // Upward pass for P2M, M2M
-    stop("Upward pass");                                        // Stop timer
-    start("Traversal");                                         // Start timer
-    traversal(&cells[0], &cells[0]);                            // Traversal for M2L, P2P
-    stop("Traversal");                                          // Stop timer
-    //start("Evaluate");                                          // Start timer
-    //evaluate();                                                 // Evaluate M2L, P2P
-    //stop("Evaluate");                                           // Stop timer
-    start("Downward pass");                                     // Start timer
-    downwardPass(&cells[0]);                                    // Downward pass for L2L, L2P
-    stop("Downward pass");                                      // Stop timer
-  }
+  start("P2M & M2M");                                           // Start timer
+  upwardPass(cells);                                            // Upward pass for P2M, M2M
+  stop("P2M & M2M");                                            // Stop timer
+  start("M2L & P2P");                                           // Start timer
+  horizontalPass(cells, cells);                                 // Horizontal pass for M2L, P2P
+  stop("M2L & P2P");                                            // Stop timer
+  start("L2L & L2P");                                           // Start timer
+  downwardPass(cells);                                          // Downward pass for L2L, L2P
+  stop("L2L & L2P");                                            // Stop timer
 
   //! Direct N-Body
   start("Direct N-Body");                                       // Start timer
