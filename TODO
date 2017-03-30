@@ -1,8 +1,12 @@
+Makefile to test eager/lazy
 Define global variables in types.h
 make cycle a global variable
+types.h > exafmm.h
+
 Use periodic index (efficient loop)
 OpenMP with loops
 Choose between eager/lazy
+Use Hilbert key instead of C->X, level offset instead of C->R
 
 Jenkins tests
 Helmholtz

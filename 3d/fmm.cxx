@@ -1,8 +1,11 @@
 #include "build_tree.h"
 #include "kernel.h"
 #include "timer.h"
-//#include "traverse_eager.h"
+#if EXAFMM_EAGER
+#include "traverse_eager.h"
+#elif EXAFMM_LAZY
 #include "traverse_lazy.h"
+#endif
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
