@@ -2,7 +2,7 @@
 #include "kernel.h"
 #include "ewald.h"
 #include "timer.h"
-#include "traversal.h"
+#include "traverse_eager.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
@@ -45,16 +45,16 @@ int main(int argc, char ** argv) {
   stop("Build tree");                                           // Stop timer
 
   //! FMM evaluation
-  start("Upward pass");                                         // Start timer
+  start("P2M & M2M");                                           // Start timer
   initKernel();                                                 // Initialize kernel
-  upwardPass(&cells[0]);                                        // Upward pass for P2M, M2M
-  stop("Upward pass");                                          // Stop timer
-  start("Traversal");                                           // Start timer
-  traversal(&cells[0], &cells[0], cycle);                       // Traversal for M2L, P2P
-  stop("Traversal");                                            // Stop timer
-  start("Downward pass");                                       // Start timer
-  downwardPass(&cells[0]);                                      // Downward pass for L2L, L2P
-  stop("Downward pass");                                        // Stop timer
+  upwardPass(cells);                                            // Upward pass for P2M, M2M
+  stop("P2M & M2M");                                            // Stop timer
+  start("M2L & P2P");                                           // Start timer
+  horizontalPass(cells, cells, cycle);                          // Horizontal pass for M2L, P2P
+  stop("M2L & P2P");                                            // Stop timer
+  start("L2L & L2P");                                           // Start timer
+  downwardPass(cells);                                          // Downward pass for L2L, L2P
+  stop("L2L & L2P");                                            // Stop timer
 
   //! Dipole correction
   start("Dipole correction");                                   // Start timer

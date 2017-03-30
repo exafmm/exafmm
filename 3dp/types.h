@@ -27,6 +27,8 @@ namespace exafmm {
     Body * BODY;                                                //!< Pointer of first body
     real_t X[3];                                                //!< Cell center
     real_t R;                                                   //!< Cell radius
+    std::vector<Cell*> listM2L;                                 //!< M2L interaction list
+    std::vector<Cell*> listP2P;                                 //!< P2P interaction list
     std::vector<complex_t> M;                                   //!< Multipole expansion coefs
     std::vector<complex_t> L;                                   //!< Local expansion coefs
   };
