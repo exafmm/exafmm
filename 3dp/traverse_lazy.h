@@ -115,9 +115,9 @@ namespace exafmm {
       for (int ix=-1; ix<=1; ix++) {                            //  Loop over x periodic direction
         for (int iy=-1; iy<=1; iy++) {                          //   Loop over y periodic direction
           for (int iz=-1; iz<=1; iz++) {                        //    Loop over z periodic direction
-            Xperiodic[0] = ix * cycle;                          //     Coordinate shift for x periodic direction
-            Xperiodic[1] = iy * cycle;                          //     Coordinate shift for y periodic direction
-            Xperiodic[2] = iz * cycle;                          //     Coordinate shift for z periodic direction
+            Xperiodic[0] = ix * cycle;                          //     Coordinate offset for x periodic direction
+            Xperiodic[1] = iy * cycle;                          //     Coordinate offset for y periodic direction
+            Xperiodic[2] = iz * cycle;                          //     Coordinate offset for z periodic direction
             getList(&icells[0], &jcells[0]);                    //     Pass root cell to recursive call
             evaluate(icells);                                   //     Evaluate M2L & P2P kernels
             for (size_t i=0; i<icells.size(); i++) {            //     Loop over target cells
@@ -157,9 +157,9 @@ namespace exafmm {
     for (int ix=-1; ix<=1; ix++) {                              //  Loop over x periodic direction
       for (int iy=-1; iy<=1; iy++) {                            //   Loop over y periodic direction
         for (int iz=-1; iz<=1; iz++) {                          //    Loop over z periodic direction
-          Xperiodic[0] = ix * cycle;                            //     Coordinate shift for x periodic direction
-          Xperiodic[1] = iy * cycle;                            //     Coordinate shift for y periodic direction
-          Xperiodic[2] = iz * cycle;                            //     Coordinate shift for z periodic direction
+          Xperiodic[0] = ix * cycle;                            //     Coordinate offset for x periodic direction
+          Xperiodic[1] = iy * cycle;                            //     Coordinate offset for y periodic direction
+          Xperiodic[2] = iz * cycle;                            //     Coordinate offset for z periodic direction
           Ci->BODY = &bodies[0];                                //     Iterator of first target body
           Ci->NBODY = bodies.size();                            //     Number of target bodies
           Cj->BODY = &jbodies[0];                               //     Iterator of first source body

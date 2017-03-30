@@ -94,8 +94,8 @@ namespace exafmm {
     } else {                                                    // If periodic boundary condition
       for (int ix=-1; ix<=1; ix++) {                            //  Loop over x periodic direction
         for (int iy=-1; iy<=1; iy++) {                          //   Loop over y periodic direction
-          Xperiodic[0] = ix * cycle;                            //    Coordinate shift for x periodic direction
-          Xperiodic[1] = iy * cycle;                            //    Coordinate shift for y periodic direction
+          Xperiodic[0] = ix * cycle;                            //    Coordinate offset for x periodic direction
+          Xperiodic[1] = iy * cycle;                            //    Coordinate offset for y periodic direction
           horizontalPass(&icells[0], &jcells[0]);               //    Horizontal pass for this periodic image
         }                                                       //   End loop over y periodic direction
       }                                                         //  End loop over x periodic direction
@@ -137,8 +137,8 @@ namespace exafmm {
 #pragma omp parallel for collapse(2)
     for (int ix=-prange; ix<=prange; ix++) {                    // Loop over x periodic direction
       for (int iy=-prange; iy<=prange; iy++) {                  //  Loop over y periodic direction
-        Xperiodic[0] = ix * cycle;                              //   Coordinate shift for x periodic direction
-        Xperiodic[1] = iy * cycle;                              //   Coordinate shift for y periodic direction
+        Xperiodic[0] = ix * cycle;                              //   Coordinate offset for x periodic direction
+        Xperiodic[1] = iy * cycle;                              //   Coordinate offset for y periodic direction
         P2P(Ci, Cj);                                            //   Evaluate P2P kernel
       }                                                         //  End loop over y periodic direction
     }                                                           // End loop over x periodic direction
