@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace exafmm {
-  // Basic type definitions
+  //! Basic type definitions
   typedef double real_t;                                        //!< Floating point type is single precision
   typedef std::complex<real_t> complex_t;                       //!< Complex type
 
@@ -35,6 +35,15 @@ namespace exafmm {
     std::vector<complex_t> L;                                   //!< Local expansion coefficients
   };
   typedef std::vector<Cell> Cells;                              //!< Vector of cells
+
+  //! Global variables
+  int P;                                                        //!< Order of expansions
+  int ncrit;                                                    //!< Number of bodies per leaf cell
+  int images;                                                   //!< Number of periodic image sublevels
+  real_t theta;                                                 //!< Multipole acceptance criterion
+  real_t dX[2];                                                 //!< Distance vector
+  real_t Xperiodic[2];                                          //!< Periodic coordinate offset
+#pragma omp threadprivate(dX,Xperiodic)                         //!< Make global variables private
 }
 
 #endif

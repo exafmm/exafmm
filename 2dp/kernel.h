@@ -3,11 +3,6 @@
 #include "types.h"
 
 namespace exafmm {
-  int P;                                                        //!< Order of expansions
-  real_t dX[2];                                                 //!< Distance vector
-  real_t Xperiodic[2];                                          //!< Periodic coordinate offset
-#pragma omp threadprivate(dX,Xperiodic)                         //!< Make global variables private
-
   //!< L2 norm of vector X
   inline real_t norm(real_t * X) {
     return X[0] * X[0] + X[1] * X[1];                           // L2 norm

@@ -3,8 +3,6 @@
 #include "types.h"
 
 namespace exafmm {
-  real_t theta;                                                 //!< Multipole acceptance criterion
-
   //! Recursive call to post-order tree traversal for upward pass
   void upwardPass(Cell * Ci) {
     for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) { // Loop over child cells

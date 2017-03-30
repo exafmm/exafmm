@@ -1,4 +1,3 @@
-Makefile to test eager/lazy
 Define global variables in types.h
 make cycle a global variable
 types.h > exafmm.h
