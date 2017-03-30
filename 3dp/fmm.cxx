@@ -2,7 +2,8 @@
 #include "kernel.h"
 #include "ewald.h"
 #include "timer.h"
-#include "traverse_eager.h"
+//#include "traverse_eager.h"
+#include "traverse_lazy.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
@@ -24,7 +25,7 @@ int main(int argc, char ** argv) {
   Bodies bodies(numBodies);                                     // Initialize bodies
   real_t average = 0;                                           // Average charge
   srand48(0);                                                   // Set seed for random number generator
-  for (int b=0; b<int(bodies.size()); b++) {                    // Loop over bodies
+  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
     for (int d=0; d<3; d++) {                                   //  Loop over dimension
       bodies[b].X[d] = drand48() * cycle - cycle * .5;          //   Initialize positions
     }                                                           //  End loop over dimension
@@ -34,7 +35,7 @@ int main(int argc, char ** argv) {
     for (int d=0; d<3; d++) bodies[b].F[d] = 0;                 //  Clear force
   }                                                             // End loop over bodies
   average /= bodies.size();                                     // Average charge
-  for (int b=0; b<int(bodies.size()); b++) {                    // Loop over bodies
+  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
     bodies[b].q -= average;                                     // Charge neutral
   }                                                             // End loop over bodies
   stop("Initialize bodies");                                    // Stop timer
@@ -59,11 +60,11 @@ int main(int argc, char ** argv) {
   //! Dipole correction
   start("Dipole correction");                                   // Start timer
   real_t dipole[3] = {0, 0, 0};                                 // Initialize dipole
-  for (int b=0; b<int(bodies.size()); b++) {                    // Loop over bodies
+  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
     for (int d=0; d<3; d++) dipole[d] += bodies[b].X[d] * bodies[b].q;// Accumulate dipole
   }                                                             // End loop over bodies
   real_t coef = 4 * M_PI / (3 * cycle * cycle * cycle);         // Domain coefficient
-  for (int b=0; b<int(bodies.size()); b++) {                    // Loop over bodies
+  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
     real_t dnorm = dipole[0] * dipole[0] + dipole[1] * dipole[1] + dipole[2] * dipole[2];// Norm of dipole
     bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;  //  Correct potential
     for (int d=0; d!=3; d++) bodies[b].F[d] -= coef * dipole[d];//  Correct force
@@ -74,7 +75,7 @@ int main(int argc, char ** argv) {
   //! Ewald summation
   start("Build tree");                                          // Start timer
   Bodies bodies2 = bodies;                                      // Backup bodies
-  for (int b=0; b<int(bodies.size()); b++) {                    // Loop over bodies
+  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
     bodies[b].p = 0;                                            //  Clear potential
     for (int d=0; d<3; d++) bodies[b].F[d] = 0;                 //  Clear force
   }                                                             // End loop over bodies
@@ -91,7 +92,7 @@ int main(int argc, char ** argv) {
 
   //! Verify result
   real_t pSum = 0, pSum2 = 0, FDif = 0, FNrm = 0;
-  for (int b=0; b<int(bodies.size()); b++) {                    // Loop over bodies & bodies2
+  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies & bodies2
     pSum += bodies[b].p * bodies[b].q;                          // Sum of potential for bodies
     pSum2 += bodies2[b].p * bodies2[b].q;                       // Sum of potential for bodies2
     FDif += (bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +// Difference of force

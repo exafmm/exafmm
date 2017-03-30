@@ -48,7 +48,7 @@ namespace exafmm {
   //! Horizontal pass for periodic images
   void periodic(Cell * Ci0, Cell * Cj0, real_t cycle) {
     Cells pcells(9);                                            // Create cells
-    for (int c=0; c<int(pcells.size()); c++) {                  // Loop over periodic cells
+    for (size_t c=0; c<pcells.size(); c++) {                    // Loop over periodic cells
       pcells[c].M.resize(P, 0.0);                               //  Allocate & initialize M coefs
       pcells[c].L.resize(P, 0.0);                               //  Allocate & initialize L coefs
     }                                                           // End loop over periodic cells

@@ -21,9 +21,9 @@ namespace exafmm {
   //! Forward DFT
   void dft(Waves & waves, Bodies & bodies) {
 #pragma omp parallel for
-    for (int w=0; w<int(waves.size()); w++) {                   // Loop over waves
+    for (size_t w=0; w<waves.size(); w++) {                     // Loop over waves
       waves[w].REAL = waves[w].IMAG = 0;                        //  Initialize waves
-      for (int b=0; b<int(bodies.size()); b++) {                //  Loop over bodies
+      for (size_t b=0; b<bodies.size(); b++) {                  //  Loop over bodies
         real_t th = 0;                                          //   Initialize phase
         for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];//  Determine phase
         waves[w].REAL += bodies[b].q * std::cos(th);            //   Accumulate real component
@@ -35,9 +35,9 @@ namespace exafmm {
   //! Inverse DFT
   void idft(Waves & waves, Bodies & bodies) {
 #pragma omp parallel for
-    for (int b=0; b<int(bodies.size()); b++) {                  // Loop over bodies
+    for (size_t b=0; b<bodies.size(); b++) {                    // Loop over bodies
       real_t p = 0, F[3] = {0, 0, 0};                           //  Initialize potential, force
-      for (int w=0; w<int(waves.size()); w++) {                 //   Loop over waves
+      for (size_t w=0; w<waves.size(); w++) {                   //   Loop over waves
         real_t th = 0;                                          //    Initialzie phase
         for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];// Determine phase
         real_t dtmp = waves[w].REAL * std::sin(th) - waves[w].IMAG * std::cos(th);// Temporary value
@@ -131,7 +131,7 @@ namespace exafmm {
     dft(waves,jbodies);                                         // Apply DFT to bodies to get waves
     real_t coef = 2 / sigma / cycle / cycle / cycle;            // First constant
     real_t coef2 = 1 / (4 * alpha * alpha);                     // Second constant
-    for (int w=0; w<int(waves.size()); w++) {                   // Loop over waves
+    for (size_t w=0; w<waves.size(); w++) {                     // Loop over waves
       for (int d=0; d<3; d++) K[d] = waves[w].K[d] * scale[d];  //  Wave number scaled
       real_t K2 = K[0] * K[0] + K[1] * K[1] + K[2] * K[2];      //  Wave number squared
       real_t factor = coef * std::exp(-K2 * coef2) / K2;        //  Wave factor
@@ -143,7 +143,7 @@ namespace exafmm {
 
   //! Subtract self term
   void selfTerm(Bodies & bodies) {
-    for (int b=0; b<int(bodies.size()); b++) {                  // Loop over all bodies
+    for (size_t b=0; b<bodies.size(); b++) {                    // Loop over all bodies
       bodies[b].p -= M_2_SQRTPI * bodies[b].q * alpha;          //  Self term of Ewald real part
     }                                                           // End loop over all bodies in cell
   }

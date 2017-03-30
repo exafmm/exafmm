@@ -59,7 +59,7 @@ int main(int argc, char ** argv) {
 
   // P2P
   Bodies bodies2(1);
-  for (int b=0; b<int(bodies2.size()); b++) {
+  for (size_t b=0; b<bodies2.size(); b++) {
     bodies2[b] = bodies[b];
     bodies2[b].p = 0;
     for (int d=0; d<2; d++) bodies2[b].F[d] = 0;
@@ -71,7 +71,7 @@ int main(int argc, char ** argv) {
 
   // Verify results
   real_t pDif = 0, pNrm = 0, FDif = 0, FNrm = 0;
-  for (int b=0; b<int(bodies.size()); b++) {
+  for (size_t b=0; b<bodies.size(); b++) {
     pDif += (bodies[b].p - bodies2[b].p) * (bodies[b].p - bodies2[b].p);
     pNrm += bodies[b].p * bodies[b].p;
     FDif += (bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +

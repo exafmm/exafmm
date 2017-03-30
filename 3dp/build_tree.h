@@ -9,7 +9,7 @@ namespace exafmm {
   void getBounds(Bodies & bodies, real_t & R0, real_t * X0) {
     real_t Xmin[3], Xmax[3];                                    // Min, max of domain
     for (int d=0; d<3; d++) Xmin[d] = Xmax[d] = bodies[0].X[d]; // Initialize Xmin, Xmax
-    for (int b=0; b<int(bodies.size()); b++) {                  // Loop over range of bodies
+    for (size_t b=0; b<bodies.size(); b++) {                    // Loop over range of bodies
       for (int d=0; d<3; d++) Xmin[d] = fmin(bodies[b].X[d], Xmin[d]);//  Update Xmin
       for (int d=0; d<3; d++) Xmax[d] = fmax(bodies[b].X[d], Xmax[d]);//  Update Xmax
     }                                                           // End loop over range of bodies
