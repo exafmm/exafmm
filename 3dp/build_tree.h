@@ -23,7 +23,7 @@ namespace exafmm {
   }
 
   //! Build cells of tree adaptively using a top-down approach based on recursion
-  void buildCells(Body * bodies, Body * buffer, int begin, int end, Cell * cell,
+  void buildCells(Body * bodies, Body * buffer, int begin, int end, Cell * cell, Cells & cells,
                   real_t * X, real_t R, int level=0, bool direction=false) {
     //! Create a tree cell
     cell->BODY = bodies + begin;                                // Pointer of first body in cell
@@ -69,8 +69,9 @@ namespace exafmm {
     }                                                           // End loop over bodies
     //! Loop over children and recurse
     real_t Xchild[3];                                           // Coordinates of children
-    Cell * child = new Cell[cell->NCHILD];                      // Allocate memory for child cells
-    cell->CHILD = child;                                        // Pointer for first child cell
+    cells.resize(cells.size()+cell->NCHILD);                    // Resize cell vector
+    Cell * child = &cells.back() - cell->NCHILD + 1;            // Pointer for first child cell
+    cell->CHILD = child;                                        // Point to first child cell
     int c = 0;                                                  // Counter for child cells
     for (int i=0; i<8; i++) {                                   // Loop over children
       for (int d=0; d<3; d++) Xchild[d] = X[d];                 //  Initialize center position of child cell
@@ -80,18 +81,19 @@ namespace exafmm {
       }                                                         //  End loop over dimensions
       if (size[i]) {                                            //  If child exists
         buildCells(buffer, bodies, offsets[i], offsets[i] + size[i],// Recursive call for each child
-                   &child[c], Xchild, R, level+1, !direction);
+                   &child[c], cells, Xchild, R, level+1, !direction);
         c++;                                                    //   Increment child cell counter
       }                                                         //  End if for child
     }                                                           // End loop over children
   }
 
-  Cell * buildTree(Bodies & bodies) {
+  Cells buildTree(Bodies & bodies) {
     real_t R0, X0[3];                                           // Radius and center root cell
     getBounds(bodies, R0, X0);                                  // Get bounding box from bodies
     Bodies buffer = bodies;                                     // Copy bodies to buffer
-    Cell * cells = new Cell();                                  // Create root cell
-    buildCells(&bodies[0], &buffer[0], 0, bodies.size(), cells, X0, R0);// Build tree recursively
+    Cells cells(1);                                             // Vector of cells
+    cells.reserve(bodies.size());                               // Reserve memory space
+    buildCells(&bodies[0], &buffer[0], 0, bodies.size(), &cells[0], cells, X0, R0);// Build tree recursively
     return cells;                                               // Return pointer of root cell
   }
 }
