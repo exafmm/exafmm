@@ -1,7 +1,7 @@
 #include "build_tree.h"
 #include "kernel.h"
 #include "timer.h"
-#include "traversal2.h"
+#include "traversal.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
@@ -33,7 +33,7 @@ int main(int argc, char ** argv) {
 
   //! Build tree
   start("Build tree");                                          // Start timer
-  Cell * cells = buildTree(bodies);                             // Build tree
+  Cells cells = buildTree(bodies);                              // Build tree
   stop("Build tree");                                           // Stop timer
 
   //! FMM evaluation
@@ -41,16 +41,16 @@ int main(int argc, char ** argv) {
 #pragma omp single nowait                                       // Start OpenMP single region with nowait
   {
     start("Upward pass");                                       // Start timer
-    upwardPass(cells);                                          // Upward pass for P2M, M2M
+    upwardPass(&cells[0]);                                      // Upward pass for P2M, M2M
     stop("Upward pass");                                        // Stop timer
     start("Traversal");                                         // Start timer
-    traversal(cells, cells);                                    // Traversal for M2L, P2P
+    traversal(&cells[0], &cells[0]);                            // Traversal for M2L, P2P
     stop("Traversal");                                          // Stop timer
-    start("Evaluate");                                          // Start timer
-    evaluate();                                                 // Evaluate M2L, P2P
-    stop("Evaluate");                                           // Stop timer
+    //start("Evaluate");                                          // Start timer
+    //evaluate();                                                 // Evaluate M2L, P2P
+    //stop("Evaluate");                                           // Stop timer
     start("Downward pass");                                     // Start timer
-    downwardPass(cells);                                        // Downward pass for L2L, L2P
+    downwardPass(&cells[0]);                                    // Downward pass for L2L, L2P
     stop("Downward pass");                                      // Stop timer
   }
 
