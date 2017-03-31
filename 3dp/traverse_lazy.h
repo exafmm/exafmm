@@ -23,14 +23,28 @@ namespace exafmm {
     upwardPass(&cells[0]);                                      // Pass root cell to recursive call
   }
 
+  //! 3-D to 1-D periodic index
+  int periodic1D(int * iX) {
+    return iX[0] + 1 + 3 * (iX[1] + 1) + 9 * (iX[2] + 1);       // Return 1-D periodic index
+  }
+
+  //! 1-D to 3-D periodic index
+  void periodic3D(int i, int * iX) {
+    iX[0] = (i % 3) - 1;                                        // x periodic index
+    iX[1] = ((i / 3) % 3) - 1;                                  // y periodic index
+    iX[2] = (i / 9) - 1;                                        // z periodic index
+  }
+
   //! Recursive call to dual tree traversal for list construction
   void getList(Cell * Ci, Cell * Cj) {
     for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - iX[d] * cycle;// Distance vector from source to target
     real_t R2 = norm(dX) * theta * theta;                       // Scalar distance squared
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {               // If distance is far enough
       Ci->listM2L.push_back(Cj);                                //  Add to M2L list
+      Ci->periodicM2L.push_back(periodic1D(iX));                //  Add to M2L periodic index
     } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {            // Else if both cells are leafs
       Ci->listP2P.push_back(Cj);                                //  Add to P2P list
+      Ci->periodicP2P.push_back(periodic1D(iX));                //  Add to P2P periodic index
     } else if (Cj->NCHILD == 0 || (Ci->R >= Cj->R && Ci->NCHILD != 0)) {// If Cj is leaf or Ci is larger
       for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {// Loop over Ci's children
         getList(ci, Cj);                                        //   Recursive call to target child cells
@@ -44,11 +58,14 @@ namespace exafmm {
 
   //! Evaluate M2L, P2P kernels
   void evaluate(Cells & cells) {
+#pragma omp parallel for
     for (size_t i=0; i<cells.size(); i++) {                     // Loop over cells
       for (size_t j=0; j<cells[i].listM2L.size(); j++) {        //  Loop over M2L list
+        periodic3D(cells[i].periodicM2L[j],iX);                 //   Get 3-D periodic index
 	M2L(&cells[i],cells[i].listM2L[j]);                     //   M2L kernel
       }                                                         //  End loop over M2L list
       for (size_t j=0; j<cells[i].listP2P.size(); j++) {        //  Loop over P2P list
+        periodic3D(cells[i].periodicP2P[j],iX);                 //   Get 3-D periodic index
         P2P(&cells[i],cells[i].listP2P[j]);                     //   P2P kernel
       }                                                         //  End loop over P2P list
     }                                                           // End loop over cells
@@ -113,14 +130,10 @@ namespace exafmm {
         for (iX[1]=-1; iX[1]<=1; iX[1]++) {                     //   Loop over y periodic direction
           for (iX[2]=-1; iX[2]<=1; iX[2]++) {                   //    Loop over z periodic direction
             getList(&icells[0], &jcells[0]);                    //     Pass root cell to recursive call
-            evaluate(icells);                                   //     Evaluate M2L & P2P kernels
-            for (size_t i=0; i<icells.size(); i++) {            //     Loop over target cells
-              icells[i].listM2L.clear();                        //      Clear M2L interaction list
-              icells[i].listP2P.clear();                        //      Clear P2P interaction list
-            }                                                   //     End loop over target cells
           }                                                     //    End loop over z periodic direction
         }                                                       //   End loop over y periodic direction
       }                                                         //  End loop over x periodic direction
+      evaluate(icells);                                         //  Evaluate M2L & P2P kernels
       real_t saveCycle = cycle;                                 //  Copy cycle
       periodic(&icells[0], &jcells[0]);                         //  Horizontal pass for periodic images
       cycle = saveCycle;                                        //  Copy back cycle

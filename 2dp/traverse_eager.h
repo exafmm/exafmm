@@ -51,6 +51,7 @@ namespace exafmm {
     }                                                           // End loop over periodic cells
     Cell * Ci = &pcells.back();                                 // Last cell is periodic parent cell
     *Ci = *Cj0;                                                 // Copy values from source root
+    Ci->CHILD = &pcells[0];                                     // Child cells for periodic center cell
     Ci->NCHILD = 8;                                             // Number of child cells for periodic center cell
     for (int level=0; level<images-1; level++) {                // Loop over sublevels of tree
       for (int ix=-1; ix<=1; ix++) {                            //  Loop over x periodic direction
@@ -66,14 +67,13 @@ namespace exafmm {
           }                                                     //    Endif for periodic center cell
         }                                                       //   End loop over y periodic direction
       }                                                         //  End loop over x periodic direction
-      Cell * Cj = &pcells.front();                              //  Iterator of periodic neighbor cells
-      Ci->CHILD = Cj;                                           //  Child cells for periodic center cell
+      Cell * Cj = &pcells[0];                                   //  Iterator of periodic neighbor cells
       for (int ix=-1; ix<=1; ix++) {                            //  Loop over x periodic direction
         for (int iy=-1; iy<=1; iy++) {                          //   Loop over y periodic direction
           if( ix != 0 || iy != 0) {                             //    If periodic cell is not at center
             Cj->X[0] = Ci->X[0] + ix * cycle;                   //     Set new x coordinate for periodic image
             Cj->X[1] = Ci->X[1] + iy * cycle;                   //     Set new y cooridnate for periodic image
-            for (int n=0; n<P; n++) Cj->M[n] = Ci->M[n];        //     Copy multipoles to new periodic image
+            Cj->M = Ci->M;                                      //     Copy multipoles to new periodic image
             Cj++;                                               //     Increment periodic cell iterator
           }                                                     //    Endif for periodic center cell
         }                                                       //   End loop over y periodic direction

@@ -30,6 +30,8 @@ namespace exafmm {
 #if EXAFMM_LAZY
     std::vector<Cell*> listM2L;                                 //!< M2L interaction list
     std::vector<Cell*> listP2P;                                 //!< P2P interaction list
+    std::vector<int> periodicM2L;                               //!< M2L periodic index
+    std::vector<int> periodicP2P;                               //!< P2P periodic index
 #endif
     std::vector<complex_t> M;                                   //!< Multipole expansion coefficients
     std::vector<complex_t> L;                                   //!< Local expansion coefficients
