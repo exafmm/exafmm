@@ -130,7 +130,7 @@ namespace exafmm {
       real_t ay = 0;
       real_t az = 0;
       for (int j=0; j<nj; j++) {
-        for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d] - Xperiodic[d];
+        for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d] - iX[d] * cycle;
         real_t R2 = norm(dX);
         if (R2 != 0) {
           real_t invR2 = 1.0 / R2;
@@ -197,7 +197,7 @@ namespace exafmm {
 
   void M2L(Cell * Ci, Cell * Cj) {
     complex_t Ynm2[4*P*P];
-    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - Xperiodic[d];
+    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - iX[d] * cycle;
     real_t rho, alpha, beta;
     cart2sph(dX, rho, alpha, beta);
     evalLocal(rho, alpha, beta, Ynm2);

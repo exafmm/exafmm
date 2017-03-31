@@ -82,7 +82,7 @@ namespace exafmm {
   void realP2P(Cell * Ci, Cell * Cj) {
     for (Body * Bi=Ci->BODY; Bi!=Ci->BODY+Ci->NBODY; Bi++) {    // Loop over target bodies
       for (Body * Bj=Cj->BODY; Bj!=Cj->BODY+Cj->NBODY; Bj++) {  //  Loop over source bodies
-        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - Xperiodic[d];//   Distance vector from source to target
+        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - iX[d] * cycle;// Distance vector from source to target
         real_t R2 = dX[0] * dX[0] + dX[1] * dX[1] + dX[2] * dX[2];//   R^2
         if (0 < R2 && R2 < cutoff * cutoff) {                   //   Exclude self interaction and cutoff
           real_t R2s = R2 * alpha * alpha;                      //    (R * alpha)^2
@@ -102,12 +102,13 @@ namespace exafmm {
   }
 
   void neighbor(Cell * Ci, Cell * Cj) {                         // Traverse tree to find neighbor
-    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d];        //  Distance vector from source to target
     for (int d=0; d<3; d++) {                                   //  Loop over dimensions
-      if(dX[d] < -cycle / 2) dX[d] += cycle;                    //   Wrap around positive
-      if(dX[d] >  cycle / 2) dX[d] -= cycle;                    //   Wrap around negative
+      dX[d] = Ci->X[d] - Cj->X[d];                              //  Distance vector from source to target
+      iX[d] = 0;                                                //   Initialize periodic index
+      if(dX[d] < -cycle / 2) iX[d]--;                           //   Wrap periodic index backward
+      if(dX[d] >  cycle / 2) iX[d]++;                           //   Wrap periodic index forward
+      dX[d] -= iX[d] * cycle;                                   //   Wrap distance vector
     }                                                           //  End loop over dimensions
-    for (int d=0; d<3; d++) Xperiodic[d] = Ci->X[d] - Cj->X[d] - dX[d];//  Coordinate offset for periodic B.C.
     real_t R = std::sqrt(dX[0] * dX[0] + dX[1] * dX[1] + dX[2] * dX[2]);//  Scalar distance
     if (R - Ci->R - Cj->R < sqrtf(3) * cutoff) {                //  If cells are close
       if(Cj->NCHILD == 0) realP2P(Ci, Cj);                      //   Ewald real part
