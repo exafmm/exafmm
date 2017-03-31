@@ -40,11 +40,11 @@ namespace exafmm {
   int P;                                                        //!< Order of expansions
   int ncrit;                                                    //!< Number of bodies per leaf cell
   int images;                                                   //!< Number of periodic image sublevels
+  int iX[2];                                                    //!< 2-D periodic index
   real_t cycle;                                                 //!< Cycle of periodic boundary condition
   real_t theta;                                                 //!< Multipole acceptance criterion
   real_t dX[2];                                                 //!< Distance vector
-  real_t Xperiodic[2];                                          //!< Periodic coordinate offset
-#pragma omp threadprivate(dX,Xperiodic)                         //!< Make global variables private
+#pragma omp threadprivate(iX,dX)                                //!< Make global variables private
 }
 
 #endif

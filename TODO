@@ -1,7 +1,6 @@
 Use periodic index (efficient loop)
 OpenMP with loops
 Choose between eager/lazy
-Use Hilbert key instead of C->X, level offset instead of C->R
 
 Jenkins tests
 Helmholtz
