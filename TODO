@@ -2,7 +2,7 @@ Use periodic index (efficient loop)
 OpenMP with loops
 Choose between eager/lazy
 
-Jenkins tests
+Travis CI tests
 Helmholtz
 Stokes
 MPI

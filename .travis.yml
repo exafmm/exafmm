@@ -1,0 +1,8 @@
+sudo: false
+language: cpp
+compiler: gcc
+script:
+    - cd 2d && make && cd -
+    - cd 2dp && make && cd -
+    - cd 3d && make && cd -
+    - cd 3dp && make && cd -
