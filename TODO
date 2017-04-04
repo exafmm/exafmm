@@ -1,10 +1,15 @@
-Use periodic index (efficient loop)
-OpenMP with loops
 Choose between eager/lazy
 
-Travis CI tests
-Helmholtz
-Stokes
-MPI
+Travis tests: kernel, tree, list, fmm
+Test for different: distribution, N, P, theta
+Ewald for periodic
+kernels: Helmholtz, Stokes
+MPI: partition, localEssentialTree
+MPI debug: serialized test
 precomputation, BLAS
-GPU
+GPU: traverse, kernels
+/utils: vec, args, timer
+Autotune ncrit
+
+[folders]
+2d, 3d, 3dp, 3dp_simd, 3dp_gpu, 3dp_simd_mpi, 3dp_gpu_mpi
