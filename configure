@@ -582,7 +582,7 @@ PACKAGE_STRING='exaFMM 2.0'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_unique_file="tests/"
+ac_unique_file="3d/"
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
@@ -2132,7 +2132,11 @@ ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
 ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 ac_config_files="$ac_config_files Makefile tests/Makefile"
+=======
+ac_config_files="$ac_config_files Makefile 3d/Makefile"
+>>>>>>> checkout autoconf files from master branch
 
 ac_config_headers="$ac_config_headers config.h"
 
@@ -6908,7 +6912,11 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
+=======
+    "3d/Makefile") CONFIG_FILES="$CONFIG_FILES 3d/Makefile" ;;
+>>>>>>> checkout autoconf files from master branch
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
 

@@ -1,10 +1,10 @@
 # https://www.gnu.org/software/autoconf-archive/The-Macros.html#The-Macros
 AC_INIT([exaFMM], [2.0])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_FILES([Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile 3d/Makefile])
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([tests/])
+AC_CONFIG_SRCDIR([3d/])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
 AM_MAINTAINER_MODE
 AC_LANG([C++])

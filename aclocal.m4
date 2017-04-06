@@ -20,9 +20,9 @@ You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically 'autoreconf'.])])
 
-# ===========================================================================
-#  http://www.gnu.org/software/autoconf-archive/ax_append_compile_flags.html
-# ===========================================================================
+# ============================================================================
+#  https://www.gnu.org/software/autoconf-archive/ax_append_compile_flags.html
+# ============================================================================
 #
 # SYNOPSIS
 #
@@ -63,7 +63,7 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 #   Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 #   As a special exception, the respective Autoconf Macro's copyright owner
 #   gives unlimited permission to copy, distribute and modify the configure
@@ -78,7 +78,11 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #serial 5
+=======
+#serial 6
+>>>>>>> checkout autoconf files from master branch
 
 AC_DEFUN([AX_APPEND_COMPILE_FLAGS],
 [AX_REQUIRE_DEFINED([AX_CHECK_COMPILE_FLAG])
@@ -89,7 +93,11 @@ done
 ])dnl AX_APPEND_COMPILE_FLAGS
 
 # ===========================================================================
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #      http://www.gnu.org/software/autoconf-archive/ax_append_flag.html
+=======
+#      https://www.gnu.org/software/autoconf-archive/ax_append_flag.html
+>>>>>>> checkout autoconf files from master branch
 # ===========================================================================
 #
 # SYNOPSIS
@@ -124,7 +132,11 @@ done
 #   Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License along
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #   with this program. If not, see <http://www.gnu.org/licenses/>.
+=======
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
+>>>>>>> checkout autoconf files from master branch
 #
 #   As a special exception, the respective Autoconf Macro's copyright owner
 #   gives unlimited permission to copy, distribute and modify the configure
@@ -139,7 +151,11 @@ done
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #serial 6
+=======
+#serial 7
+>>>>>>> checkout autoconf files from master branch
 
 AC_DEFUN([AX_APPEND_FLAG],
 [dnl
@@ -161,7 +177,11 @@ AS_VAR_POPDEF([FLAGS])dnl
 ])dnl AX_APPEND_FLAG
 
 # ===========================================================================
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #   http://www.gnu.org/software/autoconf-archive/ax_check_compile_flag.html
+=======
+#  https://www.gnu.org/software/autoconf-archive/ax_check_compile_flag.html
+>>>>>>> checkout autoconf files from master branch
 # ===========================================================================
 #
 # SYNOPSIS
@@ -202,7 +222,11 @@ AS_VAR_POPDEF([FLAGS])dnl
 #   Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License along
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #   with this program. If not, see <http://www.gnu.org/licenses/>.
+=======
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
+>>>>>>> checkout autoconf files from master branch
 #
 #   As a special exception, the respective Autoconf Macro's copyright owner
 #   gives unlimited permission to copy, distribute and modify the configure
@@ -217,7 +241,11 @@ AS_VAR_POPDEF([FLAGS])dnl
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #serial 4
+=======
+#serial 5
+>>>>>>> checkout autoconf files from master branch
 
 AC_DEFUN([AX_CHECK_COMPILE_FLAG],
 [AC_PREREQ(2.64)dnl for _AC_LANG_PREFIX and AS_VAR_IF
@@ -236,7 +264,11 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 ])dnl AX_CHECK_COMPILE_FLAGS
 
 # ===========================================================================
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #    http://www.gnu.org/software/autoconf-archive/ax_require_defined.html
+=======
+#    https://www.gnu.org/software/autoconf-archive/ax_require_defined.html
+>>>>>>> checkout autoconf files from master branch
 # ===========================================================================
 #
 # SYNOPSIS
@@ -267,7 +299,11 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
+<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #serial 1
+=======
+#serial 2
+>>>>>>> checkout autoconf files from master branch
 
 AC_DEFUN([AX_REQUIRE_DEFINED], [dnl
   m4_ifndef([$1], [m4_fatal([macro ]$1[ is not defined; is a m4 file missing?])])
