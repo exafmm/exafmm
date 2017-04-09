@@ -141,7 +141,7 @@ bin_PROGRAMS = laplace$(EXEEXT) helmholtz$(EXEEXT) biotsavart$(EXEEXT) \
 	helmholtz_kernel$(EXEEXT) biotsavart_kernel$(EXEEXT) \
 	$(am__EXEEXT_1)
 @EXAFMM_HAVE_MPI_TRUE@am__append_27 = laplace_mpi helmholtz_mpi biotsavart_mpi ewald_mpi
-subdir = 3d
+subdir = 3dp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_flags.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
@@ -557,9 +557,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign 3d/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign 3dp/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign 3d/Makefile
+	  $(AUTOMAKE) --foreign 3dp/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
