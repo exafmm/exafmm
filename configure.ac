@@ -16,12 +16,30 @@ AC_PROG_RANLIB
 AM_PROG_AR
 
 # OpenMP
-AC_ARG_ENABLE(openmp, [AC_HELP_STRING([--enable-openmp],[use OpenMP])], enable_openmp=$enableval, enable_openmp=no)
+AC_ARG_ENABLE([openmp], 
+              [AC_HELP_STRING([--disable-openmp],
+                              [disable OpenMP])], 
+              [], 
+              [enable_openmp=yes])
 if test "$enable_openmp" = "yes"; then
    AC_DEFINE(EXAFMM_HAVE_OPENMP,1,[Use OpenMP])
    AX_OPENMP([], [AC_MSG_ERROR([don't know how to enable OpenMP for C++])])
 fi
 AM_CONDITIONAL(EXAFMM_HAVE_OPENMP, test "$enable_openmp" = "yes")
+
+# MPI
+AC_ARG_ENABLE([mpi], 
+              [AC_HELP_STRING([--disable-mpi],
+                              [do not compile exaFMM MPI library])],
+              [],
+              [enable_mpi=yes])
+if test "$enable_mpi" = "yes"; then
+   AX_MPI([],[AC_MSG_ERROR([could not find mpi library for --enable-mpi])])
+   AC_CHECK_PROG(MPIRUN, mpirun, mpirun)
+   AC_SUBST(MPIRUN)
+   CXX=$MPICXX
+fi
+AM_CONDITIONAL(EXAFMM_HAVE_MPI, test "$enable_mpi" = "yes")
 
 # Single precision
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile exaFMM in single precision])], ok=$enableval, ok=no)
@@ -34,16 +52,6 @@ else
 fi
 AM_CONDITIONAL(EXAFMM_SINGLE, test "$ok" = "yes")
 AC_SUBST(PRECISION)
-
-# MPI
-AC_ARG_ENABLE(mpi, [AC_HELP_STRING([--enable-mpi],[compile exaFMM MPI library])], enable_mpi=$enableval, enable_mpi=no)
-if test "$enable_mpi" = "yes"; then
-   AX_MPI([],[AC_MSG_ERROR([could not find mpi library for --enable-mpi])])
-   AC_CHECK_PROG(MPIRUN, mpirun, mpirun)
-   AC_SUBST(MPIRUN)
-   CXX=$MPICXX
-fi
-AM_CONDITIONAL(EXAFMM_HAVE_MPI, test "$enable_mpi" = "yes")
 
 # SSE3 (always defined)
 AC_DEFINE(EXAFMM_HAVE_SSE3,1,[Define to enable SSE/SSE3 optimizations.])
@@ -115,7 +123,11 @@ AM_CONDITIONAL(EXAFMM_HAVE_NEON, test "$have_neon" = "yes")
 AC_SUBST(NEON_CXXFLAGS)
 
 # Disable SIMD
-AC_ARG_ENABLE(simd, [AC_HELP_STRING([--disable-simd],[disable SIMD optimizations])], use_simd=$enableval, use_simd=yes)
+AC_ARG_ENABLE([simd], 
+              [AC_HELP_STRING([--disable-simd],
+                              [disable SIMD optimizations])], 
+              [use_simd=$enableval],
+              [use_simd=yes])
 if test "$use_simd" = "no"; then
    AC_DEFINE(EXAFMM_USE_SIMD,0,[Disable SIMD optimizations.])
 fi

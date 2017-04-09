@@ -637,6 +637,9 @@ AVX_CXXFLAGS
 EXAFMM_HAVE_AVX_FALSE
 EXAFMM_HAVE_AVX_TRUE
 SSE3_CXXFLAGS
+PRECISION
+EXAFMM_SINGLE_FALSE
+EXAFMM_SINGLE_TRUE
 EXAFMM_HAVE_MPI_FALSE
 EXAFMM_HAVE_MPI_TRUE
 MPIRUN
@@ -644,9 +647,6 @@ OPENMPILIBS
 MPILIBS
 MPIFC
 MPICXX
-PRECISION
-EXAFMM_SINGLE_FALSE
-EXAFMM_SINGLE_TRUE
 EXAFMM_HAVE_OPENMP_FALSE
 EXAFMM_HAVE_OPENMP_TRUE
 OPENMP_CXXFLAGS
@@ -754,9 +754,9 @@ enable_silent_rules
 enable_maintainer_mode
 enable_dependency_tracking
 enable_openmp
+enable_mpi
 enable_single
 enable_float
-enable_mpi
 enable_avx
 enable_avx2
 enable_mic
@@ -1410,10 +1410,10 @@ Optional Features:
                           do not reject slow dependency extractors
   --disable-dependency-tracking
                           speeds up one-time build
-  --enable-openmp         use OpenMP
+  --disable-openmp        disable OpenMP
+  --disable-mpi           do not compile exaFMM MPI library
   --enable-single         compile exaFMM in single precision
   --enable-float          synonym for --enable-single
-  --enable-mpi            compile exaFMM MPI library
   --enable-avx            enable AVX optimizations
   --enable-avx2           enable AVX2 optimizations
   --enable-mic            enable MIC optimizations
@@ -4650,9 +4650,9 @@ esac
 # OpenMP
 # Check whether --enable-openmp was given.
 if test "${enable_openmp+set}" = set; then :
-  enableval=$enable_openmp; enable_openmp=$enableval
+  enableval=$enable_openmp;
 else
-  enable_openmp=no
+  enable_openmp=yes
 fi
 
 if test "$enable_openmp" = "yes"; then
@@ -4740,43 +4740,12 @@ else
 fi
 
 
-# Single precision
-# Check whether --enable-single was given.
-if test "${enable_single+set}" = set; then :
-  enableval=$enable_single; ok=$enableval
-else
-  ok=no
-fi
-
-# Check whether --enable-float was given.
-if test "${enable_float+set}" = set; then :
-  enableval=$enable_float; ok=$enableval
-fi
-
-if test "$ok" = "yes"; then
-
-$as_echo "#define EXAFMM_SINGLE 1" >>confdefs.h
-
-   PRECISION=s
-else
-   PRECISION=d
-fi
- if test "$ok" = "yes"; then
-  EXAFMM_SINGLE_TRUE=
-  EXAFMM_SINGLE_FALSE='#'
-else
-  EXAFMM_SINGLE_TRUE='#'
-  EXAFMM_SINGLE_FALSE=
-fi
-
-
-
 # MPI
 # Check whether --enable-mpi was given.
 if test "${enable_mpi+set}" = set; then :
-  enableval=$enable_mpi; enable_mpi=$enableval
+  enableval=$enable_mpi;
 else
-  enable_mpi=no
+  enable_mpi=yes
 fi
 
 if test "$enable_mpi" = "yes"; then
@@ -5186,6 +5155,37 @@ else
   EXAFMM_HAVE_MPI_TRUE='#'
   EXAFMM_HAVE_MPI_FALSE=
 fi
+
+
+# Single precision
+# Check whether --enable-single was given.
+if test "${enable_single+set}" = set; then :
+  enableval=$enable_single; ok=$enableval
+else
+  ok=no
+fi
+
+# Check whether --enable-float was given.
+if test "${enable_float+set}" = set; then :
+  enableval=$enable_float; ok=$enableval
+fi
+
+if test "$ok" = "yes"; then
+
+$as_echo "#define EXAFMM_SINGLE 1" >>confdefs.h
+
+   PRECISION=s
+else
+   PRECISION=d
+fi
+ if test "$ok" = "yes"; then
+  EXAFMM_SINGLE_TRUE=
+  EXAFMM_SINGLE_FALSE='#'
+else
+  EXAFMM_SINGLE_TRUE='#'
+  EXAFMM_SINGLE_FALSE=
+fi
+
 
 
 # SSE3 (always defined)
@@ -6222,12 +6222,12 @@ if test -z "${EXAFMM_HAVE_OPENMP_TRUE}" && test -z "${EXAFMM_HAVE_OPENMP_FALSE}"
   as_fn_error $? "conditional \"EXAFMM_HAVE_OPENMP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${EXAFMM_SINGLE_TRUE}" && test -z "${EXAFMM_SINGLE_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_SINGLE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${EXAFMM_HAVE_MPI_TRUE}" && test -z "${EXAFMM_HAVE_MPI_FALSE}"; then
   as_fn_error $? "conditional \"EXAFMM_HAVE_MPI\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${EXAFMM_SINGLE_TRUE}" && test -z "${EXAFMM_SINGLE_FALSE}"; then
+  as_fn_error $? "conditional \"EXAFMM_SINGLE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXAFMM_HAVE_AVX_TRUE}" && test -z "${EXAFMM_HAVE_AVX_FALSE}"; then
