@@ -2136,7 +2136,6 @@ ac_config_files="$ac_config_files Makefile 2d/Makefile 2dp/Makefile 3d/Makefile 
 ac_config_headers="$ac_config_headers config.h"
 
 
-#AC_CONFIG_SRCDIR([2d/fmm.cxx 2dp/fmm.cxx 3d/fmm.cxx 3dp/fmm.cxx])
 am__api_version='1.15'
 
 # Find a good install program.  We prefer a C program (faster),
