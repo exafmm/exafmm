@@ -52,37 +52,26 @@ fi
 AM_CONDITIONAL(EXAFMM_SINGLE, test "$ok" = "yes")
 AC_SUBST(PRECISION)
 
-# SSE3 (always defined)
-AC_DEFINE(EXAFMM_HAVE_SSE3,1,[Define to enable SSE/SSE3 optimizations.])
-if test "$PRECISION" != "d" -a "$PRECISION" != "s"; then
-   AC_MSG_ERROR([SSE3 requires single or double precision])
+# SIMD extensions supported by compiler
+AC_ARG_ENABLE([simd-ext], 
+              [AS_HELP_STRING([--disable-simd-ext],
+                              [disable SIMD optimizations supported by compiler (SSE3, AVX, AVX2)])], 
+              [use_simd_ext=$enableval],
+              [use_simd_ext=yes])
+if test "$use_simd_ext" = "yes"; then
+   AX_EXT
 fi
-SSE3_CXXFLAGS=-msse3
-AC_SUBST(SSE3_CXXFLAGS)
 
-# AVX
-AC_ARG_ENABLE(avx, [AS_HELP_STRING([--enable-avx],[enable AVX optimizations])], have_avx=$enableval, have_avx=no)
-if test "$have_avx" = "yes"; then
-   AC_DEFINE(EXAFMM_HAVE_AVX,1,[Define to enable AVX optimizations.])
-   if test "$PRECISION" != "d" -a "$PRECISION" != "s"; then
-      AC_MSG_ERROR([AVX requires single or double precision])
-   fi
-   AVX_CXXFLAGS=-mavx
+# SIMD optimization specific to exaFMM
+AC_ARG_ENABLE([simd], 
+              [AS_HELP_STRING([--disable-simd],
+                              [disable SIMD optimizations specific to exaFMM])], 
+              [use_simd=$enableval],
+              [use_simd=yes])
+if test "$use_simd" = "no"; then
+   AC_DEFINE(EXAFMM_USE_SIMD,0,[Disable SIMD optimizations.])
 fi
-AM_CONDITIONAL(EXAFMM_HAVE_AVX, test "$have_avx" = "yes")
-AC_SUBST(AVX_CXXFLAGS)
-
-# AVX2
-AC_ARG_ENABLE(avx2, [AS_HELP_STRING([--enable-avx2],[enable AVX2 optimizations])], have_avx2=$enableval, have_avx2=no)
-if test "$have_avx2" = "yes"; then
-   AC_DEFINE(EXAFMM_HAVE_AVX2,1,[Define to enable AVX2 optimizations.])
-   if test "$PRECISION" != "d" -a "$PRECISION" != "s"; then
-      AC_MSG_ERROR([AVX2 requires single or double precision])
-   fi
-   AVX2_CXXFLAGS=-mavx2
-fi
-AM_CONDITIONAL(EXAFMM_HAVE_AVX2, test "$have_avx2" = "yes")
-AC_SUBST(AVX2_CXXFLAGS)
+AM_CONDITIONAL(EXAFMM_USE_SIMD, test "$use_simd" = "yes")
 
 # MIC
 AC_ARG_ENABLE(mic, [AS_HELP_STRING([--enable-mic],[enable MIC optimizations])], have_mic=$enableval, have_mic=no)
@@ -95,18 +84,6 @@ if test "$have_mic" = "yes"; then
 fi
 AM_CONDITIONAL(EXAFMM_HAVE_MIC, test "$have_mic" = "yes")
 AC_SUBST(MIC_CXXFLAGS)
-
-# AVX512
-AC_ARG_ENABLE(avx512, [AS_HELP_STRING([--enable-avx512],[enable AVX512 optimizations])], have_avx512=$enableval, have_avx512=no)
-if test "$have_avx512" = "yes"; then
-   AC_DEFINE(EXAFMM_HAVE_AVX512,1,[Define to enable AVX512 optimizations.])
-   if test "$PRECISION" != "d" -a "$PRECISION" != "s"; then
-      AC_MSG_ERROR([AVX512 requires single or double precision])
-   fi
-   AVX512_CXXFLAGS=-xMIC-AVX512
-fi
-AM_CONDITIONAL(EXAFMM_HAVE_AVX512, test "$have_avx512" = "yes")
-AC_SUBST(AVX512_CXXFLAGS)
 
 # Neon
 AC_ARG_ENABLE(neon, [AS_HELP_STRING([--enable-neon],[enable ARM NEON optimizations])], have_neon=$enableval, have_n\
@@ -121,17 +98,6 @@ fi
 AM_CONDITIONAL(EXAFMM_HAVE_NEON, test "$have_neon" = "yes")
 AC_SUBST(NEON_CXXFLAGS)
 
-# Disable SIMD
-AC_ARG_ENABLE([simd], 
-              [AS_HELP_STRING([--disable-simd],
-                              [disable SIMD optimizations])], 
-              [use_simd=$enableval],
-              [use_simd=yes])
-if test "$use_simd" = "no"; then
-   AC_DEFINE(EXAFMM_USE_SIMD,0,[Disable SIMD optimizations.])
-fi
-AM_CONDITIONAL(EXAFMM_USE_SIMD, test "$use_simd" = "yes")
-
 # Weights for partitioning
 AC_ARG_ENABLE(weight, [AS_HELP_STRING([--enable-weight],[enable weight for partitioning])], use_weight=$enableval, use_weight=no)
 if test "$use_weight" = "yes"; then
@@ -145,6 +111,19 @@ if test "$use_kahan" = "yes"; then
    AC_DEFINE(EXAFMM_USE_KAHAN,1,[Enable Kahan summation.])
 fi
 AM_CONDITIONAL(EXAFMM_USE_KAHAN, test "$use_kahan" = "yes")
+
+# Neon
+AC_ARG_ENABLE(neon, [AS_HELP_STRING([--enable-neon],[enable ARM NEON optimizations])], have_neon=$enableval, have_n\
+eon=no)
+if test "$have_neon" = "yes"; then
+   AC_DEFINE(EXAFMM_HAVE_NEON,1,[Define to enable ARM NEON optimizations.])
+   if test "$PRECISION" != "s"; then
+      AC_MSG_ERROR([NEON requires single precision])
+   fi
+   NEON_CXXFLAGS=-mneon
+fi
+AM_CONDITIONAL(EXAFMM_HAVE_NEON, test "$have_neon" = "yes")
+AC_SUBST(NEON_CXXFLAGS)
 
 # PAPI
 AC_ARG_ENABLE(papi, [AS_HELP_STRING([--enable-papi],[enable PAPI performance counter])], use_papi=$enableval, use_papi=no)

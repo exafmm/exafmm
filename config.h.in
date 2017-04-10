@@ -12,15 +12,6 @@
 /* Define to enable extra debugging options. */
 #undef EXAFMM_DEBUG
 
-/* Define to enable AVX optimizations. */
-#undef EXAFMM_HAVE_AVX
-
-/* Define to enable AVX2 optimizations. */
-#undef EXAFMM_HAVE_AVX2
-
-/* Define to enable AVX512 optimizations. */
-#undef EXAFMM_HAVE_AVX512
-
 /* Define to enable MIC optimizations. */
 #undef EXAFMM_HAVE_MIC
 
@@ -32,9 +23,6 @@
 
 /* Use OpenMP */
 #undef EXAFMM_HAVE_OPENMP
-
-/* Define to enable SSE/SSE3 optimizations. */
-#undef EXAFMM_HAVE_SSE3
 
 /* Define to compile in single precision. */
 #undef EXAFMM_SINGLE

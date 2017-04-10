@@ -78,11 +78,7 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
-#serial 5
-=======
 #serial 6
->>>>>>> checkout autoconf files from master branch
 
 AC_DEFUN([AX_APPEND_COMPILE_FLAGS],
 [AX_REQUIRE_DEFINED([AX_CHECK_COMPILE_FLAG])
@@ -177,6 +173,7 @@ AS_VAR_POPDEF([FLAGS])dnl
 ])dnl AX_APPEND_FLAG
 
 # ===========================================================================
+<<<<<<< 653fa39bb5b2ded40874207a3b00ae7a7129d334
 <<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #   http://www.gnu.org/software/autoconf-archive/ax_check_compile_flag.html
 =======
@@ -267,6 +264,8 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 <<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
 #    http://www.gnu.org/software/autoconf-archive/ax_require_defined.html
 =======
+=======
+>>>>>>> add ax_ext macro to detect compiler-supported SIMD flags
 #    https://www.gnu.org/software/autoconf-archive/ax_require_defined.html
 >>>>>>> checkout autoconf files from master branch
 # ===========================================================================
@@ -1535,7 +1534,9 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
+m4_include([m4/ax_check_compile_flag.m4])
 m4_include([m4/ax_compiler_flags.m4])
 m4_include([m4/ax_compiler_vendor.m4])
+m4_include([m4/ax_ext.m4])
 m4_include([m4/ax_mpi.m4])
 m4_include([m4/ax_openmp.m4])

@@ -62,28 +62,10 @@ endif
 # SIMD flags
 if EXAFMM_USE_SIMD
 AM_CPPFLAGS += -DEXAFMM_USE_SIMD
-if EXAFMM_HAVE_NEON
-AM_CXXFLAGS += $(NEON_CXXFLAGS) # Use Neon intrinsics
-else
-if EXAFMM_HAVE_AVX512
-AM_CXXFLAGS += $(AVX512_CXXFLAGS) # Use AVX512 intrinsics
-else
-if EXAFMM_HAVE_MIC
-AM_CXXFLAGS += $(MIC_CXXFLAGS) # Use MIC intrinsics
-else
-if EXAFMM_HAVE_AVX2
-AM_CXXFLAGS += $(AVX2_CXXFLAGS) # Use AVX2 intrinsics
-else
-if EXAFMM_HAVE_AVX
-AM_CXXFLAGS += $(AVX_CXXFLAGS) # Use AVX intrinsics
-else
-AM_CXXFLAGS += $(SSE3_CXXFLAGS) # Use SSE3 intrinsics
 endif
-endif
-endif
-endif
-endif
-endif
+
+# SIMD extensions from AX_EXT
+AM_CPPFLAGS += $(SIMD_FLAGS)
 
 # OpenMPI needs an extra library when linking with Fortran
 if EXAFMM_HAVE_MPI
