@@ -1,5 +1,0 @@
-- use std::map for the key -> index mapping
-- correct usage of ic, jc loop counter in tree.cxx
-- separate monopole test and potential test
-- remove the usage of "bodies" in verify.h
-- fix inter-character space (before and after *, &)
