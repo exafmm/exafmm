@@ -5638,34 +5638,6 @@ else
 fi
 
 
-# Neon
-# Check whether --enable-neon was given.
-if test "${enable_neon+set}" = set; then :
-  enableval=$enable_neon; have_neon=$enableval
-else
-  have_n\
-eon=no
-fi
-
-if test "$have_neon" = "yes"; then
-
-$as_echo "#define EXAFMM_HAVE_NEON 1" >>confdefs.h
-
-   if test "$PRECISION" != "s"; then
-      as_fn_error $? "NEON requires single precision" "$LINENO" 5
-   fi
-   NEON_CXXFLAGS=-mneon
-fi
- if test "$have_neon" = "yes"; then
-  EXAFMM_HAVE_NEON_TRUE=
-  EXAFMM_HAVE_NEON_FALSE='#'
-else
-  EXAFMM_HAVE_NEON_TRUE='#'
-  EXAFMM_HAVE_NEON_FALSE=
-fi
-
-
-
 # PAPI
 # Check whether --enable-papi was given.
 if test "${enable_papi+set}" = set; then :
@@ -6516,10 +6488,6 @@ if test -z "${EXAFMM_USE_KAHAN_TRUE}" && test -z "${EXAFMM_USE_KAHAN_FALSE}"; th
   as_fn_error $? "conditional \"EXAFMM_USE_KAHAN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${EXAFMM_HAVE_NEON_TRUE}" && test -z "${EXAFMM_HAVE_NEON_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_HAVE_NEON\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${EXAFMM_USE_PAPI_TRUE}" && test -z "${EXAFMM_USE_PAPI_FALSE}"; then
   as_fn_error $? "conditional \"EXAFMM_USE_PAPI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -7165,18 +7133,10 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-<<<<<<< 21569db18173cac1fa66b307c5e956ac753fc52e
-<<<<<<< 8ddbaac8da5bf0a42870ee8da9cce548a0ed883a
-    "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
-=======
-    "3d/Makefile") CONFIG_FILES="$CONFIG_FILES 3d/Makefile" ;;
->>>>>>> checkout autoconf files from master branch
-=======
     "2d/Makefile") CONFIG_FILES="$CONFIG_FILES 2d/Makefile" ;;
     "2dp/Makefile") CONFIG_FILES="$CONFIG_FILES 2dp/Makefile" ;;
     "3d/Makefile") CONFIG_FILES="$CONFIG_FILES 3d/Makefile" ;;
     "3dp/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp/Makefile" ;;
->>>>>>> add Makefile templates in 2d 2dp 3dp
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
 

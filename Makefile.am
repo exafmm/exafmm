@@ -1,4 +1,4 @@
-SUBDIRS = tests
+SUBDIRS = 2d 2dp 3d 3dp
 
 buildbot:
 	buildbot try --connect=pb --master=131.112.5.69:443 --username=exafmm --passwd=exafmm --vc=git

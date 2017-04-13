@@ -112,19 +112,6 @@ if test "$use_kahan" = "yes"; then
 fi
 AM_CONDITIONAL(EXAFMM_USE_KAHAN, test "$use_kahan" = "yes")
 
-# Neon
-AC_ARG_ENABLE(neon, [AS_HELP_STRING([--enable-neon],[enable ARM NEON optimizations])], have_neon=$enableval, have_n\
-eon=no)
-if test "$have_neon" = "yes"; then
-   AC_DEFINE(EXAFMM_HAVE_NEON,1,[Define to enable ARM NEON optimizations.])
-   if test "$PRECISION" != "s"; then
-      AC_MSG_ERROR([NEON requires single precision])
-   fi
-   NEON_CXXFLAGS=-mneon
-fi
-AM_CONDITIONAL(EXAFMM_HAVE_NEON, test "$have_neon" = "yes")
-AC_SUBST(NEON_CXXFLAGS)
-
 # PAPI
 AC_ARG_ENABLE(papi, [AS_HELP_STRING([--enable-papi],[enable PAPI performance counter])], use_papi=$enableval, use_papi=no)
 if test "$use_papi" = "yes"; then
