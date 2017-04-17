@@ -10,34 +10,27 @@
 #
 #   Find supported SIMD extensions by requesting cpuid. When a SIMD
 #   extension is found, the -m"simdextensionname" is added to SIMD_FLAGS if
-#   compiler supports it. For example, if "sse2" is available then "-msse2"
+#   compiler supports it. For example, if "sse3" is available then "-msse3"
 #   is added to SIMD_FLAGS.
 #
-#   Find other supported CPU extensions by requesting cpuid. When a
-#   processor extension is found, the -m"extensionname" is added to
-#   CPUEXT_FLAGS if compiler supports it. For example, if "bmi2" is
-#   available then "-mbmi2" is added to CPUEXT_FLAGS.
 #
 #   This macro calls:
 #
 #     AC_SUBST(SIMD_FLAGS)
-#     AC_SUBST(CPUEXT_FLAGS)
 #
 #   And defines:
 #
-#     HAVE_RDRND / HAVE_BMI1 / HAVE_BMI2 / HAVE_ADX / HAVE_MPX
-#     HAVE_PREFETCHWT1 / HAVE_ABM / HAVE_MMX / HAVE_SSE / HAVE_SSE2
-#     HAVE_SSE3 / HAVE_SSSE3 / HAVE_SSE4_1 / HAVE_SSE4_2 / HAVE_SSE4a
-#     HAVE_SHA / HAVE_AES / HAVE_AVX / HAVE_FMA3 / HAVE_FMA4 / HAVE_XOP
-#     HAVE_AVX2 / HAVE_AVX512_F / HAVE_AVX512_CD / HAVE_AVX512_PF
-#     HAVE_AVX512_ER / HAVE_AVX512_VL / HAVE_AVX512_BW / HAVE_AVX512_DQ
-#     HAVE_AVX512_IFMA / HAVE_AVX512_VBMI / HAVE_ALTIVEC / HAVE_VSX
+#     HAVE_SSE3 / HAVE_AVX / HAVE_AVX2 / HAVE_AVX512_F / HAVE_AVX512_CD 
+#     HAVE_AVX512_PF / HAVE_AVX512_ER / HAVE_AVX512_VL / HAVE_AVX512_BW
+#     HAVE_AVX512_DQ / HAVE_AVX512_IFMA / HAVE_AVX512_VBMI
+#     HAVE_ALTIVEC / HAVE_VSX
 #
 # LICENSE
 #
 #   Copyright (c) 2007 Christophe Tournayre <turn3r@users.sourceforge.net>
 #   Copyright (c) 2013,2015 Michael Petch <mpetch@capp-sysware.com>
 #   Copyright (c) 2017 Rafael de Lucena Valle <rafaeldelucena@gmail.com>
+#   Copyright (c) 2017 Tingyu Wang <twang66@gwu.edu>
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
@@ -51,7 +44,6 @@ AC_DEFUN([AX_EXT],
   AC_REQUIRE([AC_CANONICAL_HOST])
   AC_REQUIRE([AC_PROG_CC])
 
-  CPUEXT_FLAGS=""
   SIMD_FLAGS=""
 
   case $host_cpu in
@@ -254,7 +246,16 @@ AC_DEFUN([AX_EXT],
              AX_CHECK_COMPILE_FLAG(${ac_instr_compiler_flags}, eval ax_cv_support_${ac_instr_acvar}_ext=yes,
                                                                eval ax_cv_support_${ac_instr_acvar}_ext=no)
              if test x"$(eval echo \$ax_cv_support_${ac_instr_acvar}_ext)" = x"yes"; then
-               eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
+               dnl for intel compiler, have to use "-march=core-avx2" instead of "-mavx2"
+               if test x"${ac_instr_acvar}" = x"avx2"; then
+                 if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
+                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} -march=core-avx2\"
+                 else
+                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
+                 fi
+               else
+                 eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
+               fi
                AC_DEFINE_UNQUOTED([${ac_instr_have_define}])
              else
                AC_MSG_WARN([Your processor and OS supports ${ac_instr_shortname} instructions but not your compiler, can you try another compiler?])
@@ -286,5 +287,4 @@ AC_DEFUN([AX_EXT],
   AH_TEMPLATE([HAVE_AVX512_IFMA],[Define to 1 to support AVX-512 Integer Fused Multiply Add Instructions])
   AH_TEMPLATE([HAVE_AVX512_VBMI],[Define to 1 to support AVX-512 Vector Byte Manipulation Instructions])
   AC_SUBST(SIMD_FLAGS)
-  AC_SUBST(CPUEXT_FLAGS)
 ])

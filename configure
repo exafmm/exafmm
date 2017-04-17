@@ -627,7 +627,6 @@ EXAFMM_HAVE_MIC_FALSE
 EXAFMM_HAVE_MIC_TRUE
 EXAFMM_USE_SIMD_FALSE
 EXAFMM_USE_SIMD_TRUE
-CPUEXT_FLAGS
 SIMD_FLAGS
 host_os
 host_vendor
@@ -5429,7 +5428,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-  CPUEXT_FLAGS=""
   SIMD_FLAGS=""
 
   case $host_cpu in
@@ -6181,7 +6179,15 @@ else
 fi
 
              if test x"$(eval echo \$ax_cv_support_${ac_instr_acvar}_ext)" = x"yes"; then
-               eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
+                              if test x"${ac_instr_acvar}" = x"avx2"; then
+                 if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
+                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} -march=core-avx2\"
+                 else
+                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
+                 fi
+               else
+                 eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
+               fi
                cat >>confdefs.h <<_ACEOF
 #define ${ac_instr_have_define} 1
 _ACEOF
@@ -6219,7 +6225,6 @@ fi
       done
   ;;
   esac
-
 
 
 
