@@ -132,11 +132,7 @@ host_triplet = @host@
 # Use all possible debugging flags
 @EXAFMM_DEBUG_TRUE@am__append_19 = $(COMPILER_CXXFLAGS) -DEXAFMM_DEBUG
 @EXAFMM_DEBUG_TRUE@am__append_20 = $(COMPILER_FCFLAGS) -DEXAFMM_DEBUG
-bin_PROGRAMS = laplace$(EXEEXT) helmholtz$(EXEEXT) biotsavart$(EXEEXT) \
-	tree$(EXEEXT) vec$(EXEEXT) laplace_kernel$(EXEEXT) \
-	helmholtz_kernel$(EXEEXT) biotsavart_kernel$(EXEEXT) \
-	$(am__EXEEXT_1)
-@EXAFMM_HAVE_MPI_TRUE@am__append_21 = laplace_mpi helmholtz_mpi biotsavart_mpi ewald_mpi
+bin_PROGRAMS = laplace$(EXEEXT) laplace_kernel$(EXEEXT)
 subdir = 3d
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -151,57 +147,14 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-@EXAFMM_HAVE_MPI_TRUE@am__EXEEXT_1 = laplace_mpi$(EXEEXT) \
-@EXAFMM_HAVE_MPI_TRUE@	helmholtz_mpi$(EXEEXT) \
-@EXAFMM_HAVE_MPI_TRUE@	biotsavart_mpi$(EXEEXT) \
-@EXAFMM_HAVE_MPI_TRUE@	ewald_mpi$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_biotsavart_OBJECTS = biotsavart-fmm.$(OBJEXT)
-biotsavart_OBJECTS = $(am_biotsavart_OBJECTS)
-biotsavart_LDADD = $(LDADD)
-am_biotsavart_kernel_OBJECTS = biotsavart_kernel-kernel.$(OBJEXT)
-biotsavart_kernel_OBJECTS = $(am_biotsavart_kernel_OBJECTS)
-biotsavart_kernel_LDADD = $(LDADD)
-am__biotsavart_mpi_SOURCES_DIST = fmm_mpi.cxx
-@EXAFMM_HAVE_MPI_TRUE@am_biotsavart_mpi_OBJECTS =  \
-@EXAFMM_HAVE_MPI_TRUE@	biotsavart_mpi-fmm_mpi.$(OBJEXT)
-biotsavart_mpi_OBJECTS = $(am_biotsavart_mpi_OBJECTS)
-biotsavart_mpi_LDADD = $(LDADD)
-am__ewald_mpi_SOURCES_DIST = ewald.cxx
-@EXAFMM_HAVE_MPI_TRUE@am_ewald_mpi_OBJECTS =  \
-@EXAFMM_HAVE_MPI_TRUE@	ewald_mpi-ewald.$(OBJEXT)
-ewald_mpi_OBJECTS = $(am_ewald_mpi_OBJECTS)
-ewald_mpi_LDADD = $(LDADD)
-am_helmholtz_OBJECTS = helmholtz-fmm.$(OBJEXT)
-helmholtz_OBJECTS = $(am_helmholtz_OBJECTS)
-helmholtz_LDADD = $(LDADD)
-am_helmholtz_kernel_OBJECTS = helmholtz_kernel-kernel.$(OBJEXT)
-helmholtz_kernel_OBJECTS = $(am_helmholtz_kernel_OBJECTS)
-helmholtz_kernel_LDADD = $(LDADD)
-am__helmholtz_mpi_SOURCES_DIST = fmm_mpi.cxx
-@EXAFMM_HAVE_MPI_TRUE@am_helmholtz_mpi_OBJECTS =  \
-@EXAFMM_HAVE_MPI_TRUE@	helmholtz_mpi-fmm_mpi.$(OBJEXT)
-helmholtz_mpi_OBJECTS = $(am_helmholtz_mpi_OBJECTS)
-helmholtz_mpi_LDADD = $(LDADD)
 am_laplace_OBJECTS = laplace-fmm.$(OBJEXT)
 laplace_OBJECTS = $(am_laplace_OBJECTS)
 laplace_LDADD = $(LDADD)
 am_laplace_kernel_OBJECTS = laplace_kernel-kernel.$(OBJEXT)
 laplace_kernel_OBJECTS = $(am_laplace_kernel_OBJECTS)
 laplace_kernel_LDADD = $(LDADD)
-am__laplace_mpi_SOURCES_DIST = fmm_mpi.cxx
-@EXAFMM_HAVE_MPI_TRUE@am_laplace_mpi_OBJECTS =  \
-@EXAFMM_HAVE_MPI_TRUE@	laplace_mpi-fmm_mpi.$(OBJEXT)
-laplace_mpi_OBJECTS = $(am_laplace_mpi_OBJECTS)
-laplace_mpi_LDADD = $(LDADD)
-am__dirstamp = $(am__leading_dot)dirstamp
-am_tree_OBJECTS = tree-tree.$(OBJEXT) ../src/tree-tree.$(OBJEXT)
-tree_OBJECTS = $(am_tree_OBJECTS)
-tree_LDADD = $(LDADD)
-am_vec_OBJECTS = vec-vec.$(OBJEXT)
-vec_OBJECTS = $(am_vec_OBJECTS)
-vec_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -235,18 +188,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(biotsavart_SOURCES) $(biotsavart_kernel_SOURCES) \
-	$(biotsavart_mpi_SOURCES) $(ewald_mpi_SOURCES) \
-	$(helmholtz_SOURCES) $(helmholtz_kernel_SOURCES) \
-	$(helmholtz_mpi_SOURCES) $(laplace_SOURCES) \
-	$(laplace_kernel_SOURCES) $(laplace_mpi_SOURCES) \
-	$(tree_SOURCES) $(vec_SOURCES)
-DIST_SOURCES = $(biotsavart_SOURCES) $(biotsavart_kernel_SOURCES) \
-	$(am__biotsavart_mpi_SOURCES_DIST) \
-	$(am__ewald_mpi_SOURCES_DIST) $(helmholtz_SOURCES) \
-	$(helmholtz_kernel_SOURCES) $(am__helmholtz_mpi_SOURCES_DIST) \
-	$(laplace_SOURCES) $(laplace_kernel_SOURCES) \
-	$(am__laplace_mpi_SOURCES_DIST) $(tree_SOURCES) $(vec_SOURCES)
+SOURCES = $(laplace_SOURCES) $(laplace_kernel_SOURCES)
+DIST_SOURCES = $(laplace_SOURCES) $(laplace_kernel_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -479,30 +422,12 @@ AM_CPPFLAGS = $(am__append_5) $(am__append_8) $(am__append_9) \
 @EXAFMM_HAVE_BG_TRUE@	$(am__append_2) $(am__append_4) \
 @EXAFMM_HAVE_BG_TRUE@	$(am__append_7) $(am__append_20)
 AM_MAKEFLAGS = -s
+#helmholtz biotsavart tree vec
 laplace_SOURCES = fmm.cxx
 laplace_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
-helmholtz_SOURCES = fmm.cxx
-helmholtz_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_HELMHOLTZ -DEXAFMM_PMAX=20
-biotsavart_SOURCES = fmm.cxx
-biotsavart_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_BIOTSAVART -DEXAFMM_PMAX=10
-tree_SOURCES = tree.cxx ../src/tree.cxx
-tree_CPPFLAGS = $(laplace_CPPFLAGS)
-vec_SOURCES = vec.cxx
-vec_CPPFLAGS = $(laplace_CPPFLAGS)
+#helmholtz_kernel biotsavart_kernel
 laplace_kernel_SOURCES = kernel.cxx
 laplace_kernel_CPPFLAGS = $(laplace_CPPFLAGS)
-helmholtz_kernel_SOURCES = kernel.cxx
-helmholtz_kernel_CPPFLAGS = $(helmholtz_CPPFLAGS)
-biotsavart_kernel_SOURCES = kernel.cxx
-biotsavart_kernel_CPPFLAGS = $(biotsavart_CPPFLAGS)
-@EXAFMM_HAVE_MPI_TRUE@laplace_mpi_SOURCES = fmm_mpi.cxx
-@EXAFMM_HAVE_MPI_TRUE@laplace_mpi_CPPFLAGS = $(laplace_CPPFLAGS)
-@EXAFMM_HAVE_MPI_TRUE@helmholtz_mpi_SOURCES = fmm_mpi.cxx
-@EXAFMM_HAVE_MPI_TRUE@helmholtz_mpi_CPPFLAGS = $(helmholtz_CPPFLAGS)
-@EXAFMM_HAVE_MPI_TRUE@biotsavart_mpi_SOURCES = fmm_mpi.cxx
-@EXAFMM_HAVE_MPI_TRUE@biotsavart_mpi_CPPFLAGS = $(biotsavart_CPPFLAGS)
-@EXAFMM_HAVE_MPI_TRUE@ewald_mpi_SOURCES = ewald.cxx
-@EXAFMM_HAVE_MPI_TRUE@ewald_mpi_CPPFLAGS = $(laplace_CPPFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -580,34 +505,6 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-biotsavart$(EXEEXT): $(biotsavart_OBJECTS) $(biotsavart_DEPENDENCIES) $(EXTRA_biotsavart_DEPENDENCIES) 
-	@rm -f biotsavart$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(biotsavart_OBJECTS) $(biotsavart_LDADD) $(LIBS)
-
-biotsavart_kernel$(EXEEXT): $(biotsavart_kernel_OBJECTS) $(biotsavart_kernel_DEPENDENCIES) $(EXTRA_biotsavart_kernel_DEPENDENCIES) 
-	@rm -f biotsavart_kernel$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(biotsavart_kernel_OBJECTS) $(biotsavart_kernel_LDADD) $(LIBS)
-
-biotsavart_mpi$(EXEEXT): $(biotsavart_mpi_OBJECTS) $(biotsavart_mpi_DEPENDENCIES) $(EXTRA_biotsavart_mpi_DEPENDENCIES) 
-	@rm -f biotsavart_mpi$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(biotsavart_mpi_OBJECTS) $(biotsavart_mpi_LDADD) $(LIBS)
-
-ewald_mpi$(EXEEXT): $(ewald_mpi_OBJECTS) $(ewald_mpi_DEPENDENCIES) $(EXTRA_ewald_mpi_DEPENDENCIES) 
-	@rm -f ewald_mpi$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(ewald_mpi_OBJECTS) $(ewald_mpi_LDADD) $(LIBS)
-
-helmholtz$(EXEEXT): $(helmholtz_OBJECTS) $(helmholtz_DEPENDENCIES) $(EXTRA_helmholtz_DEPENDENCIES) 
-	@rm -f helmholtz$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(helmholtz_OBJECTS) $(helmholtz_LDADD) $(LIBS)
-
-helmholtz_kernel$(EXEEXT): $(helmholtz_kernel_OBJECTS) $(helmholtz_kernel_DEPENDENCIES) $(EXTRA_helmholtz_kernel_DEPENDENCIES) 
-	@rm -f helmholtz_kernel$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(helmholtz_kernel_OBJECTS) $(helmholtz_kernel_LDADD) $(LIBS)
-
-helmholtz_mpi$(EXEEXT): $(helmholtz_mpi_OBJECTS) $(helmholtz_mpi_DEPENDENCIES) $(EXTRA_helmholtz_mpi_DEPENDENCIES) 
-	@rm -f helmholtz_mpi$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(helmholtz_mpi_OBJECTS) $(helmholtz_mpi_LDADD) $(LIBS)
-
 laplace$(EXEEXT): $(laplace_OBJECTS) $(laplace_DEPENDENCIES) $(EXTRA_laplace_DEPENDENCIES) 
 	@rm -f laplace$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(laplace_OBJECTS) $(laplace_LDADD) $(LIBS)
@@ -616,46 +513,14 @@ laplace_kernel$(EXEEXT): $(laplace_kernel_OBJECTS) $(laplace_kernel_DEPENDENCIES
 	@rm -f laplace_kernel$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(laplace_kernel_OBJECTS) $(laplace_kernel_LDADD) $(LIBS)
 
-laplace_mpi$(EXEEXT): $(laplace_mpi_OBJECTS) $(laplace_mpi_DEPENDENCIES) $(EXTRA_laplace_mpi_DEPENDENCIES) 
-	@rm -f laplace_mpi$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(laplace_mpi_OBJECTS) $(laplace_mpi_LDADD) $(LIBS)
-../src/$(am__dirstamp):
-	@$(MKDIR_P) ../src
-	@: > ../src/$(am__dirstamp)
-../src/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../src/$(DEPDIR)
-	@: > ../src/$(DEPDIR)/$(am__dirstamp)
-../src/tree-tree.$(OBJEXT): ../src/$(am__dirstamp) \
-	../src/$(DEPDIR)/$(am__dirstamp)
-
-tree$(EXEEXT): $(tree_OBJECTS) $(tree_DEPENDENCIES) $(EXTRA_tree_DEPENDENCIES) 
-	@rm -f tree$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tree_OBJECTS) $(tree_LDADD) $(LIBS)
-
-vec$(EXEEXT): $(vec_OBJECTS) $(vec_DEPENDENCIES) $(EXTRA_vec_DEPENDENCIES) 
-	@rm -f vec$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(vec_OBJECTS) $(vec_LDADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../src/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/tree-tree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart-fmm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart_kernel-kernel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/biotsavart_mpi-fmm_mpi.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ewald_mpi-ewald.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helmholtz-fmm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helmholtz_kernel-kernel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helmholtz_mpi-fmm_mpi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace-fmm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace_kernel-kernel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace_mpi-fmm_mpi.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree-tree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vec-vec.Po@am__quote@
 
 .cxx.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -672,104 +537,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-biotsavart-fmm.o: fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT biotsavart-fmm.o -MD -MP -MF $(DEPDIR)/biotsavart-fmm.Tpo -c -o biotsavart-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/biotsavart-fmm.Tpo $(DEPDIR)/biotsavart-fmm.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='biotsavart-fmm.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o biotsavart-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
-
-biotsavart-fmm.obj: fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT biotsavart-fmm.obj -MD -MP -MF $(DEPDIR)/biotsavart-fmm.Tpo -c -o biotsavart-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/biotsavart-fmm.Tpo $(DEPDIR)/biotsavart-fmm.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='biotsavart-fmm.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o biotsavart-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
-
-biotsavart_kernel-kernel.o: kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT biotsavart_kernel-kernel.o -MD -MP -MF $(DEPDIR)/biotsavart_kernel-kernel.Tpo -c -o biotsavart_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/biotsavart_kernel-kernel.Tpo $(DEPDIR)/biotsavart_kernel-kernel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='biotsavart_kernel-kernel.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o biotsavart_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
-
-biotsavart_kernel-kernel.obj: kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT biotsavart_kernel-kernel.obj -MD -MP -MF $(DEPDIR)/biotsavart_kernel-kernel.Tpo -c -o biotsavart_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/biotsavart_kernel-kernel.Tpo $(DEPDIR)/biotsavart_kernel-kernel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='biotsavart_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o biotsavart_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
-
-biotsavart_mpi-fmm_mpi.o: fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT biotsavart_mpi-fmm_mpi.o -MD -MP -MF $(DEPDIR)/biotsavart_mpi-fmm_mpi.Tpo -c -o biotsavart_mpi-fmm_mpi.o `test -f 'fmm_mpi.cxx' || echo '$(srcdir)/'`fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/biotsavart_mpi-fmm_mpi.Tpo $(DEPDIR)/biotsavart_mpi-fmm_mpi.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm_mpi.cxx' object='biotsavart_mpi-fmm_mpi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o biotsavart_mpi-fmm_mpi.o `test -f 'fmm_mpi.cxx' || echo '$(srcdir)/'`fmm_mpi.cxx
-
-biotsavart_mpi-fmm_mpi.obj: fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT biotsavart_mpi-fmm_mpi.obj -MD -MP -MF $(DEPDIR)/biotsavart_mpi-fmm_mpi.Tpo -c -o biotsavart_mpi-fmm_mpi.obj `if test -f 'fmm_mpi.cxx'; then $(CYGPATH_W) 'fmm_mpi.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm_mpi.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/biotsavart_mpi-fmm_mpi.Tpo $(DEPDIR)/biotsavart_mpi-fmm_mpi.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm_mpi.cxx' object='biotsavart_mpi-fmm_mpi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(biotsavart_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o biotsavart_mpi-fmm_mpi.obj `if test -f 'fmm_mpi.cxx'; then $(CYGPATH_W) 'fmm_mpi.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm_mpi.cxx'; fi`
-
-ewald_mpi-ewald.o: ewald.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ewald_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ewald_mpi-ewald.o -MD -MP -MF $(DEPDIR)/ewald_mpi-ewald.Tpo -c -o ewald_mpi-ewald.o `test -f 'ewald.cxx' || echo '$(srcdir)/'`ewald.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ewald_mpi-ewald.Tpo $(DEPDIR)/ewald_mpi-ewald.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ewald.cxx' object='ewald_mpi-ewald.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ewald_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ewald_mpi-ewald.o `test -f 'ewald.cxx' || echo '$(srcdir)/'`ewald.cxx
-
-ewald_mpi-ewald.obj: ewald.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ewald_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ewald_mpi-ewald.obj -MD -MP -MF $(DEPDIR)/ewald_mpi-ewald.Tpo -c -o ewald_mpi-ewald.obj `if test -f 'ewald.cxx'; then $(CYGPATH_W) 'ewald.cxx'; else $(CYGPATH_W) '$(srcdir)/ewald.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ewald_mpi-ewald.Tpo $(DEPDIR)/ewald_mpi-ewald.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ewald.cxx' object='ewald_mpi-ewald.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ewald_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ewald_mpi-ewald.obj `if test -f 'ewald.cxx'; then $(CYGPATH_W) 'ewald.cxx'; else $(CYGPATH_W) '$(srcdir)/ewald.cxx'; fi`
-
-helmholtz-fmm.o: fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz-fmm.o -MD -MP -MF $(DEPDIR)/helmholtz-fmm.Tpo -c -o helmholtz-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz-fmm.Tpo $(DEPDIR)/helmholtz-fmm.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='helmholtz-fmm.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
-
-helmholtz-fmm.obj: fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz-fmm.obj -MD -MP -MF $(DEPDIR)/helmholtz-fmm.Tpo -c -o helmholtz-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz-fmm.Tpo $(DEPDIR)/helmholtz-fmm.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='helmholtz-fmm.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
-
-helmholtz_kernel-kernel.o: kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz_kernel-kernel.o -MD -MP -MF $(DEPDIR)/helmholtz_kernel-kernel.Tpo -c -o helmholtz_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz_kernel-kernel.Tpo $(DEPDIR)/helmholtz_kernel-kernel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='helmholtz_kernel-kernel.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
-
-helmholtz_kernel-kernel.obj: kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz_kernel-kernel.obj -MD -MP -MF $(DEPDIR)/helmholtz_kernel-kernel.Tpo -c -o helmholtz_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz_kernel-kernel.Tpo $(DEPDIR)/helmholtz_kernel-kernel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='helmholtz_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
-
-helmholtz_mpi-fmm_mpi.o: fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz_mpi-fmm_mpi.o -MD -MP -MF $(DEPDIR)/helmholtz_mpi-fmm_mpi.Tpo -c -o helmholtz_mpi-fmm_mpi.o `test -f 'fmm_mpi.cxx' || echo '$(srcdir)/'`fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz_mpi-fmm_mpi.Tpo $(DEPDIR)/helmholtz_mpi-fmm_mpi.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm_mpi.cxx' object='helmholtz_mpi-fmm_mpi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz_mpi-fmm_mpi.o `test -f 'fmm_mpi.cxx' || echo '$(srcdir)/'`fmm_mpi.cxx
-
-helmholtz_mpi-fmm_mpi.obj: fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz_mpi-fmm_mpi.obj -MD -MP -MF $(DEPDIR)/helmholtz_mpi-fmm_mpi.Tpo -c -o helmholtz_mpi-fmm_mpi.obj `if test -f 'fmm_mpi.cxx'; then $(CYGPATH_W) 'fmm_mpi.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm_mpi.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz_mpi-fmm_mpi.Tpo $(DEPDIR)/helmholtz_mpi-fmm_mpi.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm_mpi.cxx' object='helmholtz_mpi-fmm_mpi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz_mpi-fmm_mpi.obj `if test -f 'fmm_mpi.cxx'; then $(CYGPATH_W) 'fmm_mpi.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm_mpi.cxx'; fi`
 
 laplace-fmm.o: fmm.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace-fmm.o -MD -MP -MF $(DEPDIR)/laplace-fmm.Tpo -c -o laplace-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
@@ -798,62 +565,6 @@ laplace_kernel-kernel.obj: kernel.cxx
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='laplace_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
-
-laplace_mpi-fmm_mpi.o: fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_mpi-fmm_mpi.o -MD -MP -MF $(DEPDIR)/laplace_mpi-fmm_mpi.Tpo -c -o laplace_mpi-fmm_mpi.o `test -f 'fmm_mpi.cxx' || echo '$(srcdir)/'`fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_mpi-fmm_mpi.Tpo $(DEPDIR)/laplace_mpi-fmm_mpi.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm_mpi.cxx' object='laplace_mpi-fmm_mpi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_mpi-fmm_mpi.o `test -f 'fmm_mpi.cxx' || echo '$(srcdir)/'`fmm_mpi.cxx
-
-laplace_mpi-fmm_mpi.obj: fmm_mpi.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_mpi-fmm_mpi.obj -MD -MP -MF $(DEPDIR)/laplace_mpi-fmm_mpi.Tpo -c -o laplace_mpi-fmm_mpi.obj `if test -f 'fmm_mpi.cxx'; then $(CYGPATH_W) 'fmm_mpi.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm_mpi.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_mpi-fmm_mpi.Tpo $(DEPDIR)/laplace_mpi-fmm_mpi.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm_mpi.cxx' object='laplace_mpi-fmm_mpi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_mpi_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_mpi-fmm_mpi.obj `if test -f 'fmm_mpi.cxx'; then $(CYGPATH_W) 'fmm_mpi.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm_mpi.cxx'; fi`
-
-tree-tree.o: tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tree-tree.o -MD -MP -MF $(DEPDIR)/tree-tree.Tpo -c -o tree-tree.o `test -f 'tree.cxx' || echo '$(srcdir)/'`tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tree-tree.Tpo $(DEPDIR)/tree-tree.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tree.cxx' object='tree-tree.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tree-tree.o `test -f 'tree.cxx' || echo '$(srcdir)/'`tree.cxx
-
-tree-tree.obj: tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tree-tree.obj -MD -MP -MF $(DEPDIR)/tree-tree.Tpo -c -o tree-tree.obj `if test -f 'tree.cxx'; then $(CYGPATH_W) 'tree.cxx'; else $(CYGPATH_W) '$(srcdir)/tree.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tree-tree.Tpo $(DEPDIR)/tree-tree.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tree.cxx' object='tree-tree.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tree-tree.obj `if test -f 'tree.cxx'; then $(CYGPATH_W) 'tree.cxx'; else $(CYGPATH_W) '$(srcdir)/tree.cxx'; fi`
-
-../src/tree-tree.o: ../src/tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/tree-tree.o -MD -MP -MF ../src/$(DEPDIR)/tree-tree.Tpo -c -o ../src/tree-tree.o `test -f '../src/tree.cxx' || echo '$(srcdir)/'`../src/tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/tree-tree.Tpo ../src/$(DEPDIR)/tree-tree.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/tree.cxx' object='../src/tree-tree.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/tree-tree.o `test -f '../src/tree.cxx' || echo '$(srcdir)/'`../src/tree.cxx
-
-../src/tree-tree.obj: ../src/tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ../src/tree-tree.obj -MD -MP -MF ../src/$(DEPDIR)/tree-tree.Tpo -c -o ../src/tree-tree.obj `if test -f '../src/tree.cxx'; then $(CYGPATH_W) '../src/tree.cxx'; else $(CYGPATH_W) '$(srcdir)/../src/tree.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/tree-tree.Tpo ../src/$(DEPDIR)/tree-tree.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/tree.cxx' object='../src/tree-tree.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ../src/tree-tree.obj `if test -f '../src/tree.cxx'; then $(CYGPATH_W) '../src/tree.cxx'; else $(CYGPATH_W) '$(srcdir)/../src/tree.cxx'; fi`
-
-vec-vec.o: vec.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(vec_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT vec-vec.o -MD -MP -MF $(DEPDIR)/vec-vec.Tpo -c -o vec-vec.o `test -f 'vec.cxx' || echo '$(srcdir)/'`vec.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/vec-vec.Tpo $(DEPDIR)/vec-vec.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vec.cxx' object='vec-vec.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(vec_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o vec-vec.o `test -f 'vec.cxx' || echo '$(srcdir)/'`vec.cxx
-
-vec-vec.obj: vec.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(vec_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT vec-vec.obj -MD -MP -MF $(DEPDIR)/vec-vec.Tpo -c -o vec-vec.obj `if test -f 'vec.cxx'; then $(CYGPATH_W) 'vec.cxx'; else $(CYGPATH_W) '$(srcdir)/vec.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/vec-vec.Tpo $(DEPDIR)/vec-vec.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vec.cxx' object='vec-vec.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(vec_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o vec-vec.obj `if test -f 'vec.cxx'; then $(CYGPATH_W) 'vec.cxx'; else $(CYGPATH_W) '$(srcdir)/vec.cxx'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -970,8 +681,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ../src/$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../src/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -981,7 +690,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ../src/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1027,7 +736,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ../src/$(DEPDIR) ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1082,39 +791,55 @@ revert:
 	@make -C .. revert
 save:
 	@make -C .. save
+#helmholtz_SOURCES = fmm.cxx
+#helmholtz_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_HELMHOLTZ -DEXAFMM_PMAX=20
+#biotsavart_SOURCES = fmm.cxx
+#biotsavart_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_BIOTSAVART -DEXAFMM_PMAX=10
+#tree_SOURCES = tree.cxx ../src/tree.cxx
+#tree_CPPFLAGS = $(laplace_CPPFLAGS)
+#vec_SOURCES = vec.cxx
+#vec_CPPFLAGS = $(laplace_CPPFLAGS)
 
 run_laplace: laplace
 	./$<
-run_helmholtz: helmholtz
-	./$< -aDgv -n 10000 -r 1 -P 20
-run_biotsavart: biotsavart
-	./$< -agv -n 10000 -r 1
-run_tree: tree
-	./$< -av -n 1000000 -r 1
-run_vec: vec
-	./$<
+#helmholtz_kernel_SOURCES = kernel.cxx
+#helmholtz_kernel_CPPFLAGS = $(helmholtz_CPPFLAGS)
+#biotsavart_kernel_SOURCES = kernel.cxx
+#biotsavart_kernel_CPPFLAGS = $(biotsavart_CPPFLAGS)
 
 run_laplace_kernel: laplace_kernel
 	./$< 10
 	./$< 20
 	./$< 30
-run_helmholtz_kernel: helmholtz_kernel
-	./$< -v -P 10
-	./$< -v -P 20
-	./$< -v -P 30
-run_biotsavart_kernel: biotsavart_kernel
-	./$< -v -P 10
-	./$< -v -P 20
-	./$< -v -P 30
-
-@EXAFMM_HAVE_MPI_TRUE@run_laplace_mpi: laplace_mpi
-@EXAFMM_HAVE_MPI_TRUE@	$(MPIRUN) -n 2 ./$< -aDgv -n 100000 -r 1
-@EXAFMM_HAVE_MPI_TRUE@run_helmholtz_mpi: helmholtz_mpi
-@EXAFMM_HAVE_MPI_TRUE@	$(MPIRUN) -n 2 ./$< -aDgv -n 10000 -r 1 -P 20
-@EXAFMM_HAVE_MPI_TRUE@run_biotsavart_mpi: biotsavart_mpi
-@EXAFMM_HAVE_MPI_TRUE@	$(MPIRUN) -n 2 ./$< -agv -n 10000 -r 1
-@EXAFMM_HAVE_MPI_TRUE@run_ewald_mpi: ewald_mpi
-@EXAFMM_HAVE_MPI_TRUE@	$(MPIRUN) -n 2 ./$< -aDgv -r 1
+#run_helmholtz_kernel: helmholtz_kernel
+#	./$< -v -P 10
+#	./$< -v -P 20
+#	./$< -v -P 30
+#run_biotsavart_kernel: biotsavart_kernel
+#	./$< -v -P 10
+#	./$< -v -P 20
+#	./$< -v -P 30
+#
+#if EXAFMM_HAVE_MPI
+#bin_PROGRAMS += laplace_mpi helmholtz_mpi biotsavart_mpi ewald_mpi
+#laplace_mpi_SOURCES = fmm_mpi.cxx
+#laplace_mpi_CPPFLAGS = $(laplace_CPPFLAGS)
+#helmholtz_mpi_SOURCES = fmm_mpi.cxx
+#helmholtz_mpi_CPPFLAGS = $(helmholtz_CPPFLAGS)
+#biotsavart_mpi_SOURCES = fmm_mpi.cxx
+#biotsavart_mpi_CPPFLAGS = $(biotsavart_CPPFLAGS)
+#ewald_mpi_SOURCES = ewald.cxx
+#ewald_mpi_CPPFLAGS = $(laplace_CPPFLAGS)
+#
+#run_laplace_mpi: laplace_mpi
+#	$(MPIRUN) -n 2 ./$< -aDgv -n 100000 -r 1
+#run_helmholtz_mpi: helmholtz_mpi
+#	$(MPIRUN) -n 2 ./$< -aDgv -n 10000 -r 1 -P 20
+#run_biotsavart_mpi: biotsavart_mpi
+#	$(MPIRUN) -n 2 ./$< -agv -n 10000 -r 1
+#run_ewald_mpi: ewald_mpi
+#	$(MPIRUN) -n 2 ./$< -aDgv -r 1
+#endif
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
