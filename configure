@@ -6210,6 +6210,9 @@ fi
   esac
 
   if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
+    if test x"${ax_cv_support_avx_ext}" = x"yes"; then
+      SIMD_FLAGS="-mavx"
+    fi
     if test x"${ax_cv_support_avx2_ext}" = x"yes"; then
             SIMD_FLAGS="-march=core-avx2"
     fi
@@ -6217,7 +6220,7 @@ fi
             SIMD_FLAGS="-xMIC-AVX512"
     fi
   fi
-  SIMD_FLAGS="-xHOST"
+
 
 
 

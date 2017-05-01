@@ -261,6 +261,9 @@ AC_DEFUN([AX_EXT],
   esac
 
   if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
+    if test x"${ax_cv_support_avx_ext}" = x"yes"; then
+      SIMD_FLAGS="-mavx"
+    fi
     if test x"${ax_cv_support_avx2_ext}" = x"yes"; then
       dnl for intel compiler, have to use "-march=core-avx2" instead of "-mavx2"
       SIMD_FLAGS="-march=core-avx2"
