@@ -140,11 +140,6 @@ AC_DEFUN([AX_EXT],
         fi
       fi
 
-      AC_CACHE_VAL([ax_cv_have_mmx_os_support_ext],
-      [
-        ax_cv_have_mmx_os_support_ext=yes
-      ])
-
       ax_cv_have_none_os_support_ext=yes
 
       AC_CACHE_VAL([ax_cv_have_sse_os_support_ext],
@@ -246,16 +241,7 @@ AC_DEFUN([AX_EXT],
              AX_CHECK_COMPILE_FLAG(${ac_instr_compiler_flags}, eval ax_cv_support_${ac_instr_acvar}_ext=yes,
                                                                eval ax_cv_support_${ac_instr_acvar}_ext=no)
              if test x"$(eval echo \$ax_cv_support_${ac_instr_acvar}_ext)" = x"yes"; then
-               dnl for intel compiler, have to use "-march=core-avx2" instead of "-mavx2"
-               if test x"${ac_instr_acvar}" = x"avx2"; then
-                 if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
-                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} -march=core-avx2\"
-                 else
-                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
-                 fi
-               else
-                 eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
-               fi
+               eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
                AC_DEFINE_UNQUOTED([${ac_instr_have_define}])
              else
                AC_MSG_WARN([Your processor and OS supports ${ac_instr_shortname} instructions but not your compiler, can you try another compiler?])
@@ -274,6 +260,17 @@ AC_DEFUN([AX_EXT],
   ;;
   esac
 
+  if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
+    if test x"${ax_cv_support_avx2_ext}" = x"yes"; then
+      dnl for intel compiler, have to use "-march=core-avx2" instead of "-mavx2"
+      SIMD_FLAGS="-march=core-avx2"
+    fi
+    if test x"${ax_cv_support_avx512er_ext}" = x"yes"; then
+      dnl Xeon Phi x200 processors, available in version 14 update 1 and later
+      SIMD_FLAGS="-xMIC-AVX512"
+    fi
+  fi
+  
   AH_TEMPLATE([HAVE_SSE3],[Define to 1 to support Streaming SIMD Extensions 3])
   AH_TEMPLATE([HAVE_AVX],[Define to 1 to support Advanced Vector Extensions])
   AH_TEMPLATE([HAVE_AVX2],[Define to 1 to support Advanced Vector Extensions 2])

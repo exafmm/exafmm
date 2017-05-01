@@ -5942,15 +5942,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
         fi
       fi
 
-      if ${ax_cv_have_mmx_os_support_ext+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-        ax_cv_have_mmx_os_support_ext=yes
-
-fi
-
-
       ax_cv_have_none_os_support_ext=yes
 
       if ${ax_cv_have_sse_os_support_ext+:} false; then :
@@ -6179,15 +6170,7 @@ else
 fi
 
              if test x"$(eval echo \$ax_cv_support_${ac_instr_acvar}_ext)" = x"yes"; then
-                              if test x"${ac_instr_acvar}" = x"avx2"; then
-                 if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
-                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} -march=core-avx2\"
-                 else
-                   eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
-                 fi
-               else
-                 eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
-               fi
+               eval ${ac_instr_flag_type}=\"\$${ac_instr_flag_type} ${ac_instr_compiler_flags}\"
                cat >>confdefs.h <<_ACEOF
 #define ${ac_instr_have_define} 1
 _ACEOF
@@ -6226,6 +6209,15 @@ fi
   ;;
   esac
 
+  if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
+    if test x"${ax_cv_support_avx2_ext}" = x"yes"; then
+            SIMD_FLAGS="-march=core-avx2"
+    fi
+    if test x"${ax_cv_support_avx512er_ext}" = x"yes"; then
+            SIMD_FLAGS="-xMIC-AVX512"
+    fi
+  fi
+  SIMD_FLAGS="-xHOST"
 
 
 
