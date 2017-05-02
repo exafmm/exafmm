@@ -1,6 +1,7 @@
 #ifndef traverse_lazy_h
 #define traverse_lazy_h
 #include "exafmm.h"
+#include "kernel.h"
 
 namespace exafmm {
   //! Recursive call to post-order tree traversal for upward pass
