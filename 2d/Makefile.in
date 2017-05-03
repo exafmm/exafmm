@@ -132,7 +132,8 @@ host_triplet = @host@
 # Use all possible debugging flags
 @EXAFMM_DEBUG_TRUE@am__append_19 = $(COMPILER_CXXFLAGS) -DEXAFMM_DEBUG
 @EXAFMM_DEBUG_TRUE@am__append_20 = $(COMPILER_FCFLAGS) -DEXAFMM_DEBUG
-bin_PROGRAMS = laplace$(EXEEXT) tree$(EXEEXT) laplace_kernel$(EXEEXT)
+bin_PROGRAMS = laplace$(EXEEXT) tree$(EXEEXT) list$(EXEEXT) \
+	laplace_kernel$(EXEEXT)
 subdir = 2d
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -155,6 +156,9 @@ laplace_LDADD = $(LDADD)
 am_laplace_kernel_OBJECTS = laplace_kernel-kernel.$(OBJEXT)
 laplace_kernel_OBJECTS = $(am_laplace_kernel_OBJECTS)
 laplace_kernel_LDADD = $(LDADD)
+am_list_OBJECTS = list-list.$(OBJEXT)
+list_OBJECTS = $(am_list_OBJECTS)
+list_LDADD = $(LDADD)
 am_tree_OBJECTS = tree-tree.$(OBJEXT)
 tree_OBJECTS = $(am_tree_OBJECTS)
 tree_LDADD = $(LDADD)
@@ -191,9 +195,10 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(laplace_SOURCES) $(laplace_kernel_SOURCES) $(tree_SOURCES)
-DIST_SOURCES = $(laplace_SOURCES) $(laplace_kernel_SOURCES) \
+SOURCES = $(laplace_SOURCES) $(laplace_kernel_SOURCES) $(list_SOURCES) \
 	$(tree_SOURCES)
+DIST_SOURCES = $(laplace_SOURCES) $(laplace_kernel_SOURCES) \
+	$(list_SOURCES) $(tree_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -435,6 +440,8 @@ laplace_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
 #biotsavart_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_BIOTSAVART -DEXAFMM_PMAX=10
 tree_SOURCES = tree.cxx
 tree_CPPFLAGS = $(laplace_CPPFLAGS)
+list_SOURCES = list.cxx
+list_CPPFLAGS = $(laplace_CPPFLAGS)
 #helmholtz_kernel biotsavart_kernel
 laplace_kernel_SOURCES = kernel.cxx
 laplace_kernel_CPPFLAGS = $(laplace_CPPFLAGS)
@@ -523,6 +530,10 @@ laplace_kernel$(EXEEXT): $(laplace_kernel_OBJECTS) $(laplace_kernel_DEPENDENCIES
 	@rm -f laplace_kernel$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(laplace_kernel_OBJECTS) $(laplace_kernel_LDADD) $(LIBS)
 
+list$(EXEEXT): $(list_OBJECTS) $(list_DEPENDENCIES) $(EXTRA_list_DEPENDENCIES) 
+	@rm -f list$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(list_OBJECTS) $(list_LDADD) $(LIBS)
+
 tree$(EXEEXT): $(tree_OBJECTS) $(tree_DEPENDENCIES) $(EXTRA_tree_DEPENDENCIES) 
 	@rm -f tree$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tree_OBJECTS) $(tree_LDADD) $(LIBS)
@@ -535,6 +546,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace-fmm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace_kernel-kernel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list-list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree-tree.Po@am__quote@
 
 .cxx.o:
@@ -580,6 +592,20 @@ laplace_kernel-kernel.obj: kernel.cxx
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='laplace_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+
+list-list.o: list.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT list-list.o -MD -MP -MF $(DEPDIR)/list-list.Tpo -c -o list-list.o `test -f 'list.cxx' || echo '$(srcdir)/'`list.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/list-list.Tpo $(DEPDIR)/list-list.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='list.cxx' object='list-list.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o list-list.o `test -f 'list.cxx' || echo '$(srcdir)/'`list.cxx
+
+list-list.obj: list.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT list-list.obj -MD -MP -MF $(DEPDIR)/list-list.Tpo -c -o list-list.obj `if test -f 'list.cxx'; then $(CYGPATH_W) 'list.cxx'; else $(CYGPATH_W) '$(srcdir)/list.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/list-list.Tpo $(DEPDIR)/list-list.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='list.cxx' object='list-list.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o list-list.obj `if test -f 'list.cxx'; then $(CYGPATH_W) 'list.cxx'; else $(CYGPATH_W) '$(srcdir)/list.cxx'; fi`
 
 tree-tree.o: tree.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tree-tree.o -MD -MP -MF $(DEPDIR)/tree-tree.Tpo -c -o tree-tree.o `test -f 'tree.cxx' || echo '$(srcdir)/'`tree.cxx
@@ -820,8 +846,6 @@ revert:
 	@make -C .. revert
 save:
 	@make -C .. save
-#vec_SOURCES = vec.cxx
-#vec_CPPFLAGS = $(laplace_CPPFLAGS)
 
 run_laplace: laplace
 	./$<
@@ -830,6 +854,9 @@ run_laplace: laplace
 #run_biotsavart: biotsavart
 #	./$< -agv -n 10000 -r 1
 run_tree: tree
+	./$< 10000
+	./$< 100000
+run_list: list
 	./$< 10000
 	./$< 100000
 #helmholtz_kernel_SOURCES = kernel.cxx

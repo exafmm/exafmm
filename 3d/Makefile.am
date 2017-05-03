@@ -1,6 +1,6 @@
 include $(top_srcdir)/Makefile.am.include
 
-bin_PROGRAMS = laplace tree 
+bin_PROGRAMS = laplace tree list 
 #helmholtz biotsavart tree vec
 laplace_SOURCES = fmm.cxx
 laplace_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
@@ -10,8 +10,8 @@ laplace_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
 #biotsavart_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_BIOTSAVART -DEXAFMM_PMAX=10
 tree_SOURCES = tree.cxx
 tree_CPPFLAGS = $(laplace_CPPFLAGS)
-#vec_SOURCES = vec.cxx
-#vec_CPPFLAGS = $(laplace_CPPFLAGS)
+list_SOURCES = list.cxx
+list_CPPFLAGS = $(laplace_CPPFLAGS)
 
 run_laplace: laplace
 	./$<
@@ -22,8 +22,9 @@ run_laplace: laplace
 run_tree: tree
 	./$< 10000
 	./$< 100000
-#run_vec: vec
-#	./$<
+run_list: list
+	./$< 10000
+	./$< 100000
 
 bin_PROGRAMS += laplace_kernel
 #helmholtz_kernel biotsavart_kernel
