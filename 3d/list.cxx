@@ -1,5 +1,6 @@
 #define EXAFMM_LAZY 1
 #include <cassert>
+#include "args.h"
 #include "build_tree.h"
 #include "dataset.h"
 #include "test.h"
@@ -7,10 +8,11 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  const int numBodies = atoi(argv[1]);                          // Number of bodies
-  theta = atof(argv[2]);                                        // Multipole acceptance criterion
-  ncrit = atoi(argv[3]);                                        // Number of bodies per leaf cell
-  const char * distribution = argv[4];                          // Type of distribution
+  Args args(argc, argv);
+  theta = args.theta;                                           // Multipole acceptance criterion
+  ncrit = args.ncrit;                                           // Number of bodies per leaf cell
+  const int numBodies = args.numBodies;                         // Number of bodies
+  const char * distribution = args.distribution;                // Type of distribution
 
   Bodies bodies = initBodies(numBodies, distribution);
   for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies

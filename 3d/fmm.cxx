@@ -1,3 +1,4 @@
+#include "args.h"
 #include "build_tree.h"
 #include "dataset.h"
 #include "kernel.h"
@@ -10,11 +11,12 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  const int numBodies = atoi(argv[1]);                                  // Number of bodies
-  P = atoi(argv[2]);
-  theta = atof(argv[3]);                                        // Multipole acceptance criterion
-  ncrit = atoi(argv[4]);                                        // Number of bodies per leaf cell
-  const char * distribution = argv[5];                          // Type of distribution
+  Args args(argc, argv);
+  P = args.P;
+  theta = args.theta;                                           // Multipole acceptance criterion
+  ncrit = args.ncrit;                                           // Number of bodies per leaf cell
+  const int numBodies = args.numBodies;                         // Number of bodies
+  const char * distribution = args.distribution;                // Type of distribution
 
   printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
   //! Initialize bodies
