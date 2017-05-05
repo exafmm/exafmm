@@ -73,10 +73,10 @@ namespace exafmm {
         verbose(0) 
     {
       while (1) {
-	    int option_index;
-	    int c = getopt_long(argc, argv, "c:d:hn:P:t:v",
+        int option_index;
+        int c = getopt_long(argc, argv, "c:d:hn:P:t:v",
                             long_options, &option_index);
-	    if (c == -1) break;
+        if (c == -1) break;
         switch (c) {
           case 'c':
             ncrit = atoi(optarg);
@@ -108,7 +108,7 @@ namespace exafmm {
 
     void print(int stringLength) {
       if (verbose) {
-	    std::cout << std::setw(stringLength) << std::fixed << std::left
+        std::cout << std::setw(stringLength) << std::fixed << std::left
                   << "ncrit" << " : " << ncrit << std::endl
                   << std::setw(stringLength)
                   << "distribution" << " : " << distribution << std::endl
