@@ -1,4 +1,5 @@
 #include "build_tree.h"
+#include "dataset.h"
 #include "kernel.h"
 #include "timer.h"
 #if EXAFMM_EAGER
@@ -9,30 +10,16 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  const int numBodies = 10000;                                  // Number of bodies
-  P = 10;                                                       // Order of expansions
-  ncrit = 64;                                                   // Number of bodies per leaf cell
-  theta = 0.4;                                                  // Multipole acceptance criterion
+  const int numBodies = atoi(argv[1]);                                  // Number of bodies
+  P = atoi(argv[2]);
+  theta = atof(argv[3]);                                        // Multipole acceptance criterion
+  ncrit = atoi(argv[4]);                                        // Number of bodies per leaf cell
+  const char * distribution = argv[5];                          // Type of distribution
 
   printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
   //! Initialize bodies
   start("Initialize bodies");                                   // Start timer
-  Bodies bodies(numBodies);                                     // Initialize bodies
-  real_t average = 0;                                           // Average charge
-  srand48(0);                                                   // Set seed for random number generator
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
-    for (int d=0; d<3; d++) {                                   //  Loop over dimension
-      bodies[b].X[d] = drand48() * 2 * M_PI - M_PI;             //   Initialize positions
-    }                                                           //  End loop over dimension
-    bodies[b].q = drand48() - .5;                               //  Initialize charge
-    average += bodies[b].q;                                     //  Accumulate charge
-    bodies[b].p = 0;                                            //  Clear potential
-    for (int d=0; d<3; d++) bodies[b].F[d] = 0;                 //  Clear force
-  }                                                             // End loop over bodies
-  average /= bodies.size();                                     // Average charge
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
-    bodies[b].q -= average;                                     // Charge neutral
-  }                                                             // End loop over bodies
+  Bodies bodies = initBodies(numBodies, distribution);
   stop("Initialize bodies");                                    // Stop timer
 
   //! Build tree
