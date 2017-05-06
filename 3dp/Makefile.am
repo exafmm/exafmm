@@ -20,11 +20,9 @@ run_laplace: laplace
 #run_biotsavart: biotsavart
 #	./$< -agv -n 10000 -r 1
 run_tree: tree
-	./$< 10000
-	./$< 100000
+	./$<
 run_list: list
-	./$< 10000
-	./$< 100000
+	./$<
 
 bin_PROGRAMS += laplace_kernel
 #helmholtz_kernel biotsavart_kernel
@@ -36,9 +34,7 @@ laplace_kernel_CPPFLAGS = $(laplace_CPPFLAGS)
 #biotsavart_kernel_CPPFLAGS = $(biotsavart_CPPFLAGS)
 
 run_laplace_kernel: laplace_kernel
-	./$< 10
-	./$< 20
-	./$< 30
+	./$<
 #run_helmholtz_kernel: helmholtz_kernel
 #	./$< -v -P 10
 #	./$< -v -P 20

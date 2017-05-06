@@ -1,8 +1,10 @@
+#include "args.h"
 #include "kernel.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  P = atoi(argv[1]);
+  Args args(argc, argv);
+  P = args.P;
   initKernel();
 
   // P2M

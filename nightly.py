@@ -14,24 +14,26 @@ test_params = { 'laplace_kernel': 'P',
                 'list': 'ntd',
                 'laplace': 'nPtd' }
 
-exedir = '3d'
+exedir_list = ['3d', '3dp']
 
-# loop over each test
-for test, params in test_params.iteritems():
-    # concatenate ranges for itertools
-    ranges_list = [ param_range[param] for param in params]
-    # nested loop of each parameter's range
-    for values in itertools.product(*ranges_list):
-        # add dash before each parameter character (ex. 'n'->'-n')
-        dash_params = [ '-'+param for param in params]
-        # interleave parameter character list and their value list
-        args_list = list(itertools.chain(*zip(dash_params, values)))
-        # join test name and args list
-        command_str = os.path.join(exedir, test)+ " " + " ".join(args_list)
-        print(command_str)
-        # execute test
-        try:
-            subprocess.check_call(command_str, shell=True)
-        except subprocess.CalledProcessError:
-            print("Regression Failed @", command_str)
-            raise SystemExit
+# loop over each directory
+for exedir in exedir_list:
+    # loop over each test
+    for test, params in test_params.iteritems():
+        # concatenate ranges for itertools
+        ranges_list = [ param_range[param] for param in params]
+        # nested loop of each parameter's range
+        for values in itertools.product(*ranges_list):
+            # add dash before each parameter character (ex. 'n'->'-n')
+            dash_params = [ '-'+param for param in params]
+            # interleave parameter character list and their value list
+            args_list = list(itertools.chain(*zip(dash_params, values)))
+            # join test name and args list
+            command_str = os.path.join(exedir, test)+ " " + " ".join(args_list)
+            print(command_str)
+            # execute test
+            try:
+                subprocess.check_call(command_str, shell=True)
+            except subprocess.CalledProcessError:
+                print("Regression Failed @", command_str)
+                raise SystemExit
