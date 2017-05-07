@@ -45,11 +45,13 @@ int main(int argc, char ** argv) {
   start("Direct N-Body");                                       // Start timer
   const int numTargets = 10;                                    // Number of targets for checking answer
   Bodies jbodies = bodies;                                      // Save bodies in jbodies
-  int stride = bodies.size() / numTargets;                      // Stride of sampling
-  for (int b=0; b<numTargets; b++) {                            // Loop over target samples
-    bodies[b] = bodies[b*stride];                               //  Sample targets
-  }                                                             // End loop over target samples
-  bodies.resize(numTargets);                                    // Resize bodies
+  if (numBodies > numTargets) {                                 // If bodies are more than sampled targets
+    int stride = bodies.size() / numTargets;                    //  Stride of sampling
+    for (int b=0; b<numTargets; b++) {                          //  Loop over target samples
+      bodies[b] = bodies[b*stride];                             //   Sample targets
+    }                                                           //  End loop over target samples
+    bodies.resize(numTargets);                                  //  Resize bodies
+  }                                                             // End if
   Bodies bodies2 = bodies;                                      // Backup bodies
   for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
     bodies[b].p = 0;                                            //  Clear potential
