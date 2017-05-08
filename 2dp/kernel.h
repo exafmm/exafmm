@@ -3,11 +3,6 @@
 #include "exafmm.h"
 
 namespace exafmm {
-  //!< L2 norm of vector X
-  inline real_t norm(real_t * X) {
-    return X[0] * X[0] + X[1] * X[1];                           // L2 norm
-  }
-
   //!< P2P kernel between cells Ci and Cj
   void P2P(Cell * Ci, Cell * Cj) {
     Body * Bi = Ci->BODY;                                       // Target body pointer

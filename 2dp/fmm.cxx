@@ -1,4 +1,6 @@
+#include "args.h"
 #include "build_tree.h"
+#include "dataset.h"
 #include "kernel.h"
 #include "timer.h"
 #if EXAFMM_EAGER
@@ -9,32 +11,20 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  const int numBodies = 10000;                                  // Number of bodies
-  P = 10;                                                       // Order of expansions
-  ncrit = 8;                                                    // Number of bodies per leaf cell
+  Args args(argc, argv);
+  P = args.P;
+  theta = args.theta;                                           // Multipole acceptance criterion
+  ncrit = args.ncrit;                                           // Number of bodies per leaf cell
+  const int numBodies = args.numBodies;                         // Number of bodies
+  const char * distribution = args.distribution;                // Type of distribution
+
   cycle = 2 * M_PI;                                             // Cycle of periodic boundary condition
-  theta = 0.4;                                                  // Multipole acceptance criterion
   images = 3;                                                   // 3^images * 3^images * 3^images periodic images
 
   printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
   //! Initialize bodies
   start("Initialize bodies");                                   // Start timer
-  Bodies bodies(numBodies);                                     // Initialize bodies
-  real_t average = 0;                                           // Average charge
-  srand48(0);                                                   // Set seed for random number generator
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
-    for (int d=0; d<2; d++) {                                   //  Loop over dimension
-      bodies[b].X[d] = drand48() * 2 * M_PI - M_PI;             //   Initialize positions
-    }                                                           //  End loop over dimension
-    bodies[b].q = drand48() - .5;                               //  Initialize charge
-    average += bodies[b].q;                                     //  Accumulate charge
-    bodies[b].p = 0;                                            //  Clear potential
-    for (int d=0; d<2; d++) bodies[b].F[d] = 0;                 //  Clear force
-  }                                                             // End loop over bodies
-  average /= bodies.size();                                     // Average charge
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
-    bodies[b].q -= average;                                     // Charge neutral
-  }                                                             // End loop over bodies
+  Bodies bodies = initBodies(numBodies, distribution);
   stop("Initialize bodies");                                    // Stop timer
 
   //! Build tree
@@ -53,15 +43,17 @@ int main(int argc, char ** argv) {
   downwardPass(cells);                                          // Downward pass for L2L, L2P
   stop("L2L & L2P");                                            // Stop timer
 
-  // Direct N-Body
+  //! Direct N-Body
   start("Direct N-Body");                                       // Start timer
   const int numTargets = 10;                                    // Number of targets for checking answer
   Bodies jbodies = bodies;                                      // Save bodies in jbodies
-  int stride = bodies.size() / numTargets;                      // Stride of sampling
-  for (int b=0; b<numTargets; b++) {                            // Loop over target samples
-    bodies[b] = bodies[b*stride];                               //  Sample targets
-  }                                                             // End loop over target samples
-  bodies.resize(numTargets);                                    // Resize bodies
+  if (numBodies > numTargets) {                                 // If bodies are more than sampled targets
+    int stride = bodies.size() / numTargets;                    //  Stride of sampling
+    for (int b=0; b<numTargets; b++) {                          //  Loop over target samples
+      bodies[b] = bodies[b*stride];                             //   Sample targets
+    }                                                           //  End loop over target samples
+    bodies.resize(numTargets);                                  //  Resize bodies
+  }                                                             // End if
   Bodies bodies2 = bodies;                                      // Backup bodies
   for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
     bodies[b].p = 0;                                            //  Clear potential

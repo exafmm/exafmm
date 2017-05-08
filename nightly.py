@@ -14,7 +14,7 @@ test_params = { 'laplace_kernel': 'P',
                 'list': 'ntd',
                 'laplace': 'nPtd' }
 
-exedir_list = ['3d', '3dp']
+exedir_list = ['2d', '2dp', '3d', '3dp']
 
 # loop over each directory
 for exedir in exedir_list:
