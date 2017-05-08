@@ -43,5 +43,10 @@ namespace exafmm {
   real_t theta;                                                 //!< Multipole acceptance criterion
   real_t dX[3];                                                 //!< Distance vector
 #pragma omp threadprivate(dX)                                   //!< Make global variables private
+
+  //!< L2 norm of vector X
+  inline real_t norm(real_t * X) {
+    return X[0] * X[0] + X[1] * X[1] + X[2] * X[2];             // L2 norm
+  }
 }
 #endif

@@ -5,11 +5,6 @@
 namespace exafmm {
   const complex_t I(0.,1.);                                     //!< Imaginary unit
 
-  //!< L2 norm of vector X
-  inline real_t norm(real_t * X) {
-    return X[0] * X[0] + X[1] * X[1] + X[2] * X[2];             // L2 norm
-  }
-
   //! Odd or even
   inline int oddOrEven(int n) {
     return (((n) & 1) == 1) ? -1 : 1;                           // Odd: -1, Even: 1

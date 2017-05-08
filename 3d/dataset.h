@@ -6,14 +6,6 @@
 #include "exafmm.h"
 
 namespace exafmm {
-  //! L2 norm squared
-  template <typename T>
-  T norm(T * vec) {
-    T temp = 0;
-    for (int i=0; i<3; ++i) temp += vec[i] * vec[i];
-    return temp;
-  }
-
   //! Split range and return partial range
   void splitRange(int & begin, int & end, int iSplit, int numSplit) {
     assert(end > begin);                                      // Check that size > 0
