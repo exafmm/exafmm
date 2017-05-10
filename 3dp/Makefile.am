@@ -14,15 +14,15 @@ list_SOURCES = list.cxx
 list_CPPFLAGS = $(laplace_CPPFLAGS)
 
 run_laplace: laplace
-	./$<
+	./$< -n 10000
 #run_helmholtz: helmholtz
 #	./$< -aDgv -n 10000 -r 1 -P 20
 #run_biotsavart: biotsavart
 #	./$< -agv -n 10000 -r 1
 run_tree: tree
-	./$<
+	./$< -n 100000
 run_list: list
-	./$<
+	./$< -n 100000
 
 bin_PROGRAMS += laplace_kernel
 #helmholtz_kernel biotsavart_kernel
@@ -34,7 +34,9 @@ laplace_kernel_CPPFLAGS = $(laplace_CPPFLAGS)
 #biotsavart_kernel_CPPFLAGS = $(biotsavart_CPPFLAGS)
 
 run_laplace_kernel: laplace_kernel
-	./$<
+	./$< -P 10
+	./$< -P 20
+	./$< -P 30
 #run_helmholtz_kernel: helmholtz_kernel
 #	./$< -v -P 10
 #	./$< -v -P 20
