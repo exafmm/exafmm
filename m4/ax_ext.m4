@@ -259,8 +259,9 @@ AC_DEFUN([AX_EXT],
       done
   ;;
   esac
-
-  if test x"${CXX}" = x"icpc" || test x"${CXX}" = x"mpiicpc"; then
+  
+  AX_COMPILER_VENDOR()
+  if test x"${ax_cv_cxx_compiler_vendor}" = x"intel"; then
     if test x"${ax_cv_support_avx_ext}" = x"yes"; then
       SIMD_FLAGS="-mavx"
     fi
