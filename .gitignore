@@ -8,6 +8,7 @@
 *.th_o
 .deps
 .dirstamp
+nightly.log
 
 autom4te.cache
 config.h

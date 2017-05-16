@@ -15,6 +15,7 @@ test_params = { 'laplace_kernel': 'P',
                 'laplace': 'nPtd' }
 
 exedir_list = ['2d', '2dp', '3d', '3dp']
+logfile = open('nightly.log', 'w')
 
 # loop over each directory
 for exedir in exedir_list:
@@ -28,12 +29,18 @@ for exedir in exedir_list:
             dash_params = [ '-'+param for param in params]
             # interleave parameter character list and their value list
             args_list = list(itertools.chain(*zip(dash_params, values)))
-            # join test name and args list
-            command_str = os.path.join(exedir, test)+ " " + " ".join(args_list)
-            print(command_str)
+            # insert executable at the beginning of args list
+            args_list.insert(0, os.path.join(exedir, test))
+            # print args string and write to log file
+            args_str = ' '.join(args_list)
+            print(args_str)
+            logfile.write(args_str + 2*'\n')
             # execute test
             try:
-                subprocess.check_call(command_str, shell=True)
+                result = subprocess.check_output(args_list)
+                logfile.write(result)
+                logfile.write(33*'-' + '\n')
             except subprocess.CalledProcessError:
-                print("Regression Failed @", command_str)
+                print("Regression Failed @", args_str)
                 raise SystemExit
+logfile.close()
