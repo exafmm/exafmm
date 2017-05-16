@@ -90,7 +90,7 @@ namespace exafmm {
     return bodies;                                            // Return bodies
   }
 
-  //! Plummer distribution in a r = M_PI/2 sphere
+  //! Plummer distribution with a virial radius r_v = 1
   Bodies plummer(int numBodies, int seed, int numSplit) {
     Bodies bodies(numBodies);                                 // Initialize bodies
     for (int i=0; i<numSplit; i++, seed++) {                  // Loop over partitions (if there are any)

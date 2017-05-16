@@ -19,13 +19,20 @@ int main(int argc, char ** argv) {
   const char * distribution = args.distribution;                // Type of distribution
 
   cycle = 2 * M_PI;                                             // Cycle of periodic boundary condition
-  images = 3;                                                   // 3^images * 3^images * 3^images periodic images
+  images = 3;                                                   // 3^images * 3^images periodic images
 
   printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
   //! Initialize bodies
   start("Initialize bodies");                                   // Start timer
   Bodies bodies = initBodies(numBodies, distribution);
   stop("Initialize bodies");                                    // Stop timer
+
+  // Update cycle for plummer distribution
+  if (distribution[0] == 'p') {
+    real_t R0, X0[2];
+    getBounds(bodies, R0, X0);
+    cycle = 2 * R0;
+  }
 
   //! Build tree
   start("Build tree");                                          // Start timer
