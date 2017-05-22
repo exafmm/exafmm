@@ -21,4 +21,5 @@
    :caption: API REFERENCE
    :maxdepth: 2
 
-   api/types
+   api/data_type
+   api/global_variable
