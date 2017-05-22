@@ -6,8 +6,8 @@
 #include <vector>
 
 namespace exafmm {
-  //! Basic type definitions
-  typedef double real_t;                                        //!< Floating point type is single precision
+  // Basic type definitions
+  typedef double real_t;                                        //!< Floating point type is double precision
   typedef std::complex<real_t> complex_t;                       //!< Complex type
 
   //! Structure of bodies
