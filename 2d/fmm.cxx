@@ -8,6 +8,7 @@
 #elif EXAFMM_LAZY
 #include "traverse_lazy.h"
 #endif
+#include "verify.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
@@ -17,6 +18,12 @@ int main(int argc, char ** argv) {
   ncrit = args.ncrit;                                           // Number of bodies per leaf cell
   const int numBodies = args.numBodies;                         // Number of bodies
   const char * distribution = args.distribution;                // Type of distribution
+
+  // Print arguments 
+  if (args.verbose) {
+    printf("--- %-16s ------------\n", "FMM Parameter");
+    args.print(20);
+  }
 
   printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
   //! Initialize bodies
@@ -60,16 +67,14 @@ int main(int argc, char ** argv) {
   stop("Direct N-Body");                                        // Stop timer
 
   //! Verify result
-  double pDif = 0, pNrm = 0, FDif = 0, FNrm = 0;
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies & bodies2
-    pDif += (bodies[b].p - bodies2[b].p) * (bodies[b].p - bodies2[b].p);// Difference of potential
-    pNrm += bodies2[b].p * bodies2[b].p;                        //  Value of potential
-    FDif += (bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0])// Difference of force
-      + (bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]);// Difference of force
-    FNrm += bodies2[b].F[0] * bodies2[b].F[0] + bodies2[b].F[1] * bodies2[b].F[1];//  Value of force
-  }                                                             // End loop over bodies & bodies2
-  printf("--- %-16s ------------\n", "FMM vs. direct");         // Print message
+  Verify verify;
+  double pDif = verify.getDifScalar(bodies, bodies2);
+  double pNrm = verify.getNrmScalar(bodies2);
+  double FDif = verify.getDifVector(bodies, bodies2);
+  double FNrm = verify.getNrmVector(bodies2);
+  printf("--- %-16s ------------\n", "FMM vs. direct");            // Print message
   printf("%-20s : %8.5e s\n","Rel. L2 Error (p)", sqrt(pDif/pNrm));// Print potential error
   printf("%-20s : %8.5e s\n","Rel. L2 Error (F)", sqrt(FDif/FNrm));// Print force error
+
   return 0;
 }
