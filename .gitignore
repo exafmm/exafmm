@@ -6,6 +6,7 @@
 *.so
 *.out*
 *.th_o
+*.reg
 .deps
 .dirstamp
 nightly.log
