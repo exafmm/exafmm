@@ -6,8 +6,8 @@
 #include <vector>
 
 namespace exafmm {
-  //! Basic type definitions
-  typedef double real_t;                                        //!< Floating point type is single precision
+  // Basic type definitions
+  typedef double real_t;                                        //!< Floating point type is double precision
   typedef std::complex<real_t> complex_t;                       //!< Complex type
 
   //! Structure of bodies
@@ -23,8 +23,8 @@ namespace exafmm {
   struct Cell {
     int NCHILD;                                                 //!< Number of child cells
     int NBODY;                                                  //!< Number of descendant bodies
-    Cell * CHILD;                                               //!< Pointer of first child cell
-    Body * BODY;                                                //!< Pointer of first body
+    Cell * CHILD;                                               //!< Pointer to first child cell
+    Body * BODY;                                                //!< Pointer to first body
     real_t X[2];                                                //!< Cell center
     real_t R;                                                   //!< Cell radius
 #if EXAFMM_LAZY
@@ -38,7 +38,7 @@ namespace exafmm {
   };
   typedef std::vector<Cell> Cells;                              //!< Vector of cells
 
-  //! Global variables
+  // Global variables
   int P;                                                        //!< Order of expansions
   int ncrit;                                                    //!< Number of bodies per leaf cell
   int images;                                                   //!< Number of periodic image sublevels
@@ -46,11 +46,15 @@ namespace exafmm {
   real_t cycle;                                                 //!< Cycle of periodic boundary condition
   real_t theta;                                                 //!< Multipole acceptance criterion
   real_t dX[2];                                                 //!< Distance vector
-#pragma omp threadprivate(iX,dX)                                //!< Make global variables private
+#pragma omp threadprivate(iX,dX)                                // Make global variables private
 
-  //!< L2 norm of vector X
-  inline real_t norm(real_t * X) {
-    return X[0] * X[0] + X[1] * X[1];                           // L2 norm
+  //!< L2 norm of array X
+  /*!
+    \param X a two-element array.
+    \return L2 norm of X
+  */
+  inline real_t norm(const real_t * X) {
+    return X[0] * X[0] + X[1] * X[1];
   }
 }
 
