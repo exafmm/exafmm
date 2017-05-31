@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <iomanip>
+#include <stdint.h>
 
 namespace exafmm {
   static struct option long_options[] = {
@@ -25,7 +26,7 @@ namespace exafmm {
   */
   class Args {
   public:
-    int ncrit;                                  //!< Number of bodies per leaf cell 
+    int ncrit;                                  //!< Number of bodies per leaf cell
     const char * distribution;                  //!< Body Distribution
     int numBodies;                              //!< Number of bodies
     int P;                                      //!< Order of expansions
@@ -98,12 +99,12 @@ namespace exafmm {
       Set default values to FMM parameters and parse argv for user-defined options
     */
     Args(int argc=0, char ** argv=NULL)
-      : ncrit(64), 
+      : ncrit(64),
         distribution("cube"),
         numBodies(1000000),
         P(10),
         theta(.4),
-        verbose(0) 
+        verbose(0)
     {
       while (1) {
         int option_index;
