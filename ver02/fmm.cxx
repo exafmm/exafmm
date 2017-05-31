@@ -1,5 +1,4 @@
 #include "build_tree.h"
-#include "dataset.h"
 #include "kernel.h"
 #include "timer.h"
 #include "traverse.h"
@@ -18,8 +17,16 @@ int main(int argc, char ** argv) {
   double totalFMM = 0;                                          // Initialize total FMM time
   printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
   // Initialize bodies
-  start("Initialize bodies");                                   // Start timer
-  Bodies bodies = initBodies(numBodies, distribution);
+  start("Initialize bodies");
+  Bodies bodies(numBodies);
+  for (size_t b=0; b<numBodies; ++b) {                          // Loop over bodies
+    for (int d=0; d<2; d++) {                                   //  Loop over dimension
+      bodies[b].X[d] = drand48();                               //   Initialize coordinates
+      bodies[b].F[d] = 0;                                       //   Initialize force
+    }                                                           //  End loop over dimension
+    bodies[b].q = 1;                                            //  Initialize charges
+    bodies[b].p = 0;                                            //  Initialize potential
+  }                                                             // End loop over bodies
   stop("Initialize bodies");                                    // Stop timer
 
   start("Total FMM");
