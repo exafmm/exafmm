@@ -101,7 +101,7 @@ namespace exafmm {
     Args(int argc=0, char ** argv=NULL)
       : ncrit(64),
         distribution("cube"),
-        numBodies(1000000),
+        numBodies(100000),
         P(10),
         theta(.4),
         verbose(0)
