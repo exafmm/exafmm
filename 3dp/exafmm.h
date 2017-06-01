@@ -50,7 +50,7 @@ namespace exafmm {
 #pragma omp threadprivate(iX,dX)                                //!< Make global variables private
 
   //!< L2 norm of vector X
-  inline real_t norm(real_t * X) {
+  inline real_t norm(const real_t * X) {
     return X[0] * X[0] + X[1] * X[1] + X[2] * X[2];             // L2 norm
   }
 }

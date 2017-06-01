@@ -9,6 +9,7 @@
 #elif EXAFMM_LAZY
 #include "traverse_lazy.h"
 #endif
+#include "verify.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
@@ -26,77 +27,102 @@ int main(int argc, char ** argv) {
   sigma = .25 / M_PI;                                           // Ewald distribution parameter
   cutoff = cycle / 2;                                           // Ewald cutoff distance
 
-  printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
-  //! Initialize bodies
-  start("Initialize bodies");                                   // Start timer
-  Bodies bodies = initBodies(numBodies, distribution);
-  stop("Initialize bodies");                                    // Stop timer
+  // Print arguments 
+  if (args.verbose) {
+    printf("--- %-16s ------------\n", "FMM Parameter");
+    args.print(20);
+  }
+  
+  // FMM
+  int repeat = 10;                                              // Number of runs for time regression test
+  Verify verify;
+  verify.verbose = args.verbose;                                    // Initialize a verify instance
+  bool isAccuracy = true;                               // Flag for checking accuracy
+  double totalFMM = 0;                                          // Initialize total FMM time
+  for (int t=0; t<repeat; t++) {                                // Loop over identical time regression runs
+    printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
+    printf("--- %-17s %d ---------\n", "Time average loop", t);
+    // Initialize bodies
+    start("Initialize bodies");                                   // Start timer
+    Bodies bodies = initBodies(numBodies, distribution);
+    stop("Initialize bodies");                                    // Stop timer
 
-  //! Build tree
-  start("Build tree");                                          // Start timer
-  Cells  cells = buildTree(bodies);                             // Build tree
-  stop("Build tree");                                           // Stop timer
+    start("Total FMM");
+    // Build tree
+    start("Build tree");                                          // Start timer
+    Cells cells = buildTree(bodies);                              // Build tree
+    stop("Build tree");                                           // Stop timer
 
-  //! FMM evaluation
-  start("P2M & M2M");                                           // Start timer
-  initKernel();                                                 // Initialize kernel
-  upwardPass(cells);                                            // Upward pass for P2M, M2M
-  stop("P2M & M2M");                                            // Stop timer
-  start("M2L & P2P");                                           // Start timer
-  horizontalPass(cells, cells);                                 // Horizontal pass for M2L, P2P
-  stop("M2L & P2P");                                            // Stop timer
-  start("L2L & L2P");                                           // Start timer
-  downwardPass(cells);                                          // Downward pass for L2L, L2P
-  stop("L2L & L2P");                                            // Stop timer
+    // FMM evaluation
+    start("P2M & M2M");                                           // Start timer
+    initKernel();                                                 // Initialize kernel
+    upwardPass(cells);                                            // Upward pass for P2M, M2M
+    stop("P2M & M2M");                                            // Stop timer
+    start("M2L & P2P");                                           // Start timer
+    horizontalPass(cells, cells);                                 // Horizontal pass for M2L, P2P
+    stop("M2L & P2P");                                            // Stop timer
+    start("L2L & L2P");                                           // Start timer
+    downwardPass(cells);                                          // Downward pass for L2L, L2P
+    stop("L2L & L2P");                                            // Stop timer
 
-  //! Dipole correction
-  start("Dipole correction");                                   // Start timer
-  real_t dipole[3] = {0, 0, 0};                                 // Initialize dipole
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
-    for (int d=0; d<3; d++) dipole[d] += bodies[b].X[d] * bodies[b].q;// Accumulate dipole
-  }                                                             // End loop over bodies
-  real_t coef = 4 * M_PI / (3 * cycle * cycle * cycle);         // Domain coefficient
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
-    real_t dnorm = dipole[0] * dipole[0] + dipole[1] * dipole[1] + dipole[2] * dipole[2];// Norm of dipole
-    bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;  //  Correct potential
-    for (int d=0; d!=3; d++) bodies[b].F[d] -= coef * dipole[d];//  Correct force
-  }                                                             // End loop over bodies
-  stop("Dipole correction");                                    // Stop timer
+    // Dipole correction
+    start("Dipole correction");                                   // Start timer
+    real_t dipole[3] = {0, 0, 0};                                 // Initialize dipole
+    for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
+      for (int d=0; d<3; d++) dipole[d] += bodies[b].X[d] * bodies[b].q;// Accumulate dipole
+    }                                                             // End loop over bodies
+    real_t coef = 4 * M_PI / (3 * cycle * cycle * cycle);         // Domain coefficient
+    for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
+      real_t dnorm = dipole[0] * dipole[0] + dipole[1] * dipole[1] + dipole[2] * dipole[2];// Norm of dipole
+      bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;  //  Correct potential
+      for (int d=0; d!=3; d++) bodies[b].F[d] -= coef * dipole[d];//  Correct force
+    }                                                             // End loop over bodies
+    stop("Dipole correction");                                    // Stop timer 
+    totalFMM += stop("Total FMM");
 
-  printf("--- %-16s ------------\n", "Ewald Profiling");        // Print message
-  //! Ewald summation
-  start("Build tree");                                          // Start timer
-  Bodies bodies2 = bodies;                                      // Backup bodies
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
-    bodies[b].p = 0;                                            //  Clear potential
-    for (int d=0; d<3; d++) bodies[b].F[d] = 0;                 //  Clear force
-  }                                                             // End loop over bodies
-  Bodies jbodies = bodies;                                      // Copy bodies
-  Cells  jcells = buildTree(jbodies);                           // Build tree
-  stop("Build tree");                                           // Stop timer
-  start("Wave part");                                           // Start timer
-  wavePart(bodies, jbodies);                                    // Ewald wave part
-  stop("Wave part");                                            // Stop timer
-  start("Real part");                                           // Start timer
-  realPart(&cells[0], &jcells[0]);                              // Ewald real part
-  selfTerm(bodies);                                             // Ewald self term
-  stop("Real part");                                            // Stop timer
+    if (isAccuracy) {                                     // Start accuracy regression test
+      printf("--- %-16s ------------\n", "Ewald Profiling");        // Print message
+      // Ewald summation
+      start("Build tree");                                          // Start timer
+      Bodies bodies2 = bodies;                                      // Backup bodies
+      for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies
+        bodies[b].p = 0;                                            //  Clear potential
+        for (int d=0; d<3; d++) bodies[b].F[d] = 0;                 //  Clear force
+      }                                                             // End loop over bodies
+      Bodies jbodies = bodies;                                      // Copy bodies
+      Cells  jcells = buildTree(jbodies);                           // Build tree
+      stop("Build tree");                                           // Stop timer
+      start("Wave part");                                           // Start timer
+      wavePart(bodies, jbodies);                                    // Ewald wave part
+      stop("Wave part");                                            // Stop timer
+      start("Real part");                                           // Start timer
+      realPart(&cells[0], &jcells[0]);                              // Ewald real part
+      selfTerm(bodies);                                             // Ewald self term
+      stop("Real part");                                            // Stop timer
 
-  //! Verify result
-  real_t pSum = 0, pSum2 = 0, FDif = 0, FNrm = 0;
-  for (size_t b=0; b<bodies.size(); b++) {                      // Loop over bodies & bodies2
-    pSum += bodies[b].p * bodies[b].q;                          // Sum of potential for bodies
-    pSum2 += bodies2[b].p * bodies2[b].q;                       // Sum of potential for bodies2
-    FDif += (bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +// Difference of force
-      (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]) +// Difference of force
-      (bodies[b].F[2] - bodies2[b].F[2]) * (bodies[b].F[2] - bodies2[b].F[2]);// Difference of force
-    FNrm += bodies[b].F[0] * bodies[b].F[0] + bodies[b].F[1] * bodies[b].F[1] +// Value of force
-      bodies[b].F[2] * bodies[b].F[2];
-  }                                                             // End loop over bodies & bodies2
-  real_t pDif = (pSum - pSum2) * (pSum - pSum2);                // Difference in sum
-  real_t pNrm = pSum * pSum;                                    // Norm of the sum
-  printf("--- %-16s ------------\n", "FMM vs. direct");         // Print message
-  printf("%-20s : %8.5e s\n","Rel. L2 Error (p)", sqrt(pDif/pNrm));// Print potential error
-  printf("%-20s : %8.5e s\n","Rel. L2 Error (F)", sqrt(FDif/FNrm));// Print force error
+      // Verify result
+      double pSum = verify.getSumScalar(bodies);
+      double pSum2 = verify.getSumScalar(bodies2);
+      double pDif = (pSum - pSum2) * (pSum - pSum2);                // Difference in sum
+      double pNrm = pSum * pSum;                                    // Norm of the sum
+      double pRel = std::sqrt(pDif/pNrm);
+      double FDif = verify.getDifVector(bodies, bodies2);
+      double FNrm = verify.getNrmVector(bodies2);
+      double FRel = std::sqrt(FDif/FNrm);
+
+      printf("--- %-16s ------------\n", "FMM vs. direct");         // Print message
+      printf("%-20s : %8.5e s\n","Rel. L2 Error (p)", pRel);        // Print potential error
+      printf("%-20s : %8.5e s\n","Rel. L2 Error (F)", FRel);        // Print force error
+
+      isAccuracy = false;
+      printf("--- %-19s ---------\n", "Accuracy regression");
+      bool pass = verify.accuracyRegression(args.getKey(), pRel, FRel);
+      if (!pass) abort();
+    }
+  }
+  double averageFMM = totalFMM / repeat;
+  bool pass = false;
+  pass = verify.timeRegression(args.getKey(), averageFMM);
+  if (!pass) abort();
   return 0;
 }
