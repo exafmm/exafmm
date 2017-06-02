@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <iomanip>
+#include <stdint.h>
 
 namespace exafmm {
   static struct option long_options[] = {
