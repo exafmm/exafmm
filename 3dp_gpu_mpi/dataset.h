@@ -17,25 +17,29 @@ namespace exafmm {
     if (remainder > iSplit) end++;                            // Adjust the end counter for remainder
   }
   
-  //! Uniform distribution on [-1,1]^2 lattice
+  //! Uniform distribution on [-1,1]^3 lattice
   Bodies lattice(int numBodies, int mpirank, int mpisize) {
-    int nx = int(std::pow(numBodies*mpisize, 1./2));          // Number of points in x direction
+    int nx = int(std::pow(numBodies*mpisize, 1./3));          // Number of points in x direction
     int ny = nx;                                              // Number of points in y direction
-    int begin = 0;                                            // Begin index in y direction
-    int end = ny;                                             // End index in y direction
-    splitRange(begin, end, mpirank, mpisize);                 // Split range in y direction
-    int numLattice = nx * (end - begin);                 // Total number of lattice points
+    int nz = nx;                                              // Number of points in z direction
+    int begin = 0;                                            // Begin index in z direction
+    int end = nz;                                             // End index in z direction
+    splitRange(begin, end, mpirank, mpisize);                 // Split range in z direction
+    int numLattice = nx * ny * (end - begin);                 // Total number of lattice points
     Bodies bodies(numLattice);                                // Initialize bodies
-    for (int ix=0; ix<nx; ++ix) {                             // Loop over x direction
-      for (int iy=begin, b=0; iy<end; ++iy, ++b) {               //   Loop over y direction
-        bodies[b].X[0] = (ix / real_t(nx-1)) * 2 - 1;              //    x coordinate
-        bodies[b].X[1] = (iy / real_t(ny-1)) * 2 - 1;              //    y coordinate
-      }                                                     //   End loop over y direction
+    for (int ix=0; ix<nx; ix++) {                             // Loop over x direction
+      for (int iy=0; iy<ny; iy++) {                           //  Loop over y direction
+        for (int iz=begin, b=0; iz<end; ++iz, ++b) {               //   Loop over z direction
+          bodies[b].X[0] = (ix / real_t(nx-1)) * 2 - 1;              //    x coordinate
+          bodies[b].X[1] = (iy / real_t(ny-1)) * 2 - 1;              //    y coordinate
+          bodies[b].X[2] = (iz / real_t(nz-1)) * 2 - 1;              //    z coordinate
+        }                                                     //   End loop over z direction
+      }                                                       //  End loop over y direction
     }                                                         // End loop over x direction
     return bodies;                                            // Return bodies
   }
 
-  //! Random distribution in [-1,1]^2 cube
+  //! Random distribution in [-1,1]^3 cube
   Bodies cube(int numBodies, int seed, int numSplit) {
     Bodies bodies(numBodies);                                 // Initialize bodies
     for (int i=0; i<numSplit; i++, seed++) {                  // Loop over partitions (if there are any)
@@ -44,7 +48,7 @@ namespace exafmm {
       splitRange(begin, end, i, numSplit);                    //  Split range of bodies
       srand48(seed);                                          //  Set seed for random number generator
       for (size_t b=begin; b!=end; ++b) {// Loop over bodies
-        for (int d=0; d<2; d++) {                             //   Loop over dimension
+        for (int d=0; d<3; d++) {                             //   Loop over dimension
           bodies[b].X[d] = drand48() * 2 * M_PI - M_PI;              //    Initialize coordinates
         }                                                     //   End loop over dimension
       }                                                       //  End loop over bodies
@@ -61,11 +65,11 @@ namespace exafmm {
       splitRange(begin, end, i, numSplit);                    //  Split range of bodies
       srand48(seed);                                          //  Set seed for random number generator
       for (size_t b=begin; b!=end; ++b) {// Loop over bodies
-        for (int d=0; d<2; d++) {                             //   Loop over dimension
+        for (int d=0; d<3; d++) {                             //   Loop over dimension
           bodies[b].X[d] = drand48() * 2 - 1;                        //    Initialize coordinates
         }                                                     //   End loop over dimension
         real_t r = std::sqrt(norm(bodies[b].X));                     //   Distance from center
-        for (int d=0; d<2; d++) {                             //   Loop over dimension
+        for (int d=0; d<3; d++) {                             //   Loop over dimension
           bodies[b].X[d] *= M_PI / r;                                //    Normalize coordinates
         }                                                     //   End loop over dimension
       }                                                       //  End loop over bodies
@@ -82,15 +86,17 @@ namespace exafmm {
       splitRange(begin, end, i, numSplit);                    //  Split range of bodies
       srand48(seed);                                          //  Set seed for random number generator
       for (size_t b=begin; b!=end; ++b) {// Loop over bodies
+        real_t theta = drand48() * M_PI * 0.5;                //   Polar angle [0,pi/2]
         real_t phi = drand48() * M_PI * 0.5;                  //   Azimuthal angle [0,pi/2]
-        bodies[b].X[0] = 2 * M_PI * std::cos(phi) - M_PI;     // x coordinate
-        bodies[b].X[1] = 2 * M_PI * std::sin(phi) - M_PI;     // y coordinate
+        bodies[b].X[0] = 2 * M_PI * std::sin(theta) * std::cos(phi) - M_PI;// x coordinate
+        bodies[b].X[1] = 2 * M_PI * std::sin(theta) * std::sin(phi) - M_PI;// y coordinate
+        bodies[b].X[2] = 2 * M_PI * std::cos(theta) - M_PI;          //    z coordinate
       }                                                       //  End loop over bodies
     }                                                         // End loop over partitions
     return bodies;                                            // Return bodies
   }
 
-  //! Plummer distribution with a virial radius r_v = 1
+  //! Plummer distribution in a r = M_PI/2 sphere
   Bodies plummer(int numBodies, int seed, int numSplit) {
     Bodies bodies(numBodies);                                 // Initialize bodies
     for (int i=0; i<numSplit; i++, seed++) {                  // Loop over partitions (if there are any)
@@ -98,18 +104,21 @@ namespace exafmm {
       int end = bodies.size();                                //  End index of bodies
       splitRange(begin, end, i, numSplit);                    //  Split range of bodies
       srand48(seed);                                          //  Set seed for random number generator
-      size_t b = begin;                                       //  Body begin iterator
-      while (b != end) {                                      //  While body iterator is within range
+      size_t b = begin;                          //  Body begin iterator
+      while (b != end) {                       //  While body iterator is within range
         real_t X1 = drand48();                                //   First random number
         real_t X2 = drand48();                                //   Second random number
+        real_t X3 = drand48();                                //   Third random number
         real_t R = 1.0 / sqrt( (pow(X1, -2.0 / 3.0) - 1.0) ); //   Radius
         if (R < 100.0) {                                      //   If radius is less than 100
-          real_t X = R * std::cos(2.0 * M_PI * X2);           // x component
-          real_t Y = R * std::sin(2.0 * M_PI * X2);           // y component
+          real_t Z = (1.0 - 2.0 * X2) * R;                    //    z component
+          real_t X = sqrt(R * R - Z * Z) * std::cos(2.0 * M_PI * X3);// x component
+          real_t Y = sqrt(R * R - Z * Z) * std::sin(2.0 * M_PI * X3);// y component
           real_t scale = 3.0 * M_PI / 16.0;                   //    Scaling factor
-          X *= scale; Y *= scale;                             //    Scale coordinates
-          bodies[b].X[0] = X;                                 //    Assign x coordinate to body
-          bodies[b].X[1] = Y;                                 //    Assign y coordinate to body
+          X *= scale; Y *= scale; Z *= scale;                 //    Scale coordinates
+          bodies[b].X[0] = X;                                        //    Assign x coordinate to body
+          bodies[b].X[1] = Y;                                        //    Assign y coordinate to body
+          bodies[b].X[2] = Z;                                        //    Assign z coordinate to body
           ++b;                                                //    Increment body iterator
         }                                                     //   End if for bodies within range
       }                                                       //  End while loop over bodies
@@ -141,7 +150,7 @@ namespace exafmm {
   void initTarget(Bodies & bodies) {
     for (size_t b=0; b!=bodies.size(); ++b) {     // Loop over bodies
       bodies[b].p = 0;                                             //  Clear potential
-      for (int d=0; d<2; d++) bodies[b].F[d] = 0;                 //  Clear force
+      for (int d=0; d<3; d++) bodies[b].F[d] = 0;                 //  Clear force
     }                                                         // End loop over bodies
   }
 

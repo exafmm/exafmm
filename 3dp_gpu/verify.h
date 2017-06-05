@@ -74,7 +74,8 @@ namespace exafmm {
       double v = 0;                                             // Initialize difference
       for (size_t b=0; b<bodies.size(); b++) {                  // Loop over bodies & bodies2
         v += std::abs((bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +
-                      (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]));
+                      (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]) +
+                      (bodies[b].F[2] - bodies2[b].F[2]) * (bodies[b].F[2] - bodies2[b].F[2]));
       }                                                         // End loop over bodies & bodies2
       return v;                                                 // Return difference
     }
@@ -84,7 +85,8 @@ namespace exafmm {
       double v = 0;                                             // Initialize difference
       for (size_t b=0; b<bodies.size(); b++) {                  // Loop over bodies & bodies2
         v += std::abs(((bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +
-		                   (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]))
+		                   (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]) +
+                       (bodies[b].F[2] - bodies2[b].F[2]) * (bodies[b].F[2] - bodies2[b].F[2]))
 		                  / norm(bodies2[b].F));
       }                                                         // End loop over bodies & bodies2
       return v;                                                 // Return difference
