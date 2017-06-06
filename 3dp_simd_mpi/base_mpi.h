@@ -2,7 +2,7 @@
 #define base_mpi_h
 #include <mpi.h>
 #include "exafmm.h"
-
+#include <iostream>
 namespace exafmm {
   //! Custom MPI utilities
   class BaseMPI {
@@ -37,23 +37,22 @@ namespace exafmm {
     return recv;                                                // Return received values
   }
 
-  //! Allreduce bounding box from all ranks
-  void allreduceBounds(real_t & R0, real_t * X0, const real_t & r0, real_t * x0 ) {
-    float Xmin[2], Xmax[2];
-    float xmin[2], xmax[2];
-    for (int d=0; d<2; ++d) {
-      xmin[d] = x0[d] - r0;
-      xmax[d] = x0[d] + r0;
-    }
-    MPI_Allreduce(xmin, Xmin, 2, MPI_FLOAT, MPI_MIN, MPI_COMM_WORLD);
-    MPI_Allreduce(xmax, Xmax, 2, MPI_FLOAT, MPI_MAX, MPI_COMM_WORLD);
-    for (int d=0; d<2; ++d) X0[d] = (Xmin[d] + Xmax[d]) / 2;
-    R0 = 0;
-    for (int d=0; d<2; ++d) {
-      R0 = fmax(X0[d] - Xmin[d], R0);
-      R0 = fmax(Xmax[d] - X0[d], R0);
-    }
-    R0 *= 1.00001;
+  //! Allreduce bounds type from all ranks
+  Bounds allreduceBounds(Bounds local) {
+    float localXmin[3], localXmax[3], globalXmin[3], globalXmax[3];
+    for (int d=0; d<3; d++) {                                 // Loop over dimensions
+      localXmin[d] = local.Xmin[d];                           //  Convert Xmin to float
+      localXmax[d] = local.Xmax[d];                           //  Convert Xmax to float
+    }                                                         // End loop over dimensions
+    MPI_Allreduce(localXmin, globalXmin, 3, MPI_FLOAT, MPI_MIN, MPI_COMM_WORLD);// Reduce domain Xmin
+    MPI_Allreduce(localXmax, globalXmax, 3, MPI_FLOAT, MPI_MAX, MPI_COMM_WORLD);// Reduce domain Xmax
+    Bounds global;
+    for (int d=0; d<3; d++) {                                 // Loop over dimensions
+      real_t leeway = (globalXmax[d] - globalXmin[d]) * 1e-6; //  Adding a bit of leeway to global domain
+      global.Xmin[d] = globalXmin[d] - leeway;                //  Convert Xmin to real_t
+      global.Xmax[d] = globalXmax[d] + leeway;                //  Convert Xmax to real_t
+    }                                                         // End loop over dimensions
+    return global;                                            // Return global bounds
   }
 }
 #endif
