@@ -6,9 +6,10 @@
 #include <vector>
 
 namespace exafmm {
-  //! Basic type definitions
+  // Basic type definitions
   typedef double real_t;                                        //!< Floating point type
   typedef std::complex<real_t> complex_t;                       //!< Complex type
+  const real_t EPS = 1e-16;                                     // Double precision epsilon
 
   //! Structure of bodies
   struct Body {
@@ -18,6 +19,12 @@ namespace exafmm {
     real_t F[3];                                                //!< Force
   };
   typedef std::vector<Body> Bodies;                             //!< Vector of bodies
+
+  //! Min & max bounds of bounding box
+  struct Bounds {
+    real_t Xmin[3];                                             //!< Minimum value of coordinates
+    real_t Xmax[3];                                             //!< Maximum value of coordinates
+  };
 
   //! Structure of cells
   struct Cell {

@@ -4,20 +4,21 @@
 
 namespace exafmm {
   //! Get bounding box of bodies
-  void getBounds(Bodies & bodies, real_t & R0, real_t * X0) {
-    real_t Xmin[3], Xmax[3];                                    // Min, max of domain
-    for (int d=0; d<3; d++) Xmin[d] = Xmax[d] = bodies[0].X[d]; // Initialize Xmin, Xmax
+  Bounds getBounds(Bodies & bodies, real_t & R0, real_t * X0) {
+    Bounds bounds;
+    for (int d=0; d<3; d++) bounds.Xmin[d] = bounds.Xmax[d] = bodies[0].X[d]; // Initialize Xmin, Xmax
     for (size_t b=0; b<bodies.size(); b++) {                    // Loop over range of bodies
-      for (int d=0; d<3; d++) Xmin[d] = fmin(bodies[b].X[d], Xmin[d]);//  Update Xmin
-      for (int d=0; d<3; d++) Xmax[d] = fmax(bodies[b].X[d], Xmax[d]);//  Update Xmax
+      for (int d=0; d<3; d++) bounds.Xmin[d] = fmin(bodies[b].X[d], bounds.Xmin[d]);//  Update Xmin
+      for (int d=0; d<3; d++) bounds.Xmax[d] = fmax(bodies[b].X[d], bounds.Xmax[d]);//  Update Xmax
     }                                                           // End loop over range of bodies
-    for (int d=0; d<3; d++) X0[d] = (Xmax[d] + Xmin[d]) / 2;    // Calculate center of domain
+    for (int d=0; d<3; d++) X0[d] = (bounds.Xmax[d] + bounds.Xmin[d]) / 2;    // Calculate center of domain
     R0 = 0;                                                     // Initialize localRadius
     for (int d=0; d<3; d++) {                                   // Loop over dimensions
-      R0 = fmax(X0[d] - Xmin[d], R0);                           //  Calculate min distance from center
-      R0 = fmax(Xmax[d] - X0[d], R0);                           //  Calculate max distance from center
+      R0 = fmax(X0[d] - bounds.Xmin[d], R0);                           //  Calculate min distance from center
+      R0 = fmax(bounds.Xmax[d] - X0[d], R0);                           //  Calculate max distance from center
     }                                                           // End loop over dimensions
     R0 *= 1.00001;                                              // Add some leeway to radius
+    return bounds;
   }
 
   //! Build cells of tree adaptively using a top-down approach based on recursion
