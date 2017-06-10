@@ -3,6 +3,7 @@
 #include "build_tree.h"
 #include "dataset.h"
 #include "kernel.h"
+#include "partition.h"
 #include "timer.h"
 #if EXAFMM_EAGER
 #include "traverse_eager.h"
@@ -20,11 +21,13 @@ int main(int argc, char ** argv) {
   const int numBodies = args.numBodies;                         // Number of bodies
   const char * distribution = args.distribution;                // Type of distribution
   BaseMPI baseMPI;                                              // Initialize MPI environment
+  Partition partition;
 
   Bodies bodies = initBodies(numBodies, distribution, baseMPI.mpirank, baseMPI.mpisize); // Initialize bodies
   real_t r0, x0[2];                                             // Initialize local & global bounds
   Bounds localBounds = getBounds(bodies, r0, x0);               // Get local bounds
   Bounds globalBounds = allreduceBounds(localBounds);           // Reduce to global bounds
+  partition.bisection(bodies, globalBounds);
 
   return 0;
 }

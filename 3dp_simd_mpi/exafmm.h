@@ -17,6 +17,8 @@ namespace exafmm {
     real_t q;                                                   //!< Charge
     real_t p;                                                   //!< Potential
     real_t F[3];                                                //!< Force
+    int irank;                                                  //!< Initial rank numbering for partitioning back
+    real_t weight;                                              //!< Weight for partitioning
   };
   typedef std::vector<Body> Bodies;                             //!< Vector of bodies
 
