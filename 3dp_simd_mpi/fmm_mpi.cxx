@@ -23,8 +23,8 @@ int main(int argc, char ** argv) {
   BaseMPI baseMPI;                                              // Initialize MPI environment
   Partition partition;
 
+  real_t r0, x0[3];                                             // Initialize local & global bounds
   Bodies bodies = initBodies(numBodies, distribution, baseMPI.mpirank, baseMPI.mpisize); // Initialize bodies
-  real_t r0, x0[2];                                             // Initialize local & global bounds
   Bounds localBounds = getBounds(bodies, r0, x0);               // Get local bounds
   Bounds globalBounds = allreduceBounds(localBounds);           // Reduce to global bounds
   partition.bisection(bodies, globalBounds);

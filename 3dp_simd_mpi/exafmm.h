@@ -21,6 +21,7 @@ namespace exafmm {
     real_t weight;                                              //!< Weight for partitioning
   };
   typedef std::vector<Body> Bodies;                             //!< Vector of bodies
+  typedef typename Bodies::iterator B_iter;
 
   //! Min & max bounds of bounding box
   struct Bounds {
