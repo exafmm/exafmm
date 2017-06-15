@@ -1,6 +1,7 @@
 #ifndef verify_h
 #define verify_h
 #include <fstream>
+#include <map>
 #include "exafmm.h"
 
 namespace exafmm {

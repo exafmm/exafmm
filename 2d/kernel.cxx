@@ -1,10 +1,12 @@
 #include "args.h"
 #include "kernel.h"
+#include "verify.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
   P = args.P;
+  Verify verify;
 
   // P2M
   Bodies jbodies(1);
@@ -72,15 +74,13 @@ int main(int argc, char ** argv) {
   P2P(Ci, Cj);
 
   // Verify results
-  real_t pDif = 0, pNrm = 0, FDif = 0, FNrm = 0;
-  for (size_t b=0; b<bodies.size(); b++) {
-    pDif += (bodies[b].p - bodies2[b].p) * (bodies[b].p - bodies2[b].p);
-    pNrm += bodies[b].p * bodies[b].p;
-    FDif += (bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +
-      (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]);
-    FNrm += bodies[b].F[0] * bodies[b].F[0] + bodies[b].F[1] * bodies[b].F[1];
-  }
-  printf("%-20s : %8.5e s\n","Rel. L2 Error (p)", sqrt(pDif/pNrm));
-  printf("%-20s : %8.5e s\n","Rel. L2 Error (F)", sqrt(FDif/FNrm));
+  double pDif = verify.getDifScalar(bodies, bodies2);
+  double pNrm = verify.getNrmScalar(bodies2);
+  double pRel = std::sqrt(pDif/pNrm);
+  double FDif = verify.getDifVector(bodies, bodies2);
+  double FNrm = verify.getNrmVector(bodies2);
+  double FRel = std::sqrt(FDif/FNrm);
+  printf("%-20s : %8.5e \n","Rel. L2 Error (p)", pRel);
+  printf("%-20s : %8.5e \n","Rel. L2 Error (F)", FRel);
   return 0;
 }
