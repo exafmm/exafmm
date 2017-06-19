@@ -10,6 +10,7 @@
 
 namespace exafmm {
   static struct option long_options[] = {
+    {"accuracy",     no_argument,       0, 'a'},
     {"ncrit",        required_argument, 0, 'c'},
     {"distribution", required_argument, 0, 'd'},
     {"help",         no_argument,       0, 'h'},
@@ -26,6 +27,7 @@ namespace exafmm {
   */
   class Args {
   public:
+    int accuracy;                               //!< Regression for accuracy only
     int ncrit;                                  //!< Number of bodies per leaf cell 
     const char * distribution;                  //!< Body Distribution
     int numBodies;                              //!< Number of bodies
@@ -39,6 +41,7 @@ namespace exafmm {
       fprintf(stderr,
               "Usage: %s [options]\n"
               "Long option (short option)       : Description (Default value)\n"
+              " --accuracy (-a)                 : Regression for accuracy only (%d)\n"
               " --ncrit (-c)                    : Number of bodies per leaf cell (%d)\n"
               " --distribution (-d) [c/l/o/p/s] : lattice, cube, sphere, octant, plummer (%s)\n"
               " --help (-h)                     : Show this help document\n"
@@ -46,6 +49,7 @@ namespace exafmm {
               " --P (-P) not working            : Order of expansion (%d)\n"
               " --theta (-t)                    : Multipole acceptance criterion (%f)\n"
               " --verbose (-v)                  : Print information to screen (%d)\n",
+              accuracy,
               name,
               ncrit,
               distribution,
@@ -99,7 +103,8 @@ namespace exafmm {
       Set default values to FMM parameters and parse argv for user-defined options
     */
     Args(int argc=0, char ** argv=NULL)
-      : ncrit(64), 
+      : accuracy(0),
+        ncrit(64), 
         distribution("cube"),
         numBodies(1000000),
         P(10),
@@ -108,10 +113,13 @@ namespace exafmm {
     {
       while (1) {
         int option_index;
-        int c = getopt_long(argc, argv, "c:d:hn:P:t:v",
+        int c = getopt_long(argc, argv, "ac:d:hn:P:t:v",
                             long_options, &option_index);
         if (c == -1) break;
         switch (c) {
+          case 'a':
+            accuracy = 1;
+            break;
           case 'c':
             ncrit = atoi(optarg);
             break;
