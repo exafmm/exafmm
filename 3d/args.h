@@ -49,8 +49,8 @@ namespace exafmm {
               " --P (-P) not working            : Order of expansion (%d)\n"
               " --theta (-t)                    : Multipole acceptance criterion (%f)\n"
               " --verbose (-v)                  : Print information to screen (%d)\n",
-              accuracy,
               name,
+              accuracy,
               ncrit,
               distribution,
               numBodies,
@@ -171,6 +171,8 @@ namespace exafmm {
     void print(int stringLength) {
       if (verbose) {
         std::cout << std::setw(stringLength) << std::fixed << std::left
+                  << "accuracy" << " : " << accuracy << std::endl
+                  << std::setw(stringLength)
                   << "ncrit" << " : " << ncrit << std::endl
                   << std::setw(stringLength)
                   << "distribution" << " : " << distribution << std::endl
