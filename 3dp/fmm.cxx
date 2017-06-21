@@ -115,12 +115,14 @@ int main(int argc, char ** argv) {
       isAccuracy = false;                                    //   Set accuracy check flag to false
       printf("--- %-19s ---------\n", "Accuracy regression");
       bool pass = verify.accuracyRegression(args.getKey(), pRel, FRel); //   Accuracy regression test
-      if (!pass) abort();
+      if (pass) std::cout << "passed accuracy regression" << std::endl;
+      else abort();
       if (args.accuracy) std::exit(0);                //   Finish execution if only needs accuracy regression
     }                                                 //  End if perform accuracy regression test
   }                                                   // End loop over identical runs for time regression
   double averageFMM = totalFMM / repeat;              // Average FMM time
   bool pass = verify.timeRegression(args.getKey(), averageFMM);         // Time regression test
-  if (!pass) abort();
+  if (pass) std::cout << "passed time regression" << std::endl;
+  else abort();
   return 0;
 }
