@@ -10,7 +10,7 @@ int main(int argc, char ** argv) {
 
   // P2M
   Bodies jbodies(1);
-  for (int d=0; d<2; d++) jbodies[0].X[d] = 2;
+  jbodies[0].X = 2;
   jbodies[0].q = 1;
   Cells cells(4);
   Cell * Cj = &cells[0];
@@ -56,7 +56,7 @@ int main(int argc, char ** argv) {
   bodies[0].X[1] = 2;
   bodies[0].q = 1;
   bodies[0].p = 0;
-  for (int d=0; d<2; d++) bodies[0].F[d] = 0;
+  bodies[0].F = 0;
   Ci->BODY = &bodies[0];
   Ci->NBODY = bodies.size();
   L2P(Ci);
@@ -66,7 +66,7 @@ int main(int argc, char ** argv) {
   for (size_t b=0; b<bodies2.size(); b++) {
     bodies2[b] = bodies[b];
     bodies2[b].p = 0;
-    for (int d=0; d<2; d++) bodies2[b].F[d] = 0;
+    bodies2[b].F = 0;
   }
   Cj->NBODY = jbodies.size();
   Ci->NBODY = bodies2.size();

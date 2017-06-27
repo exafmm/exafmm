@@ -141,7 +141,7 @@ namespace exafmm {
   void initTarget(Bodies & bodies) {
     for (size_t b=0; b!=bodies.size(); ++b) {     // Loop over bodies
       bodies[b].p = 0;                                             //  Clear potential
-      for (int d=0; d<2; d++) bodies[b].F[d] = 0;                 //  Clear force
+      bodies[b].F = 0;                                             //  Clear force
     }                                                         // End loop over bodies
   }
 

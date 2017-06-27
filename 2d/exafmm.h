@@ -4,18 +4,20 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
+#include "vec.h"
 
 namespace exafmm {
   // Basic type definitions
   typedef double real_t;                                        //!< Floating point type is double precision
   typedef std::complex<real_t> complex_t;                       //!< Complex type
+  typedef vec<2,real_t> vec2;                                   //!< Vector of 2 real_t types
 
   //! Structure of bodies
   struct Body {
-    real_t X[2];                                                //!< Position
+    vec2 X;                                                     //!< Position
     real_t q;                                                   //!< Charge
     real_t p;                                                   //!< Potential
-    real_t F[2];                                                //!< Force
+    vec2 F;                                                     //!< Force
   };
   typedef std::vector<Body> Bodies;                             //!< Vector of bodies
 
@@ -25,7 +27,7 @@ namespace exafmm {
     int NBODY;                                                  //!< Number of descendant bodies
     Cell * CHILD;                                               //!< Pointer to first child cell
     Body * BODY;                                                //!< Pointer to first body
-    real_t X[2];                                                //!< Cell center
+    vec2 X;                                                     //!< Cell center
     real_t R;                                                   //!< Cell radius
 #if EXAFMM_LAZY
     std::vector<Cell*> listM2L;                                 //!< M2L interaction list
