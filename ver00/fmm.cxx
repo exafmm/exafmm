@@ -19,7 +19,7 @@ int main(int argc, char ** argv) {
   const int numBodies = args.numBodies;                         // Number of bodies
   const char * distribution = args.distribution;                // Type of distribution
 
-  // Print arguments 
+  // Print arguments
   if (args.verbose) {
     printf("--- %-16s ------------\n", "FMM Parameter");
     args.print(20);
@@ -32,7 +32,7 @@ int main(int argc, char ** argv) {
   bool isAccuracy = true;                               // Flag for checking accuracy
   double totalFMM = 0;                                          // Initialize total FMM time
   for (int t=0; t<repeat; t++) {                                // Loop over identical time regression runs
-    
+
     printf("--- %-16s ------------\n", "FMM Profiling");          // Start profiling
     printf("--- %-17s %d ---------\n", "Time average loop", t);
     // Initialize bodies
@@ -56,7 +56,7 @@ int main(int argc, char ** argv) {
     start("L2L & L2P");                                           // Start timer
     downwardPass(cells);                                          // Downward pass for L2L, L2P
     stop("L2L & L2P");                                            // Stop timer
-    
+
     totalFMM += stop("Total FMM");
 
     if (isAccuracy) {                                     // Start accuracy regression test

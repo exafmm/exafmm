@@ -19,7 +19,7 @@ struct Cell {
 };
 typedef std::vector<Cell> Cells;                              //!< Vector of cells
 
-void buildTree(Bodies & bodies, real_t * Xmin, real_t * X0, real_t R0, int begin, int end) {
+void buildTree(Bodies & bodies, Bodies & buffer, real_t * Xmin, real_t * X0, real_t R0, int begin, int end) {
   // Count bodies in each quadrant
   int size[4] = {0};
   for (size_t b=begin; b<end; b++) {
@@ -27,16 +27,14 @@ void buildTree(Bodies & bodies, real_t * Xmin, real_t * X0, real_t R0, int begin
     size[quadrant]++;
   }
   // Calculate offset of each quadrant
-  int counter[4] = {0};
+  int counter[4] = {begin, begin, begin, begin};
   for (int i=1; i<4; i++) {
     counter[i] = size[i-1] + counter[i-1];
   }
   // Sort bodies
-  Bodies buffer(end-begin);
   for (size_t b=begin; b<end; b++) {
     int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);
-    buffer[counter[quadrant]].X[0] = bodies[b].X[0];
-    buffer[counter[quadrant]].X[1] = bodies[b].X[1];
+    buffer[counter[quadrant]] = bodies[b];
     counter[quadrant]++;
   }
   // Calculate new center and radius
@@ -46,11 +44,9 @@ void buildTree(Bodies & bodies, real_t * Xmin, real_t * X0, real_t R0, int begin
     for (int d=0; d<2; d++) {
       X[d] = X0[d] + R * (((i & 1 << d) >> d) * 2 - 1);
     }
-    std::cout << i << " " << X[0] << " " << X[1] << " " << R << std::endl;
     // Recursive call only if size[i] > 4
-    if (size[i] > 4) buildTree(bodies, Xmin, X, R, counter[i]-size[i], counter[i]);
+    if (size[i] > 4) buildTree(buffer, bodies, Xmin, X, R, counter[i]-size[i], counter[i]);
   }
-  bodies = buffer;
 }
 
 int main(int argc, char ** argv) {
@@ -84,7 +80,8 @@ int main(int argc, char ** argv) {
   Xmin[1] = X0[1] - R0;
   Xmax[1] = X0[1] + R0;
 
-  buildTree(bodies, Xmin, X0, R0, 0, numBodies);
+  Bodies buffer = bodies;
+  buildTree(bodies, buffer, Xmin, X0, R0, 0, numBodies);
 
   for (size_t b=0; b<numBodies; b++) {
     int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);

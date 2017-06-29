@@ -65,8 +65,7 @@ int main(int argc, char ** argv) {
   Bodies buffer(numBodies);
   for (size_t b=0; b<numBodies; b++) {
     int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);
-    buffer[counter[quadrant]].X[0] = bodies[b].X[0];
-    buffer[counter[quadrant]].X[1] = bodies[b].X[1];
+    buffer[counter[quadrant]] = bodies[b];
     counter[quadrant]++;
   }
   // Check sorting
