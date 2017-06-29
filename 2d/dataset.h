@@ -65,9 +65,7 @@ namespace exafmm {
           bodies[b].X[d] = drand48() * 2 - 1;                        //    Initialize coordinates
         }                                                     //   End loop over dimension
         real_t r = std::sqrt(norm(bodies[b].X));                     //   Distance from center
-        for (int d=0; d<2; d++) {                             //   Loop over dimension
-          bodies[b].X[d] *= M_PI / r;                                //    Normalize coordinates
-        }                                                     //   End loop over dimension
+        bodies[b].X *= M_PI / r;                                //    Normalize coordinates
       }                                                       //  End loop over bodies
     }                                                         // End loop over partitions
     return bodies;                                            // Return bodies

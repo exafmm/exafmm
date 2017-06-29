@@ -26,7 +26,7 @@ namespace exafmm {
 
   //! Recursive call to dual tree traversal for list construction
   void getList(Cell * Ci, Cell * Cj) {
-    for (int d=0; d<2; d++) dX[d] = Ci->X[d] - Cj->X[d];        // Distance vector from source to target
+    dX = Ci->X - Cj->X;                                         // Distance vector from source to target
     real_t R2 = norm(dX) * theta * theta;                       // Scalar distance squared
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {               // If distance is far enough
       Ci->listM2L.push_back(Cj);                                //  Add to M2L list

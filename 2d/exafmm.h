@@ -42,7 +42,7 @@ namespace exafmm {
   int P;                                                        //!< Order of expansions
   int ncrit;                                                    //!< Number of bodies per leaf cell
   real_t theta;                                                 //!< Multipole acceptance criterion
-  real_t dX[2];                                                 //!< Distance array
+  vec2 dX;                                                      //!< Distance array
 #pragma omp threadprivate(dX)                                   // Make global variables private
 
   //! L2 norm of array X
