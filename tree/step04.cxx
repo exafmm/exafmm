@@ -19,7 +19,7 @@ struct Cell {
 };
 typedef std::vector<Cell> Cells;                              //!< Vector of cells
 
-void buildTree(Bodies & bodies, Bodies & buffer, Cells & cells, Cell * cell, real_t * Xmin, real_t * X0, real_t R0, int begin, int end, int ncrit) {
+void buildTree(Bodies & bodies, Cells & cells, Cell * cell, real_t * Xmin, real_t * X0, real_t R0, int begin, int end, int ncrit) {
   cell->BODY = &bodies[0] + begin;
   cell->NBODY = end - begin;
   cell->NCHILD = 0;
@@ -41,10 +41,10 @@ void buildTree(Bodies & bodies, Bodies & buffer, Cells & cells, Cell * cell, rea
     counter[i] = size[i-1] + counter[i-1];
   }
   // Sort bodies
+  Bodies buffer = bodies;
   for (size_t b=begin; b<end; b++) {
-    int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);
-    buffer[counter[quadrant]].X[0] = bodies[b].X[0];
-    buffer[counter[quadrant]].X[1] = bodies[b].X[1];
+    int quadrant = ((buffer[b].X[0] - Xmin[0]) > X0[0]) + (((buffer[b].X[1] - Xmin[1]) > X0[1]) << 1);
+    bodies[counter[quadrant]] = buffer[b];
     counter[quadrant]++;
   }
   cells.resize(cells.size()+cell->NCHILD);
@@ -61,7 +61,7 @@ void buildTree(Bodies & bodies, Bodies & buffer, Cells & cells, Cell * cell, rea
     std::cout << i << " " << X[0] << " " << X[1] << " " << R << " " << cell->NCHILD << std::endl;
     // Recursive call only if size[i] != 0
     if (size[i]) {
-      buildTree(buffer, bodies, cells, &child[c], Xmin, X, R, counter[i]-size[i], counter[i], ncrit);
+      buildTree(bodies, cells, &child[c], Xmin, X, R, counter[i]-size[i], counter[i], ncrit);
       c++;
     }
   }
@@ -103,8 +103,7 @@ int main(int argc, char ** argv) {
   cells[0].X[0] = X0[0];
   cells[0].X[1] = X0[1];
   cells[0].R = R0;
-  Bodies buffer = bodies;
-  buildTree(bodies, buffer, cells, &cells[0], Xmin, X0, R0, 0, numBodies, ncrit);
+  buildTree(bodies, cells, &cells[0], Xmin, X0, R0, 0, numBodies, ncrit);
   std::cout << cells.size() << std::endl;
   return 0;
 }
