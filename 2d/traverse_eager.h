@@ -26,7 +26,7 @@ namespace exafmm {
 
   //! Recursive call to dual tree traversal for horizontal pass
   void horizontalPass(Cell * Ci, Cell * Cj) {
-    dX = Ci->X - Cj->X;                                         // Distance vector from source to target
+    vec2 dX = Ci->X - Cj->X;                                    // Distance vector from source to target
     real_t R2 = norm(dX) * theta * theta;                       // Scalar distance squared
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {               // If distance is far enough
       M2L(Ci, Cj);                                              //  M2L kernel

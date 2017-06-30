@@ -11,7 +11,7 @@ namespace exafmm {
       real_t p = 0;                                             //  Initialize potential
       vec2 F = 0;                                               //  Initialize force
       for (int j=0; j<Cj->NBODY; j++) {                         //  Loop over source bodies
-        dX = Bi[i].X - Bj[j].X;                                 //   Calculate distance vector
+        vec2 dX = Bi[i].X - Bj[j].X;                            //   Calculate distance vector
         real_t R2 = norm(dX);                                   //   Calculate distance squared
         if (R2 != 0) {                                          //   If not the same point
           real_t invR = 1 / sqrt(R2);                           //    1 / R
@@ -28,7 +28,7 @@ namespace exafmm {
   //!< P2M kernel for cell C
   void P2M(Cell * C) {
     for (Body * B=C->BODY; B!=C->BODY+C->NBODY; B++) {          // Loop over bodies
-      dX = B->X - C->X;                                         //  Get distance vector
+      vec2 dX = B->X - C->X;                                    //  Get distance vector
       complex_t Z(dX[0],dX[1]), powZ(1.0, 0.0);                 //  Convert to complex plane
       C->M[0] += B->q;                                          //  Add constant term
       for (int n=1; n<P; n++) {                                 //  Loop over coefficients
@@ -41,7 +41,7 @@ namespace exafmm {
   //!< M2M kernel for one parent cell Ci
   void M2M(Cell * Ci) {
     for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) { // Loop over child cells
-      dX = Cj->X - Ci->X;                                       //  Get distance vector
+      vec2 dX = Cj->X - Ci->X;                                  //  Get distance vector
       for (int k=0; k<P; k++) {                                 //  Loop over coefficients
         complex_t Z(dX[0],dX[1]), powZ(1.0, 0.0);               //   z^0 = 1
         Ci->M[k] += Cj->M[k];                                   //   Add constant term
@@ -55,7 +55,7 @@ namespace exafmm {
 
   //!< M2L kernel between cells Ci and Cj
   void M2L(Cell * Ci, Cell * Cj) {
-    dX = Ci->X - Cj->X;                                         // Get distance vector
+    vec2 dX = Ci->X - Cj->X;                                    // Get distance vector
     complex_t Z(dX[0],dX[1]), powZn(1.0, 0.0), powZnk(1.0, 0.0), invZ(powZn/Z);// Convert to complex plane
     Ci->L[0] += -Cj->M[0] * log(Z);                             // Log term (for 0th order)
     Ci->L[0] += Cj->M[1] * invZ;                                // Constant term
@@ -86,7 +86,7 @@ namespace exafmm {
   //!< L2L kernel for one parent cell Cj
   void L2L(Cell * Cj) {
     for (Cell * Ci=Cj->CHILD; Ci<Cj->CHILD+Cj->NCHILD; Ci++) {  // Loop over child cells
-      dX = Ci->X - Cj->X;                                       //  Get distance vector
+      vec2 dX = Ci->X - Cj->X;                                  //  Get distance vector
       complex_t Z(dX[0],dX[1]);                                 //  Convert to complex plane
       for (int l=0; l<P; l++) {                                 //  Loop over coefficients
         complex_t powZ(1.0, 0.0);                               //   z^0 = 1
@@ -102,7 +102,7 @@ namespace exafmm {
   //!< L2P kernel for cell C
   void L2P(Cell * C) {
     for (Body * B=C->BODY; B!=C->BODY+C->NBODY; B++) {          // Loop over bodies
-      dX = B->X - C->X;                                         //  Get distance vector
+      vec2 dX = B->X - C->X;                                    //  Get distance vector
       complex_t Z(dX[0],dX[1]), powZ(1.0, 0.0);                 //  Convert to complex plane
       B->p += std::real(C->L[0]);                               //  Add constant term
       B->F[0] += std::real(C->L[1]);                            //  Add constant term

@@ -42,16 +42,5 @@ namespace exafmm {
   int P;                                                        //!< Order of expansions
   int ncrit;                                                    //!< Number of bodies per leaf cell
   real_t theta;                                                 //!< Multipole acceptance criterion
-  vec2 dX;                                                      //!< Distance array
-#pragma omp threadprivate(dX)                                   // Make global variables private
-
-  //! L2 norm of array X
-  /*!
-    \param X a two-element array.
-    \return L2 norm of X
-  */
-  inline real_t norm(const real_t * X) {
-    return X[0] * X[0] + X[1] * X[1];
-  }
 }
 #endif
