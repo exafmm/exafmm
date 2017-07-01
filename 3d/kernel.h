@@ -16,14 +16,14 @@ namespace exafmm {
   }
 
   //! Get r,theta,phi from x,y,z
-  void cart2sph(real_t * dX, real_t & r, real_t & theta, real_t & phi) {
+  void cart2sph(const vec3 & dX, real_t & r, real_t & theta, real_t & phi) {
     r = sqrt(norm(dX));                                         // r = sqrt(x^2 + y^2 + z^2)
     theta = r == 0 ? 0 : acos(dX[2] / r);                       // theta = acos(z / r)
     phi = atan2(dX[1], dX[0]);                                  // phi = atan(y / x)
   }
 
   //! Spherical to cartesian coordinates
-  void sph2cart(real_t r, real_t theta, real_t phi, real_t * spherical, real_t * cartesian) {
+  void sph2cart(real_t r, real_t theta, real_t phi, const vec3 & spherical, vec3 & cartesian) {
     cartesian[0] = std::sin(theta) * std::cos(phi) * spherical[0]// x component (not x itself)
       + std::cos(theta) * std::cos(phi) / r * spherical[1]
       - std::sin(phi) / r / std::sin(theta) * spherical[2];
@@ -117,37 +117,28 @@ namespace exafmm {
   void P2P(Cell * Ci, Cell * Cj) {
     Body * Bi = Ci->BODY;
     Body * Bj = Cj->BODY;
-    int ni = Ci->NBODY;
-    int nj = Cj->NBODY;
-    for (int i=0; i<ni; i++) {
-      real_t pot = 0;
-      real_t ax = 0;
-      real_t ay = 0;
-      real_t az = 0;
-      for (int j=0; j<nj; j++) {
-        for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d];
+    for (int i=0; i<Ci->NBODY; i++) {
+      real_t p = 0;
+      vec3 F = 0;
+      for (int j=0; j<Cj->NBODY; j++) {
+        vec3 dX = Bi[i].X - Bj[j].X;
         real_t R2 = norm(dX);
         if (R2 != 0) {
           real_t invR2 = 1.0 / R2;
           real_t invR = Bj[j].q * sqrt(invR2);
-          for (int d=0; d<3; d++) dX[d] *= invR2 * invR;
-          pot += invR;
-          ax += dX[0];
-          ay += dX[1];
-          az += dX[2];
+          p += invR;
+          F += dX * invR2 * invR;
         }
       }
-      Bi[i].p += pot;
-      Bi[i].F[0] -= ax;
-      Bi[i].F[1] -= ay;
-      Bi[i].F[2] -= az;
+      Bi[i].p += p;
+      Bi[i].F -= F;
     }
   }
 
   void P2M(Cell * C) {
     complex_t Ynm[P*P], YnmTheta[P*P];
     for (Body * B=C->BODY; B!=C->BODY+C->NBODY; B++) {
-      for (int d=0; d<3; d++) dX[d] = B->X[d] - C->X[d];
+      vec3 dX = B->X - C->X;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
       evalMultipole(rho, alpha, -beta, Ynm, YnmTheta);
@@ -164,7 +155,7 @@ namespace exafmm {
   void M2M(Cell * Ci) {
     complex_t Ynm[P*P], YnmTheta[P*P];
     for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) {
-      for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d];
+      vec3 dX = Ci->X - Cj->X;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
       evalMultipole(rho, alpha, beta, Ynm, YnmTheta);
@@ -192,7 +183,7 @@ namespace exafmm {
 
   void M2L(Cell * Ci, Cell * Cj) {
     complex_t Ynm2[4*P*P];
-    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d];
+    vec3 dX = Ci->X - Cj->X;
     real_t rho, alpha, beta;
     cart2sph(dX, rho, alpha, beta);
     evalLocal(rho, alpha, beta, Ynm2);
@@ -222,7 +213,7 @@ namespace exafmm {
   void L2L(Cell * Cj) {
     complex_t Ynm[P*P], YnmTheta[P*P];
     for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; Ci++) {
-      for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d];
+      vec3 dX = Ci->X - Cj->X;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
       evalMultipole(rho, alpha, beta, Ynm, YnmTheta);
@@ -253,9 +244,9 @@ namespace exafmm {
   void L2P(Cell * Ci) {
     complex_t Ynm[P*P], YnmTheta[P*P];
     for (Body * B=Ci->BODY; B!=Ci->BODY+Ci->NBODY; B++) {
-      for (int d=0; d<3; d++) dX[d] = B->X[d] - Ci->X[d];
-      real_t spherical[3] = {0, 0, 0};
-      real_t cartesian[3] = {0, 0, 0};
+      vec3 dX = B->X - Ci->X;
+      vec3 spherical = 0;
+      vec3 cartesian = 0;
       real_t r, theta, phi;
       cart2sph(dX, r, theta, phi);
       evalMultipole(r, theta, phi, Ynm, YnmTheta);
@@ -275,9 +266,7 @@ namespace exafmm {
         }
       }
       sph2cart(r, theta, phi, spherical, cartesian);
-      B->F[0] += cartesian[0];
-      B->F[1] += cartesian[1];
-      B->F[2] += cartesian[2];
+      B->F += cartesian;
     }
   }
 }

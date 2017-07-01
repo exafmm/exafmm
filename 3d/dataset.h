@@ -69,9 +69,7 @@ namespace exafmm {
           bodies[b].X[d] = drand48() * 2 - 1;                        //    Initialize coordinates
         }                                                     //   End loop over dimension
         real_t r = std::sqrt(norm(bodies[b].X));                     //   Distance from center
-        for (int d=0; d<3; d++) {                             //   Loop over dimension
-          bodies[b].X[d] *= M_PI / r;                                //    Normalize coordinates
-        }                                                     //   End loop over dimension
+        bodies[b].X *= M_PI / r;                                //    Normalize coordinates
       }                                                       //  End loop over bodies
     }                                                         // End loop over partitions
     return bodies;                                            // Return bodies
@@ -150,7 +148,7 @@ namespace exafmm {
   void initTarget(Bodies & bodies) {
     for (size_t b=0; b!=bodies.size(); ++b) {     // Loop over bodies
       bodies[b].p = 0;                                             //  Clear potential
-      for (int d=0; d<3; d++) bodies[b].F[d] = 0;                 //  Clear force
+      bodies[b].F = 0;                 //  Clear force
     }                                                         // End loop over bodies
   }
 

@@ -73,7 +73,7 @@ int main(int argc, char ** argv) {
       Bodies bodies2 = bodies;                        //   Backup bodies
       for (size_t b=0; b<bodies.size(); b++) {        //   Loop over bodies
         bodies[b].p = 0;                              //    Clear potential
-        for (int d=0; d<3; d++) bodies[b].F[d] = 0;   //    Clear force
+        bodies[b].F = 0;                              //    Clear force
       }                                               //   End loop over bodies
       direct(bodies, jbodies);                        //   Direct N-Body
       stop("Direct N-Body");                          //   Stop timer
