@@ -36,7 +36,8 @@ namespace exafmm {
   void idft(Waves & waves, Bodies & bodies) {
 #pragma omp parallel for
     for (size_t b=0; b<bodies.size(); b++) {                    // Loop over bodies
-      real_t p = 0, F[3] = {0, 0, 0};                           //  Initialize potential, force
+      real_t p = 0;                                             //  Initialize potential
+      vec3 F = 0;                                               //  Initialize force
       for (size_t w=0; w<waves.size(); w++) {                   //   Loop over waves
         real_t th = 0;                                          //    Initialzie phase
         for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];// Determine phase
@@ -46,7 +47,7 @@ namespace exafmm {
       }                                                         //  End loop over waves
       for (int d=0; d<3; d++) F[d] *= scale[d];                 //  Scale forces
       bodies[b].p += p;                                         //  Copy potential to bodies
-      for (int d=0; d<3; d++) bodies[b].F[d] += F[d];           //  Copy force to bodies
+      bodies[b].F += F;                                         //  Copy force to bodies
     }                                                           // End loop over bodies
   }
 
@@ -82,8 +83,9 @@ namespace exafmm {
   void realP2P(Cell * Ci, Cell * Cj) {
     for (Body * Bi=Ci->BODY; Bi!=Ci->BODY+Ci->NBODY; Bi++) {    // Loop over target bodies
       for (Body * Bj=Cj->BODY; Bj!=Cj->BODY+Cj->NBODY; Bj++) {  //  Loop over source bodies
+        vec3 dX;
         for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - iX[d] * cycle;// Distance vector from source to target
-        real_t R2 = dX[0] * dX[0] + dX[1] * dX[1] + dX[2] * dX[2];//   R^2
+        real_t R2 = norm(dX);                                   //   R^2
         if (0 < R2 && R2 < cutoff * cutoff) {                   //   Exclude self interaction and cutoff
           real_t R2s = R2 * alpha * alpha;                      //    (R * alpha)^2
           real_t Rs = std::sqrt(R2s);                           //    R * alpha
@@ -93,23 +95,21 @@ namespace exafmm {
           real_t dtmp = Bj->q * (M_2_SQRTPI * std::exp(-R2s) * invR2s + erfc(Rs) * invR3s);
           dtmp *= alpha * alpha * alpha;                        //    Scale temporary value
           Bi->p += Bj->q * erfc(Rs) * invRs * alpha;            //    Ewald real potential
-          Bi->F[0] -= dX[0] * dtmp;                             //    x component of Ewald real force
-          Bi->F[1] -= dX[1] * dtmp;                             //    y component of Ewald real force
-          Bi->F[2] -= dX[2] * dtmp;                             //    z component of Ewald real force
+          Bi->F -= dX * dtmp;                                   //    Ewald real force
         }                                                       //   End if for self interaction
       }                                                         //  End loop over source bodies
     }                                                           // End loop over target bodies
   }
 
   void neighbor(Cell * Ci, Cell * Cj) {                         // Traverse tree to find neighbor
+    vec3 dX = Ci->X - Cj->X;                                    //  Distance vector from source to target
     for (int d=0; d<3; d++) {                                   //  Loop over dimensions
-      dX[d] = Ci->X[d] - Cj->X[d];                              //  Distance vector from source to target
       iX[d] = 0;                                                //   Initialize periodic index
       if(dX[d] < -cycle / 2) iX[d]--;                           //   Wrap periodic index backward
       if(dX[d] >  cycle / 2) iX[d]++;                           //   Wrap periodic index forward
       dX[d] -= iX[d] * cycle;                                   //   Wrap distance vector
     }                                                           //  End loop over dimensions
-    real_t R = std::sqrt(dX[0] * dX[0] + dX[1] * dX[1] + dX[2] * dX[2]);//  Scalar distance
+    real_t R = std::sqrt(norm(dX));                             //  Scalar distance
     if (R - Ci->R - Cj->R < sqrtf(3) * cutoff) {                //  If cells are close
       if(Cj->NCHILD == 0) realP2P(Ci, Cj);                      //   Ewald real part
       for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {// Loop over cell's children

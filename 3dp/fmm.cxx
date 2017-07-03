@@ -67,15 +67,13 @@ int main(int argc, char ** argv) {
 
     // Dipole correction
     start("Dipole correction");                       //  Start timer
-    real_t dipole[3] = {0, 0, 0};                     //  Initialize dipole
-    for (size_t b=0; b<bodies.size(); b++) {          //  Loop over bodies
-      for (int d=0; d<3; d++) dipole[d] += bodies[b].X[d] * bodies[b].q;//   Accumulate dipole
-    }                                                 //  End loop over bodies
+    vec3 dipole = 0;                                  //  Initialize dipole
+    for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q; //   Accumulate dipole
     real_t coef = 4 * M_PI / (3 * cycle * cycle * cycle); //  Domain coefficient
     for (size_t b=0; b<bodies.size(); b++) {          //  Loop over bodies
-      real_t dnorm = dipole[0] * dipole[0] + dipole[1] * dipole[1] + dipole[2] * dipole[2]; //   Norm of dipole
+      real_t dnorm = norm(dipole);                    //   Norm of dipole
       bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;   //   Correct potential
-      for (int d=0; d!=3; d++) bodies[b].F[d] -= coef * dipole[d]; //   Correct force
+      bodies[b].F -= dipole * coef;                   //   Correct force
     }                                                 //  End loop over bodies
     stop("Dipole correction");                        //  Stop timer 
     totalFMM += stop("Total FMM");                    //  Stop FMM timer
@@ -87,7 +85,7 @@ int main(int argc, char ** argv) {
       Bodies bodies2 = bodies;                        //   Backup bodies
       for (size_t b=0; b<bodies.size(); b++) {        //   Loop over bodies
         bodies[b].p = 0;                              //    Clear potential
-        for (int d=0; d<3; d++) bodies[b].F[d] = 0;   //    Clear force
+        bodies[b].F = 0;                              //    Clear force
       }                                               //   End loop over bodies
       Bodies jbodies = bodies;                        //   Copy bodies
       Cells  jcells = buildTree(jbodies);             //   Build tree
