@@ -53,7 +53,7 @@ int main(int argc, char ** argv) {
   // Count bodies in each quadrant
   int size[4] = {0};
   for (size_t b=0; b<numBodies; b++) {
-    int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);
+    int quadrant = (bodies[b].X[0] > X0[0]) + ((bodies[b].X[1] > X0[1]) << 1);
     size[quadrant]++;
   }
   // Calculate offset of each quadrant
@@ -64,13 +64,13 @@ int main(int argc, char ** argv) {
   // Sort bodies
   Bodies buffer(numBodies);
   for (size_t b=0; b<numBodies; b++) {
-    int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);
+    int quadrant = (bodies[b].X[0] > X0[0]) + ((bodies[b].X[1] > X0[1]) << 1);
     buffer[counter[quadrant]] = bodies[b];
     counter[quadrant]++;
   }
   // Check sorting
   for (size_t b=0; b<numBodies; b++) {
-    int quadrant = ((buffer[b].X[0] - Xmin[0]) > X0[0]) + (((buffer[b].X[1] - Xmin[1]) > X0[1]) << 1);
+    int quadrant = (buffer[b].X[0] > X0[0]) + ((buffer[b].X[1] > X0[1]) << 1);
     std::cout << b << " " << quadrant << std::endl;
   }
   return 0;

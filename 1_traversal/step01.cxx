@@ -32,7 +32,7 @@ void buildTree(Bodies & bodies, Cells & cells, Cell * cell, real_t * Xmin, real_
   // Count bodies in each quadrant
   int size[4] = {0};
   for (size_t b=begin; b<end; b++) {
-    int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);
+    int quadrant = (bodies[b].X[0] > X0[0]) + ((bodies[b].X[1] > X0[1]) << 1);
     size[quadrant]++;
   }
   cell->NCHILD = 0;
@@ -46,7 +46,7 @@ void buildTree(Bodies & bodies, Cells & cells, Cell * cell, real_t * Xmin, real_
   // Sort bodies
   Bodies buffer = bodies;
   for (size_t b=begin; b<end; b++) {
-    int quadrant = ((buffer[b].X[0] - Xmin[0]) > X0[0]) + (((buffer[b].X[1] - Xmin[1]) > X0[1]) << 1);
+    int quadrant = (buffer[b].X[0] > X0[0]) + ((buffer[b].X[1] > X0[1]) << 1);
     bodies[counter[quadrant]] = buffer[b];
     counter[quadrant]++;
   }

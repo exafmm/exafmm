@@ -52,7 +52,7 @@ int main(int argc, char ** argv) {
   Xmax[1] = X0[1] + R0;
   // Count bodies in each quadrant
   for (size_t b=0; b<numBodies; b++) {
-    int quadrant = ((bodies[b].X[0] - Xmin[0]) > X0[0]) + (((bodies[b].X[1] - Xmin[1]) > X0[1]) << 1);
+    int quadrant = (bodies[b].X[0] > X0[0]) + ((bodies[b].X[1] > X0[1]) << 1);
     std::cout << b << " " << bodies[b].X[0] << " " << bodies[b].X[1] << " " << quadrant << std::endl;
   }
   return 0;
