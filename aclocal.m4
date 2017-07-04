@@ -20,9 +20,9 @@ You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically 'autoreconf'.])])
 
-# ===========================================================================
-#  http://www.gnu.org/software/autoconf-archive/ax_append_compile_flags.html
-# ===========================================================================
+# ============================================================================
+#  https://www.gnu.org/software/autoconf-archive/ax_append_compile_flags.html
+# ============================================================================
 #
 # SYNOPSIS
 #
@@ -63,7 +63,7 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 #   Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 #   As a special exception, the respective Autoconf Macro's copyright owner
 #   gives unlimited permission to copy, distribute and modify the configure
@@ -78,7 +78,7 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 5
+#serial 6
 
 AC_DEFUN([AX_APPEND_COMPILE_FLAGS],
 [AX_REQUIRE_DEFINED([AX_CHECK_COMPILE_FLAG])
@@ -89,7 +89,7 @@ done
 ])dnl AX_APPEND_COMPILE_FLAGS
 
 # ===========================================================================
-#      http://www.gnu.org/software/autoconf-archive/ax_append_flag.html
+#      https://www.gnu.org/software/autoconf-archive/ax_append_flag.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -124,7 +124,7 @@ done
 #   Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 #   As a special exception, the respective Autoconf Macro's copyright owner
 #   gives unlimited permission to copy, distribute and modify the configure
@@ -139,7 +139,7 @@ done
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 6
+#serial 7
 
 AC_DEFUN([AX_APPEND_FLAG],
 [dnl
@@ -161,35 +161,34 @@ AS_VAR_POPDEF([FLAGS])dnl
 ])dnl AX_APPEND_FLAG
 
 # ===========================================================================
-#   http://www.gnu.org/software/autoconf-archive/ax_check_compile_flag.html
+#  https://www.gnu.org/software/autoconf-archive/ax_gcc_x86_avx_xgetbv.html
 # ===========================================================================
 #
 # SYNOPSIS
 #
-#   AX_CHECK_COMPILE_FLAG(FLAG, [ACTION-SUCCESS], [ACTION-FAILURE], [EXTRA-FLAGS], [INPUT])
+#   AX_GCC_X86_AVX_XGETBV
 #
 # DESCRIPTION
 #
-#   Check whether the given FLAG works with the current language's compiler
-#   or gives an error.  (Warnings, however, are ignored)
+#   On later x86 processors with AVX SIMD support, with gcc or a compiler
+#   that has a compatible syntax for inline assembly instructions, run a
+#   small program that executes the xgetbv instruction with input OP. This
+#   can be used to detect if the OS supports AVX instruction usage.
 #
-#   ACTION-SUCCESS/ACTION-FAILURE are shell commands to execute on
-#   success/failure.
+#   On output, the values of the eax and edx registers are stored as
+#   hexadecimal strings as "eax:edx" in the cache variable
+#   ax_cv_gcc_x86_avx_xgetbv.
 #
-#   If EXTRA-FLAGS is defined, it is added to the current language's default
-#   flags (e.g. CFLAGS) when the check is done.  The check is thus made with
-#   the flags: "CFLAGS EXTRA-FLAGS FLAG".  This can for example be used to
-#   force the compiler to issue an error when a bad flag is given.
+#   If the xgetbv instruction fails (because you are running a
+#   cross-compiler, or because you are not using gcc, or because you are on
+#   a processor that doesn't have this instruction),
+#   ax_cv_gcc_x86_avx_xgetbv_OP is set to the string "unknown".
 #
-#   INPUT gives an alternative input source to AC_COMPILE_IFELSE.
-#
-#   NOTE: Implementation based on AX_CFLAGS_GCC_OPTION. Please keep this
-#   macro in sync with AX_CHECK_{PREPROC,LINK}_FLAG.
+#   This macro mainly exists to be used in AX_EXT.
 #
 # LICENSE
 #
-#   Copyright (c) 2008 Guido U. Draheim <guidod@gmx.de>
-#   Copyright (c) 2011 Maarten Bosmans <mkbosmans@gmail.com>
+#   Copyright (c) 2013 Michael Petch <mpetch@capp-sysware.com>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -202,7 +201,7 @@ AS_VAR_POPDEF([FLAGS])dnl
 #   Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 #   As a special exception, the respective Autoconf Macro's copyright owner
 #   gives unlimited permission to copy, distribute and modify the configure
@@ -217,26 +216,122 @@ AS_VAR_POPDEF([FLAGS])dnl
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 4
+#serial 3
 
-AC_DEFUN([AX_CHECK_COMPILE_FLAG],
-[AC_PREREQ(2.64)dnl for _AC_LANG_PREFIX and AS_VAR_IF
-AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_[]_AC_LANG_ABBREV[]flags_$4_$1])dnl
-AC_CACHE_CHECK([whether _AC_LANG compiler accepts $1], CACHEVAR, [
-  ax_check_save_flags=$[]_AC_LANG_PREFIX[]FLAGS
-  _AC_LANG_PREFIX[]FLAGS="$[]_AC_LANG_PREFIX[]FLAGS $4 $1"
-  AC_COMPILE_IFELSE([m4_default([$5],[AC_LANG_PROGRAM()])],
-    [AS_VAR_SET(CACHEVAR,[yes])],
-    [AS_VAR_SET(CACHEVAR,[no])])
-  _AC_LANG_PREFIX[]FLAGS=$ax_check_save_flags])
-AS_VAR_IF(CACHEVAR,yes,
-  [m4_default([$2], :)],
-  [m4_default([$3], :)])
-AS_VAR_POPDEF([CACHEVAR])dnl
-])dnl AX_CHECK_COMPILE_FLAGS
+AC_DEFUN([AX_GCC_X86_AVX_XGETBV],
+[AC_REQUIRE([AC_PROG_CC])
+AC_LANG_PUSH([C])
+AC_CACHE_CHECK(for x86-AVX xgetbv $1 output, ax_cv_gcc_x86_avx_xgetbv_$1,
+ [AC_RUN_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>], [
+     int op = $1, eax, edx;
+     FILE *f;
+      /* Opcodes for xgetbv */
+      __asm__ __volatile__ (".byte 0x0f, 0x01, 0xd0"
+        : "=a" (eax), "=d" (edx)
+        : "c" (op));
+     f = fopen("conftest_xgetbv", "w"); if (!f) return 1;
+     fprintf(f, "%x:%x\n", eax, edx);
+     fclose(f);
+     return 0;
+])],
+     [ax_cv_gcc_x86_avx_xgetbv_$1=`cat conftest_xgetbv`; rm -f conftest_xgetbv],
+     [ax_cv_gcc_x86_avx_xgetbv_$1=unknown; rm -f conftest_xgetbv],
+     [ax_cv_gcc_x86_avx_xgetbv_$1=unknown])])
+AC_LANG_POP([C])
+])
 
 # ===========================================================================
-#    http://www.gnu.org/software/autoconf-archive/ax_require_defined.html
+#     https://www.gnu.org/software/autoconf-archive/ax_gcc_x86_cpuid.html
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_GCC_X86_CPUID(OP)
+#   AX_GCC_X86_CPUID_COUNT(OP, COUNT)
+#
+# DESCRIPTION
+#
+#   On Pentium and later x86 processors, with gcc or a compiler that has a
+#   compatible syntax for inline assembly instructions, run a small program
+#   that executes the cpuid instruction with input OP. This can be used to
+#   detect the CPU type. AX_GCC_X86_CPUID_COUNT takes an additional COUNT
+#   parameter that gets passed into register ECX before calling cpuid.
+#
+#   On output, the values of the eax, ebx, ecx, and edx registers are stored
+#   as hexadecimal strings as "eax:ebx:ecx:edx" in the cache variable
+#   ax_cv_gcc_x86_cpuid_OP.
+#
+#   If the cpuid instruction fails (because you are running a
+#   cross-compiler, or because you are not using gcc, or because you are on
+#   a processor that doesn't have this instruction), ax_cv_gcc_x86_cpuid_OP
+#   is set to the string "unknown".
+#
+#   This macro mainly exists to be used in AX_GCC_ARCHFLAG.
+#
+# LICENSE
+#
+#   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
+#   Copyright (c) 2008 Matteo Frigo
+#   Copyright (c) 2015 Michael Petch <mpetch@capp-sysware.com>
+#
+#   This program is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+#   As a special exception, the respective Autoconf Macro's copyright owner
+#   gives unlimited permission to copy, distribute and modify the configure
+#   scripts that are the output of Autoconf when processing the Macro. You
+#   need not follow the terms of the GNU General Public License when using
+#   or distributing such scripts, even though portions of the text of the
+#   Macro appear in them. The GNU General Public License (GPL) does govern
+#   all other use of the material that constitutes the Autoconf Macro.
+#
+#   This special exception to the GPL applies to versions of the Autoconf
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 10
+
+AC_DEFUN([AX_GCC_X86_CPUID],
+[AX_GCC_X86_CPUID_COUNT($1, 0)
+])
+
+AC_DEFUN([AX_GCC_X86_CPUID_COUNT],
+[AC_REQUIRE([AC_PROG_CC])
+AC_LANG_PUSH([C])
+AC_CACHE_CHECK(for x86 cpuid $1 output, ax_cv_gcc_x86_cpuid_$1,
+ [AC_RUN_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>], [
+     int op = $1, level = $2, eax, ebx, ecx, edx;
+     FILE *f;
+      __asm__ __volatile__ ("xchg %%ebx, %1\n"
+        "cpuid\n"
+        "xchg %%ebx, %1\n"
+        : "=a" (eax), "=r" (ebx), "=c" (ecx), "=d" (edx)
+        : "a" (op), "2" (level));
+
+     f = fopen("conftest_cpuid", "w"); if (!f) return 1;
+     fprintf(f, "%x:%x:%x:%x\n", eax, ebx, ecx, edx);
+     fclose(f);
+     return 0;
+])],
+     [ax_cv_gcc_x86_cpuid_$1=`cat conftest_cpuid`; rm -f conftest_cpuid],
+     [ax_cv_gcc_x86_cpuid_$1=unknown; rm -f conftest_cpuid],
+     [ax_cv_gcc_x86_cpuid_$1=unknown])])
+AC_LANG_POP([C])
+])
+
+# ===========================================================================
+#    https://www.gnu.org/software/autoconf-archive/ax_require_defined.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -267,7 +362,7 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 1
+#serial 2
 
 AC_DEFUN([AX_REQUIRE_DEFINED], [dnl
   m4_ifndef([$1], [m4_fatal([macro ]$1[ is not defined; is a m4 file missing?])])
@@ -1499,7 +1594,9 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
+m4_include([m4/ax_check_compile_flag.m4])
 m4_include([m4/ax_compiler_flags.m4])
 m4_include([m4/ax_compiler_vendor.m4])
+m4_include([m4/ax_ext.m4])
 m4_include([m4/ax_mpi.m4])
 m4_include([m4/ax_openmp.m4])

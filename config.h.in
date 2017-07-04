@@ -12,15 +12,6 @@
 /* Define to enable extra debugging options. */
 #undef EXAFMM_DEBUG
 
-/* Define to enable AVX optimizations. */
-#undef EXAFMM_HAVE_AVX
-
-/* Define to enable AVX2 optimizations. */
-#undef EXAFMM_HAVE_AVX2
-
-/* Define to enable AVX512 optimizations. */
-#undef EXAFMM_HAVE_AVX512
-
 /* Define to enable MIC optimizations. */
 #undef EXAFMM_HAVE_MIC
 
@@ -32,9 +23,6 @@
 
 /* Use OpenMP */
 #undef EXAFMM_HAVE_OPENMP
-
-/* Define to enable SSE/SSE3 optimizations. */
-#undef EXAFMM_HAVE_SSE3
 
 /* Define to compile in single precision. */
 #undef EXAFMM_SINGLE
@@ -54,8 +42,50 @@
 /* Enable weight for partitioning. */
 #undef EXAFMM_USE_WEIGHT
 
+/* Support Altivec instructions */
+#undef HAVE_ALTIVEC
+
+/* Define to 1 to support Advanced Vector Extensions */
+#undef HAVE_AVX
+
+/* Define to 1 to support Advanced Vector Extensions 2 */
+#undef HAVE_AVX2
+
+/* Define to 1 to support AVX-512 Byte and Word Instructions */
+#undef HAVE_AVX512_BW
+
+/* Define to 1 to support AVX-512 Conflict Detection Instructions */
+#undef HAVE_AVX512_CD
+
+/* Define to 1 to support AVX-512 Doubleword and Quadword Instructions */
+#undef HAVE_AVX512_DQ
+
+/* Define to 1 to support AVX-512 Exponential & Reciprocal Instructions */
+#undef HAVE_AVX512_ER
+
+/* Define to 1 to support AVX-512 Foundation Extensions */
+#undef HAVE_AVX512_F
+
+/* Define to 1 to support AVX-512 Integer Fused Multiply Add Instructions */
+#undef HAVE_AVX512_IFMA
+
+/* Define to 1 to support AVX-512 Conflict Prefetch Instructions */
+#undef HAVE_AVX512_PF
+
+/* Define to 1 to support AVX-512 Vector Byte Manipulation Instructions */
+#undef HAVE_AVX512_VBMI
+
+/* Define to 1 to support AVX-512 Vector Length Extensions */
+#undef HAVE_AVX512_VL
+
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
+
+/* Define to 1 to support Streaming SIMD Extensions 3 */
+#undef HAVE_SSE3
+
+/* Support VSX instructions */
+#undef HAVE_VSX
 
 /* Name of package */
 #undef PACKAGE

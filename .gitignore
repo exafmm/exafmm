@@ -6,8 +6,10 @@
 *.so
 *.out*
 *.th_o
+*.reg
 .deps
 .dirstamp
+nightly.log
 
 autom4te.cache
 config.h
@@ -15,4 +17,10 @@ config.h.in~
 config.log
 config.status
 Makefile
+!docs/**/Makefile
 stamp-h1
+
+build
+html
+latex
+xml
