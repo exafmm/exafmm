@@ -35,7 +35,6 @@ int main(int argc, char ** argv) {
     start("Initialize bodies");
     Bodies bodies = initBodies(numBodies, distribution);
     stop("Initialize bodies");
-
     start("Total FMM");
     start("Build tree");
     Cells cells = buildTree(bodies);

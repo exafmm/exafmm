@@ -13,92 +13,80 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  Args args(argc, argv);                              // Argument parser
-  P = args.P;                                         // Order of expansions
-  theta = args.theta;                                 // Multipole acceptance criterion
-  ncrit = args.ncrit;                                 // Number of bodies per leaf cell
-  const int numBodies = args.numBodies;               // Number of bodies
-  const char * distribution = args.distribution;      // Type of distribution
-  cycle = 2 * M_PI;                                   // Cycle of periodic boundary condition
-  images = 4;                                         // 3^images * 3^images * 3^images periodic images
+  Args args(argc, argv);
+  P = args.P;
+  theta = args.theta;
+  ncrit = args.ncrit;
+  const int numBodies = args.numBodies;
+  const char * distribution = args.distribution;
+  cycle = 2 * M_PI;
+  images = 4;
+  ksize = 11;
+  alpha = ksize / cycle;
+  sigma = .25 / M_PI;
+  cutoff = cycle / 2;
 
-  ksize = 11;                                         // Ewald wave number
-  alpha = ksize / cycle;                              // Ewald real/wave balance parameter
-  sigma = .25 / M_PI;                                 // Ewald distribution parameter
-  cutoff = cycle / 2;                                 // Ewald cutoff distance
-
-  // Print arguments 
   if (args.verbose) {
-    printf("--- %-16s ------------\n", "FMM Parameter");
+    printf("--- %-20s --------\n", "FMM Parameter");
     args.print(20);
   }
 
-  // FMM
-  int repeat = 10;                                    // Number of runs for time regression test
-  Verify verify;                                      // Initialize verify object
-  verify.verbose = args.verbose;                      // Set verbosity
-  bool isAccuracy = true;                             // Flag for checking accuracy
-  double totalFMM = 0;                                // Initialize total FMM time
-  for (int t=0; t<repeat; t++) {                      // Loop over identical runs for time regression
-    printf("--- %-16s ------------\n", "FMM Profiling");
-    printf("--- %-17s %d ---------\n", "Time average loop", t);
-    // Initialize bodies
-    start("Initialize bodies");                       //  Start timer
-    Bodies bodies = initBodies(numBodies, distribution); //  Initialize bodies
-    stop("Initialize bodies");                        //  Stop timer
+  int repeat = 10;
+  Verify verify;
+  verify.verbose = args.verbose;
+  bool isAccuracy = true;
+  double totalFMM = 0;
+  for (int t=0; t<repeat; t++) {
+    printf("--- %-20s --------\n", "FMM Profiling");
+    printf("--- %-17s %2d --------\n", "Time average loop", t);
+    start("Initialize bodies");
+    Bodies bodies = initBodies(numBodies, distribution);
+    stop("Initialize bodies");
+    start("Total FMM");
+    start("Build tree");
+    Cells cells = buildTree(bodies);
+    stop("Build tree");
+    start("P2M & M2M");
+    initKernel();
+    upwardPass(cells);
+    stop("P2M & M2M");
+    start("M2L & P2P");
+    horizontalPass(cells, cells);
+    stop("M2L & P2P");
+    start("L2L & L2P");
+    downwardPass(cells);
+    stop("L2L & L2P");
+    start("Dipole correction");
+    vec3 dipole = 0;
+    for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q;
+    real_t coef = 4 * M_PI / (3 * cycle * cycle * cycle);
+    for (size_t b=0; b<bodies.size(); b++) {
+      real_t dnorm = norm(dipole);
+      bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;
+      bodies[b].F -= dipole * coef;
+    }
+    stop("Dipole correction");
+    totalFMM += stop("Total FMM");
 
-    start("Total FMM");                               //  Start FMM timer
-    // Build tree
-    start("Build tree");                              //  Start timer
-    Cells cells = buildTree(bodies);                  //  Build tree
-    stop("Build tree");                               //  Stop timer
+    if (isAccuracy) {
+      printf("--- %-20s -------\n", "Ewald Profiling");
+      start("Build tree");
+      Bodies bodies2 = bodies;
+      for (size_t b=0; b<bodies.size(); b++) {
+        bodies[b].p = 0;
+        bodies[b].F = 0;
+      }
+      Bodies jbodies = bodies;
+      Cells  jcells = buildTree(jbodies);
+      stop("Build tree");
+      start("Wave part");
+      wavePart(bodies, jbodies);
+      stop("Wave part");
+      start("Real part");
+      realPart(&cells[0], &jcells[0]);
+      selfTerm(bodies);
+      stop("Real part");
 
-    // FMM evaluation
-    start("P2M & M2M");                               //  Start timer
-    initKernel();                                     //  Initialize kernel
-    upwardPass(cells);                                //  Upward pass for P2M, M2M
-    stop("P2M & M2M");                                //  Stop timer
-    start("M2L & P2P");                               //  Start timer
-    horizontalPass(cells, cells);                     //  Horizontal pass for M2L, P2P
-    stop("M2L & P2P");                                //  Stop timer
-    start("L2L & L2P");                               //  Start timer
-    downwardPass(cells);                              //  Downward pass for L2L, L2P
-    stop("L2L & L2P");                                //  Stop timer
-
-    // Dipole correction
-    start("Dipole correction");                       //  Start timer
-    vec3 dipole = 0;                                  //  Initialize dipole
-    for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q; //   Accumulate dipole
-    real_t coef = 4 * M_PI / (3 * cycle * cycle * cycle); //  Domain coefficient
-    for (size_t b=0; b<bodies.size(); b++) {          //  Loop over bodies
-      real_t dnorm = norm(dipole);                    //   Norm of dipole
-      bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;   //   Correct potential
-      bodies[b].F -= dipole * coef;                   //   Correct force
-    }                                                 //  End loop over bodies
-    stop("Dipole correction");                        //  Stop timer 
-    totalFMM += stop("Total FMM");                    //  Stop FMM timer
-
-    if (isAccuracy) {                                 //  If perform accuracy regression test
-      printf("--- %-16s ------------\n", "Ewald Profiling");
-      // Ewald summation
-      start("Build tree");                            //   Start timer
-      Bodies bodies2 = bodies;                        //   Backup bodies
-      for (size_t b=0; b<bodies.size(); b++) {        //   Loop over bodies
-        bodies[b].p = 0;                              //    Clear potential
-        bodies[b].F = 0;                              //    Clear force
-      }                                               //   End loop over bodies
-      Bodies jbodies = bodies;                        //   Copy bodies
-      Cells  jcells = buildTree(jbodies);             //   Build tree
-      stop("Build tree");                             //   Stop timer
-      start("Wave part");                             //   Start timer
-      wavePart(bodies, jbodies);                      //   Ewald wave part
-      stop("Wave part");                              //   Stop timer
-      start("Real part");                             //   Start timer
-      realPart(&cells[0], &jcells[0]);                //   Ewald real part
-      selfTerm(bodies);                               //   Ewald self term
-      stop("Real part");                              //   Stop timer
-
-      // Verify result
       double pSum = verify.getSumScalar(bodies);
       double pSum2 = verify.getSumScalar(bodies2);
       double pDif = (pSum - pSum2) * (pSum - pSum2);
@@ -107,20 +95,20 @@ int main(int argc, char ** argv) {
       double FDif = verify.getDifVector(bodies, bodies2);
       double FNrm = verify.getNrmVector(bodies2);
       double FRel = std::sqrt(FDif/FNrm);
-      printf("--- %-16s ------------\n", "FMM vs. direct");
-      printf("%-20s : %8.5e s\n","Rel. L2 Error (p)", pRel); //   Print potential error
-      printf("%-20s : %8.5e s\n","Rel. L2 Error (F)", FRel); //   Print force error
-      isAccuracy = false;                                    //   Set accuracy check flag to false
-      printf("--- %-19s ---------\n", "Accuracy regression");
-      bool pass = verify.accuracyRegression(args.getKey(), pRel, FRel); //   Accuracy regression test
-      if (pass) std::cout << "passed accuracy regression" << std::endl;
+      printf("--- %-20s --------\n", "FMM vs. direct");
+      printf("%-20s : %7.4e\n","Rel. L2 Error (p)", pRel);
+      printf("%-20s : %7.4e\n","Rel. L2 Error (F)", FRel);
+      isAccuracy = false;
+      printf("--- %-20s --------\n", "Accuracy regression");
+      bool pass = verify.accuracyRegression(args.getKey(), pRel, FRel);
+      if (pass) printf("Passed accuracy regression\n");
       else abort();
-      if (args.accuracy) std::exit(0);                //   Finish execution if only needs accuracy regression
-    }                                                 //  End if perform accuracy regression test
-  }                                                   // End loop over identical runs for time regression
-  double averageFMM = totalFMM / repeat;              // Average FMM time
-  bool pass = verify.timeRegression(args.getKey(), averageFMM);         // Time regression test
-  if (pass) std::cout << "passed time regression" << std::endl;
+      if (args.accuracy) std::exit(0);
+    }
+  }
+  double averageFMM = totalFMM / repeat;
+  bool pass = verify.timeRegression(args.getKey(), averageFMM);
+  if (pass) printf("Passed time regression\n");
   else abort();
   return 0;
 }
