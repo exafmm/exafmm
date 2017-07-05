@@ -88,26 +88,24 @@ namespace exafmm {
       std::stringstream name;
       name << path << "accuracy.reg";
 
-      {
-        std::ifstream ifile(name.str().c_str());
-        if (verbose) std::cout << "opening: " << name.str() << std::endl;
-        int numKeys;
-        if (ifile.good()) {
-          if (verbose) std::cout << "file exists" << std::endl;
-          ifile >> numKeys;
-          for (int i=0; i<numKeys; i++) {
-            uint64_t readKey;
-            ifile >> readKey;
-            ifile >> record[readKey];
-            ifile >> record2[readKey];
-          }
+      std::ifstream ifile(name.str().c_str());
+      if (verbose) std::cout << "opening: " << name.str() << std::endl;
+      int numKeys;
+      if (ifile.good()) {
+        if (verbose) std::cout << "file exists" << std::endl;
+        ifile >> numKeys;
+        for (int i=0; i<numKeys; i++) {
+          uint64_t readKey;
+          ifile >> readKey;
+          ifile >> record[readKey];
+          ifile >> record2[readKey];
         }
       }
 
       if (record[key] != 0 && verbose) std::cout << "entry exists" << std::endl;
       double threshold = 1 + 1e-8 + 0.01;
       if ((record[key] == 0 || value <= threshold*record[key]) && (average < 5e-4) &&
-        (record2[key] == 0 || value2 <= threshold*record2[key]) && (average < 5e-3)) {
+          (record2[key] == 0 || value2 <= threshold*record2[key]) && (average < 5e-3)) {
         pass = true;
         record[key] = value;
         record2[key] = value2;
@@ -115,9 +113,9 @@ namespace exafmm {
 
       if (!pass) {
         std::cout << "Accuracy regression failed: " <<
-              std::scientific << value << " / " << record[key] << std::endl;
+          std::scientific << value << " / " << record[key] << std::endl;
         std::cout << "                            " <<
-              value2 << " / " << record2[key] << std::endl;
+          value2 << " / " << record2[key] << std::endl;
       } else {
         std::ofstream ofile(name.str().c_str());
         ofile << record.size() << std::endl;
@@ -137,19 +135,17 @@ namespace exafmm {
       std::stringstream name;
       name << path << "time.reg";
 
-      {
-        std::ifstream ifile(name.str().c_str());
-        if (verbose) std::cout << "opening: " << name.str() << std::endl;
-        int numKeys;
-        if (ifile.good()) {
-          if (verbose) std::cout << "file exists" << std::endl;
-          ifile >> numKeys;
-          for (int i=0; i<numKeys; i++) {
-            uint64_t readKey;
-            ifile >> readKey;
-            ifile >> record[readKey];
-            ifile >> record2[readKey];
-          }
+      std::ifstream ifile(name.str().c_str());
+      if (verbose) std::cout << "opening: " << name.str() << std::endl;
+      int numKeys;
+      if (ifile.good()) {
+        if (verbose) std::cout << "file exists" << std::endl;
+        ifile >> numKeys;
+        for (int i=0; i<numKeys; i++) {
+          uint64_t readKey;
+          ifile >> readKey;
+          ifile >> record[readKey];
+          ifile >> record2[readKey];
         }
       }
 
