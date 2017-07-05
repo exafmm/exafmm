@@ -4,28 +4,19 @@
 #include <sys/time.h>
 
 namespace exafmm {
-  static timeval t;                                             //!< Time value
-  static std::map<std::string,timeval> timer;                   //!< Map of timer event name to time value
+  static timeval t;
+  static std::map<std::string,timeval> timer;
 
-  //! Start timer for given event
-  /*!
-    \param event event name
-  */ 
   void start(std::string event) {
-    gettimeofday(&t, NULL);                                     // Get time of day in seconds and microseconds
-    timer[event] = t;                                           // Store in timer
+    gettimeofday(&t, NULL);
+    timer[event] = t;
   }
 
-  //! Stop timer for given event
-  /*!
-    \param event event name
-    \return eventTime event time in seconds
-  */
   double stop(std::string event) {
-    gettimeofday(&t, NULL);                                     // Get time of day in seconds and microseconds
-    double eventTime = t.tv_sec - timer[event].tv_sec +         // Calculate event time
-                     (t.tv_usec - timer[event].tv_usec) * 1e-6;
-    printf("%-20s : %f s\n", event.c_str(), eventTime);         // Print time difference
+    gettimeofday(&t, NULL);
+    double eventTime = t.tv_sec - timer[event].tv_sec +
+      (t.tv_usec - timer[event].tv_usec) * 1e-6;
+    printf("%-20s : %f s\n", event.c_str(), eventTime);
     return eventTime;
   }
 }
