@@ -95,9 +95,7 @@ AC_LANG_POP([Fortran])
 
 AC_MSG_NOTICE([Vendor   : $ax_cv_cxx_compiler_vendor])
 AC_MSG_NOTICE([CXX      : $CXX])
-AC_MSG_NOTICE([CXXFLAGS : $COMPILER_CXXFLAGS])
 AC_MSG_NOTICE([FC       : $FC])
-AC_MSG_NOTICE([FCFLAGS  : $COMPILER_FCFLAGS])
 
 AM_CONDITIONAL(EXAFMM_HAVE_CRAY, test "$CXX" = "CC")
 AM_CONDITIONAL(EXAFMM_HAVE_INTEL, test "$ax_cv_cxx_compiler_vendor" = "intel")

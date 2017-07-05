@@ -6788,12 +6788,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 $as_echo "$as_me: Vendor   : $ax_cv_cxx_compiler_vendor" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: CXX      : $CXX" >&5
 $as_echo "$as_me: CXX      : $CXX" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: CXXFLAGS : $COMPILER_CXXFLAGS" >&5
-$as_echo "$as_me: CXXFLAGS : $COMPILER_CXXFLAGS" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: FC       : $FC" >&5
 $as_echo "$as_me: FC       : $FC" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: FCFLAGS  : $COMPILER_FCFLAGS" >&5
-$as_echo "$as_me: FCFLAGS  : $COMPILER_FCFLAGS" >&6;}
 
  if test "$CXX" = "CC"; then
   EXAFMM_HAVE_CRAY_TRUE=
