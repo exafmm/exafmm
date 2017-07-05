@@ -101,6 +101,14 @@ namespace exafmm {
     }
   }
 
+  //! Get leaf cells
+  void getLeaf(Cells & ileafs, Cell * Ci) {
+    if (Ci->NCHILD == 0) ileafs.push_back(*Ci);
+    for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {
+      getLeaf(ileafs, ci);
+    }
+  }
+
   //! Find neighbor cell
   void neighbor(Cell * Ci, Cell * Cj) {
     vec3 dX = Ci->X - Cj->X;
@@ -120,10 +128,12 @@ namespace exafmm {
   }
 
   //! Ewald real part
-  void realPart(Cell * Ci, Cell * Cj) {
-    if (Ci->NCHILD == 0) neighbor(Ci, Cj);
-    for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {
-      realPart(ci, Cj);
+  void realPart(Cells & icells, Cells & jcells) {
+    Cells ileafs;
+    getLeaf(ileafs, &icells[0]);
+#pragma omp parallel for
+    for (int i=0; i<ileafs.size(); i++) {
+      neighbor(&ileafs[i], &jcells[0]);
     }
   }
 

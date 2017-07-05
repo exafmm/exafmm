@@ -83,7 +83,7 @@ int main(int argc, char ** argv) {
       wavePart(bodies, jbodies);
       stop("Wave part");
       start("Real part");
-      realPart(&cells[0], &jcells[0]);
+      realPart(cells, jcells);
       selfTerm(bodies);
       stop("Real part");
 

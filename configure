@@ -601,8 +601,6 @@ EXAFMM_DEBUG_FALSE
 EXAFMM_DEBUG_TRUE
 EXAFMM_ASSERT_FALSE
 EXAFMM_ASSERT_TRUE
-EXAFMM_USE_SIMD_FALSE
-EXAFMM_USE_SIMD_TRUE
 SIMD_FLAGS
 host_os
 host_vendor
@@ -733,7 +731,6 @@ enable_mpi
 enable_single
 enable_float
 enable_simd_ext
-enable_simd
 enable_assert
 enable_debug
 '
@@ -1380,14 +1377,12 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --disable-openmp        disable OpenMP
-  --disable-mpi           do not compile exaFMM MPI library
-  --enable-single         compile exaFMM in single precision
+  --disable-mpi           do not compile with MPI
+  --enable-single         compile in single precision
   --enable-float          synonym for --enable-single
-  --disable-simd-ext      disable SIMD optimizations supported by compiler
-                          (SSE3, AVX, AVX2)
-  --disable-simd          disable SIMD optimizations specific to exaFMM
+  --disable-simd-ext      disable SIMD
   --enable-assert         enable assertion
-  --enable-debug          compile with extra runtime checks for debugging
+  --enable-debug          compile in debugging mode
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -6255,28 +6250,6 @@ $as_echo "$ax_cv_cxx_compiler_vendor" >&6; }
 
 fi
 
-# SIMD optimization specific to exaFMM
-# Check whether --enable-simd was given.
-if test "${enable_simd+set}" = set; then :
-  enableval=$enable_simd; use_simd=$enableval
-else
-  use_simd=yes
-fi
-
-if test "$use_simd" = "no"; then
-
-$as_echo "#define EXAFMM_USE_SIMD 0" >>confdefs.h
-
-fi
- if test "$use_simd" = "yes"; then
-  EXAFMM_USE_SIMD_TRUE=
-  EXAFMM_USE_SIMD_FALSE='#'
-else
-  EXAFMM_USE_SIMD_TRUE='#'
-  EXAFMM_USE_SIMD_FALSE=
-fi
-
-
 # Assertion
 # Check whether --enable-assert was given.
 if test "${enable_assert+set}" = set; then :
@@ -6975,10 +6948,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXAFMM_SINGLE_TRUE}" && test -z "${EXAFMM_SINGLE_FALSE}"; then
   as_fn_error $? "conditional \"EXAFMM_SINGLE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_USE_SIMD_TRUE}" && test -z "${EXAFMM_USE_SIMD_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_USE_SIMD\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXAFMM_ASSERT_TRUE}" && test -z "${EXAFMM_ASSERT_FALSE}"; then

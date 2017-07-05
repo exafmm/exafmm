@@ -89,10 +89,10 @@ namespace exafmm {
   public:
     //! Set default values to FMM parameters and parse argv for user-defined options
     Args(int argc=0, char ** argv=NULL)
-      : accuracy(0),
+      : accuracy(1),
         ncrit(64),
         distribution("cube"),
-        numBodies(1000000),
+        numBodies(10000),
         P(10),
         theta(.4),
         verbose(0)

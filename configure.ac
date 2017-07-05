@@ -16,8 +16,7 @@ AM_PROG_AR
 
 # OpenMP
 AC_ARG_ENABLE([openmp],
-              [AS_HELP_STRING([--disable-openmp],
-                              [disable OpenMP])],
+              [AS_HELP_STRING([--disable-openmp],[disable OpenMP])],
               [],
               [enable_openmp=yes])
 if test "$enable_openmp" = "yes"; then
@@ -28,8 +27,7 @@ AM_CONDITIONAL(EXAFMM_HAVE_OPENMP, test "$enable_openmp" = "yes")
 
 # MPI
 AC_ARG_ENABLE([mpi],
-              [AS_HELP_STRING([--disable-mpi],
-                              [do not compile exaFMM MPI library])],
+              [AS_HELP_STRING([--disable-mpi],[do not compile with MPI])],
               [],
               [enable_mpi=yes])
 if test "$enable_mpi" = "yes"; then
@@ -41,8 +39,13 @@ fi
 AM_CONDITIONAL(EXAFMM_HAVE_MPI, test "$enable_mpi" = "yes")
 
 # Single precision
-AC_ARG_ENABLE(single, [AS_HELP_STRING([--enable-single],[compile exaFMM in single precision])], ok=$enableval, ok=no)
-AC_ARG_ENABLE(float, [AS_HELP_STRING([--enable-float],[synonym for --enable-single])], ok=$enableval)
+AC_ARG_ENABLE([single],
+              [AS_HELP_STRING([--enable-single],[compile in single precision])],
+              [ok=$enableval],
+              [ok=no])
+AC_ARG_ENABLE([float],
+              [AS_HELP_STRING([--enable-float],[synonym for --enable-single])],
+              [ok=$enableval])
 if test "$ok" = "yes"; then
    AC_DEFINE(EXAFMM_SINGLE,1,[Define to compile in single precision.])
    PRECISION=s
@@ -54,34 +57,28 @@ AC_SUBST(PRECISION)
 
 # SIMD extensions supported by compiler
 AC_ARG_ENABLE([simd-ext],
-              [AS_HELP_STRING([--disable-simd-ext],
-                              [disable SIMD optimizations supported by compiler (SSE3, AVX, AVX2)])],
+              [AS_HELP_STRING([--disable-simd-ext],[disable SIMD])],
               [use_simd_ext=$enableval],
               [use_simd_ext=yes])
 if test "$use_simd_ext" = "yes"; then
    AX_EXT
 fi
 
-# SIMD optimization specific to exaFMM
-AC_ARG_ENABLE([simd],
-              [AS_HELP_STRING([--disable-simd],
-                              [disable SIMD optimizations specific to exaFMM])],
-              [use_simd=$enableval],
-              [use_simd=yes])
-if test "$use_simd" = "no"; then
-   AC_DEFINE(EXAFMM_USE_SIMD,0,[Disable SIMD optimizations.])
-fi
-AM_CONDITIONAL(EXAFMM_USE_SIMD, test "$use_simd" = "yes")
-
 # Assertion
-AC_ARG_ENABLE(assert, [AS_HELP_STRING([--enable-assert],[enable assertion])], use_assert=$enableval, use_assert=no)
+AC_ARG_ENABLE([assert],
+              [AS_HELP_STRING([--enable-assert],[enable assertion])],
+              [use_assert=$enableval],
+              [use_assert=no])
 if test "$use_assert" = "yes"; then
    AC_DEFINE(EXAFMM_ASSERT,1,[Enable assertion.])
 fi
 AM_CONDITIONAL(EXAFMM_ASSERT, test "$use_assert" = "yes")
 
 # Debug
-AC_ARG_ENABLE(debug, [AS_HELP_STRING([--enable-debug],[compile with extra runtime checks for debugging])], enable_debug=$enableval, enable_debug=no)
+AC_ARG_ENABLE([debug],
+              [AS_HELP_STRING([--enable-debug],[compile in debugging mode])],
+              [enable_debug=$enableval],
+              [enable_debug=no])
 if test "$enable_debug" = "yes"; then
    AC_DEFINE(EXAFMM_DEBUG,1,[Define to enable extra debugging options.])
 fi

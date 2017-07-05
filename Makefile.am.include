@@ -32,7 +32,7 @@ endif
 endif
 endif
 
-# Thread libraries
+# OpenMP
 if EXAFMM_HAVE_OPENMP
 AM_CPPFLAGS += -DEXAFMM_WITH_OPENMP
 AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
@@ -44,12 +44,7 @@ if EXAFMM_SINGLE
 AM_CPPFLAGS += -DEXAFMM_SINGLE
 endif
 
-# SIMD flags
-if EXAFMM_USE_SIMD
-AM_CPPFLAGS += -DEXAFMM_USE_SIMD
-endif
-
-# SIMD extensions from AX_EXT
+# SIMD
 AM_CPPFLAGS += $(SIMD_FLAGS)
 
 # OpenMPI needs an extra library when linking with Fortran
@@ -71,8 +66,6 @@ endif
 
 AM_MAKEFLAGS = -s
 
-help:
-	@make -C .. help
 buildbot:
 	@make -C .. buildbot
 cleanbin:

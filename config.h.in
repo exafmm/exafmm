@@ -15,9 +15,6 @@
 /* Define to compile in single precision. */
 #undef EXAFMM_SINGLE
 
-/* Disable SIMD optimizations. */
-#undef EXAFMM_USE_SIMD
-
 /* Support Altivec instructions */
 #undef HAVE_ALTIVEC
 
