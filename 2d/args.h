@@ -21,14 +21,11 @@ namespace exafmm {
     {0, 0, 0, 0}
   };
 
-  //! Argument parser class
-  /*!
-    Parse and set the parameters of FMM and bodies from argv
-  */
+  //! Parse and set the parameters of FMM and bodies from argv
   class Args {
   public:
     int accuracy;                               //!< Regression for accuracy only
-    int ncrit;                                  //!< Number of bodies per leaf cell 
+    int ncrit;                                  //!< Number of bodies per leaf cell
     const char * distribution;                  //!< Body Distribution
     int numBodies;                              //!< Number of bodies
     int P;                                      //!< Order of expansions
@@ -60,10 +57,6 @@ namespace exafmm {
     }
 
     //! Parse body distribution from option-argument (optarg)
-    /*!
-      \param arg a pointer to optarg
-      \return a string of distribution name
-    */
     const char * parseDistribution(const char * arg) {
       switch (arg[0]) {
         case 'c': return "cube";
@@ -79,10 +72,6 @@ namespace exafmm {
     }
 
     //! Get the integer (value) mapped to body distribution (key)
-    /*!
-      \param _distribution body distribution string
-      \return the associated integer
-    */
     uint64_t getDistNum(const char * _distribution) {
       switch (_distribution[0]) {
         case 'c': return 0;
@@ -98,18 +87,15 @@ namespace exafmm {
     }
 
   public:
-    //! Constructor
-    /*!
-      Set default values to FMM parameters and parse argv for user-defined options
-    */
+    //! Set default values to FMM parameters and parse argv for user-defined options
     Args(int argc=0, char ** argv=NULL)
       : accuracy(0),
-        ncrit(64), 
+        ncrit(64),
         distribution("cube"),
         numBodies(1000000),
         P(10),
         theta(.4),
-        verbose(0) 
+        verbose(0)
     {
       while (1) {
         int option_index;
@@ -148,12 +134,7 @@ namespace exafmm {
       }
     }
 
-    //! Calculate key based on arguments
-    /*!
-      Use bit masking to store arguments information in key, which will be
-      used in regression test to identify different runs
-      \return key
-    */
+    //! Use bit masking to store arguments information in key, used in regression test to identify different runs
     uint64_t getKey() {
       uint64_t key = 0;
       key |= uint64_t(round(log(ncrit)/log(2)));                // [1-4] bit
@@ -165,9 +146,6 @@ namespace exafmm {
     }
 
     //! Print formatted output for arguments
-    /*!
-      \param stringLength field width for output
-    */
     void print(int stringLength) {
       if (verbose) {
         std::cout << std::setw(stringLength) << std::fixed << std::left
