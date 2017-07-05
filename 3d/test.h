@@ -40,35 +40,33 @@ namespace test {
     }
   }
 
-  //! Recursive call to post-order tree traversal for evaluating monopoles
   void upwardPass(Cell * Ci) {
-    for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; ++Cj) {   // Loop over child cells
-      test::upwardPass(Cj);                                       //  Recursive call for child cell
-    }                                                             // End loop over child cells
-    Ci->M.resize(1, 0.0);                                         // Allocate and initialize multipole coefs
-    Ci->L.resize(1, 0.0);                                         // Allocate and initialize local coefs
-    if (Ci->NCHILD==0) test::P2M(Ci);                             // If Ci is leaf, call P2M kernel
-    test::M2M(Ci);                                                // M2M kernel
+    for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; ++Cj) {
+      test::upwardPass(Cj);
+    }
+    Ci->M.resize(1, 0.0);
+    Ci->L.resize(1, 0.0);
+    if (Ci->NCHILD==0) test::P2M(Ci);
+    test::M2M(Ci);
   }
 
-  //! Recursive call to post-order tree traversal for evaluating monopoles
   void downwardPass(Cell * Cj) {
-    test::L2L(Cj);                                                // L2L kernel
-    if (Cj->NCHILD==0) test::L2P(Cj);                             // If Cj is leaf, call L2P kernel
-    for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; ++Ci) {   // Loop over child cells
-      test::downwardPass(Ci);                                     //  Recursive call for child cell
-    }                                                             // End loop over child cells
+    test::L2L(Cj);
+    if (Cj->NCHILD==0) test::L2P(Cj);
+    for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; ++Ci) {
+      test::downwardPass(Ci);
+    }
   }
 #if EXAFMM_LAZY
   void evaluate(Cells & cells) {
-    for (size_t i=0; i<cells.size(); i++) {                       // Loop over cells
-      for (size_t j=0; j<cells[i].listM2L.size(); j++) {          //  Loop over M2L list
-        test::M2L(&cells[i], cells[i].listM2L[j]);                //   M2L kernel
-      }                                                           //  End loop over M2L list
-      for (size_t j=0; j<cells[i].listP2P.size(); j++) {          //  Loop over P2P list
-        test::P2P(&cells[i], cells[i].listP2P[j]);                //   P2P kernel
-      }                                                           //  End loop over P2P list
-    }                                                             // End loop over cells
+    for (size_t i=0; i<cells.size(); i++) {
+      for (size_t j=0; j<cells[i].listM2L.size(); j++) {
+        test::M2L(&cells[i], cells[i].listM2L[j]);
+      }
+      for (size_t j=0; j<cells[i].listP2P.size(); j++) {
+        test::P2P(&cells[i], cells[i].listP2P[j]);
+      }
+    }
   }
 #endif
 }

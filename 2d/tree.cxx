@@ -17,7 +17,6 @@ int main(int argc, char ** argv) {
   Cells cells = buildTree(bodies);
   test::upwardPass(&cells[0]);
 
-
   printf("%-20s : %i\n", "Num of Bodies", numBodies);
   printf("--- %-18s ------------\n", "Checking monopole");
   assert(numBodies == std::real(cells[0].M[0]));

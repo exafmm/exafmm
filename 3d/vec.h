@@ -1,209 +1,209 @@
 #ifndef vec_h
 #define vec_h
 #include <ostream>
-namespace exafmm {  
+namespace exafmm {
   template<int N, typename T>
   class vec {
   private:
     T data[N];
   public:
-    vec(){}                                                     // Default constructor
-    vec(const T &v) {                                           // Copy constructor (scalar)
+    vec(){}
+    vec(const T &v) {
       for (int i=0; i<N; i++) data[i] = v;
     }
-    vec(const vec &v) {                                         // Copy constructor (vector)
+    vec(const vec &v) {
       for (int i=0; i<N; i++) data[i] = v[i];
     }
-    ~vec(){}                                                    // Destructor
-    const vec &operator=(const T v) {                           // Scalar assignment
+    ~vec(){}
+    const vec &operator=(const T v) {
       for (int i=0; i<N; i++) data[i] = v;
       return *this;
     }
-    const vec &operator+=(const T v) {                          // Scalar compound assignment (add)
+    const vec &operator+=(const T v) {
       for (int i=0; i<N; i++) data[i] += v;
       return *this;
     }
-    const vec &operator-=(const T v) {                          // Scalar compound assignment (subtract)
+    const vec &operator-=(const T v) {
       for (int i=0; i<N; i++) data[i] -= v;
       return *this;
     }
-    const vec &operator*=(const T v) {                          // Scalar compound assignment (multiply)
+    const vec &operator*=(const T v) {
       for (int i=0; i<N; i++) data[i] *= v;
       return *this;
     }
-    const vec &operator/=(const T v) {                          // Scalar compound assignment (divide)
+    const vec &operator/=(const T v) {
       for (int i=0; i<N; i++) data[i] /= v;
       return *this;
     }
-    const vec &operator>=(const T v) {                          // Scalar compound assignment (greater than)
+    const vec &operator>=(const T v) {
       for (int i=0; i<N; i++) data[i] >= v;
       return *this;
     }
-    const vec &operator<=(const T v) {                          // Scalar compound assignment (less than)
+    const vec &operator<=(const T v) {
       for (int i=0; i<N; i++) data[i] <= v;
       return *this;
     }
-    const vec &operator&=(const T v) {                          // Scalar compound assignment (bitwise and)
+    const vec &operator&=(const T v) {
       for (int i=0; i<N; i++) data[i] &= v;
       return *this;
     }
-    const vec &operator|=(const T v) {                          // Scalar compound assignment (bitwise or)
+    const vec &operator|=(const T v) {
       for (int i=0; i<N; i++) data[i] |= v;
       return *this;
     }
-    const vec &operator=(const vec & v) {                       // Vector assignment
+    const vec &operator=(const vec & v) {
       for (int i=0; i<N; i++) data[i] = v[i];
       return *this;
     }
-    const vec &operator+=(const vec & v) {                      // Vector compound assignment (add)
+    const vec &operator+=(const vec & v) {
       for (int i=0; i<N; i++) data[i] += v[i];
       return *this;
     }
-    const vec &operator-=(const vec & v) {                      // Vector compound assignment (subtract)
+    const vec &operator-=(const vec & v) {
       for (int i=0; i<N; i++) data[i] -= v[i];
       return *this;
     }
-    const vec &operator*=(const vec & v) {                      // Vector compound assignment (multiply)
+    const vec &operator*=(const vec & v) {
       for (int i=0; i<N; i++) data[i] *= v[i];
       return *this;
     }
-    const vec &operator/=(const vec & v) {                      // Vector compound assignment (divide)
+    const vec &operator/=(const vec & v) {
       for (int i=0; i<N; i++) data[i] /= v[i];
       return *this;
     }
-    const vec &operator>=(const vec & v) {                      // Vector compound assignment (greater than)
+    const vec &operator>=(const vec & v) {
       for (int i=0; i<N; i++) data[i] >= v[i];
       return *this;
     }
-    const vec &operator<=(const vec & v) {                      // Vector compound assignment (less than)
+    const vec &operator<=(const vec & v) {
       for (int i=0; i<N; i++) data[i] <= v[i];
       return *this;
     }
-    const vec &operator&=(const vec & v) {                      // Vector compound assignment (bitwise and)
+    const vec &operator&=(const vec & v) {
       for (int i=0; i<N; i++) data[i] &= v[i];
       return *this;
     }
-    const vec &operator|=(const vec & v) {                      // Vector compound assignment (bitwise or)
+    const vec &operator|=(const vec & v) {
       for (int i=0; i<N; i++) data[i] |= v[i];
       return *this;
     }
-    vec operator+(const T v) const {                            // Scalar arithmetic (add)
+    vec operator+(const T v) const {
       return vec(*this) += v;
     }
-    vec operator-(const T v) const {                            // Scalar arithmetic (subtract)
+    vec operator-(const T v) const {
       return vec(*this) -= v;
     }
-    vec operator*(const T v) const {                            // Scalar arithmetic (multiply)
+    vec operator*(const T v) const {
       return vec(*this) *= v;
     }
-    vec operator/(const T v) const {                            // Scalar arithmetic (divide)
+    vec operator/(const T v) const {
       return vec(*this) /= v;
     }
-    vec operator>(const T v) const {                            // Scalar arithmetic (greater than)
+    vec operator>(const T v) const {
       return vec(*this) >= v;
     }
-    vec operator<(const T v) const {                            // Scalar arithmetic (less than)
+    vec operator<(const T v) const {
       return vec(*this) <= v;
     }
-    vec operator&(const T v) const {                            // Scalar arithmetic (bitwise and)
+    vec operator&(const T v) const {
       return vec(*this) &= v;
     }
-    vec operator|(const T v) const {                            // Scalar arithmetic (bitwise or)
+    vec operator|(const T v) const {
       return vec(*this) |= v;
     }
-    vec operator+(const vec & v) const {                        // Vector arithmetic (add)
+    vec operator+(const vec & v) const {
       return vec(*this) += v;
     }
-    vec operator-(const vec & v) const {                        // Vector arithmetic (subtract)
+    vec operator-(const vec & v) const {
       return vec(*this) -= v;
     }
-    vec operator*(const vec & v) const {                        // Vector arithmetic (multiply)
+    vec operator*(const vec & v) const {
       return vec(*this) *= v;
     }
-    vec operator/(const vec & v) const {                        // Vector arithmetic (divide)
+    vec operator/(const vec & v) const {
       return vec(*this) /= v;
     }
-    vec operator>(const vec & v) const {                        // Vector arithmetic (greater than)
+    vec operator>(const vec & v) const {
       return vec(*this) >= v;
     }
-    vec operator<(const vec & v) const {                        // Vector arithmetic (less than)
+    vec operator<(const vec & v) const {
       return vec(*this) <= v;
     }
-    vec operator&(const vec & v) const {                        // Vector arithmetic (bitwise and)
+    vec operator&(const vec & v) const {
       return vec(*this) &= v;
     }
-    vec operator|(const vec & v) const {                        // Vector arithmetic (bitwise or)
+    vec operator|(const vec & v) const {
       return vec(*this) |= v;
     }
-    vec operator-() const {                                     // Vector arithmetic (negation)
+    vec operator-() const {
       vec temp;
       for (int i=0; i<N; i++) temp[i] = -data[i];
       return temp;
     }
-    T &operator[](int i) {                                      // Indexing (lvalue)
+    T &operator[](int i) {
       return data[i];
     }
-    const T &operator[](int i) const {                          // Indexing (rvalue)
+    const T &operator[](int i) const {
       return data[i];
     }
-    operator       T* ()       {return data;}                   // Type-casting (lvalue)
-    operator const T* () const {return data;}                   // Type-casting (rvalue)
-    friend std::ostream &operator<<(std::ostream & s, const vec & v) {// Component-wise output stream
+    operator       T* ()       {return data;}
+    operator const T* () const {return data;}
+    friend std::ostream &operator<<(std::ostream & s, const vec & v) {
       for (int i=0; i<N; i++) s << v[i] << ' ';
       return s;
     }
-    friend T sum(const vec & v) {                               // Sum vector
+    friend T sum(const vec & v) {
       T temp = 0;
       for (int i=0; i<N; i++) temp += v[i];
       return temp;
     }
-    friend T norm(const vec & v) {                              // L2 norm squared
+    friend T norm(const vec & v) {
       T temp = 0;
       for (int i=0; i<N; i++) temp += v[i] * v[i];
       return temp;
     }
-    friend vec min(const vec & v, const vec & w) {              // Element-wise minimum
+    friend vec min(const vec & v, const vec & w) {
       vec temp;
       for (int i=0; i<N; i++) temp[i] = v[i] < w[i] ? v[i] : w[i];
       return temp;
     }
-    friend vec max(const vec & v, const vec & w) {              // Element-wise maximum
+    friend vec max(const vec & v, const vec & w) {
       vec temp;
       for (int i=0; i<N; i++) temp[i] = v[i] > w[i] ? v[i] : w[i];
       return temp;
     }
-    friend T min(const vec & v) {                               // Reduce minimum
+    friend T min(const vec & v) {
       T temp = v[0];
       for (int i=1; i<N; i++) temp = temp < v[i] ? temp : v[i];
       return temp;
     }
-    friend T max(const vec & v) {                               // Reduce maximum
+    friend T max(const vec & v) {
       T temp = v[0];
       for (int i=1; i<N; i++) temp = temp > v[i] ? temp : v[i];
       return temp;
     }
-    friend vec sin(const vec & v) {                             // Sine function
+    friend vec sin(const vec & v) {
       vec temp;
       for (int i=0; i<N; i++) temp[i] = sin(v[i]);
       return temp;
     }
-    friend vec cos(const vec & v) {                             // Cosine function
+    friend vec cos(const vec & v) {
       vec temp;
       for (int i=0; i<N; i++) temp[i] = cos(v[i]);
       return temp;
     }
-    friend void sincos(vec & s, vec & c, const vec & v) {       // Sine & cosine function
+    friend void sincos(vec & s, vec & c, const vec & v) {
       for (int i=0; i<N; i++) {
         s[i] = sin(v[i]);
         c[i] = cos(v[i]);
       }
     }
-    friend vec exp(const vec & v) {                             // Exponential function
+    friend vec exp(const vec & v) {
       vec temp;
       for (int i=0; i<N; i++) temp[i] = exp(v[i]);
       return temp;
     }
-    friend int wrap(vec & v, const vec & w) {                     // Wrap around periodic boundary
+    friend int wrap(vec & v, const vec & w) {
       int iw = 0;
       for (int i=0; i<N; i++) {
         if(v[i] < -w[i] / 2) {
@@ -217,7 +217,7 @@ namespace exafmm {
       }
       return iw;
     }
-    friend void unwrap(vec & v, const vec & w, const int & iw) {  // Undo wrap around periodic boundary
+    friend void unwrap(vec & v, const vec & w, const int & iw) {
       for (int i=0; i<N; i++) {
         if((iw >> i) & 1) v[i] += (v[i] > 0 ? -w[i] : w[i]);
       }
