@@ -748,21 +748,20 @@ uninstall-am: uninstall-binPROGRAMS
 	uninstall-binPROGRAMS
 
 
+help:
+	@make -C .. help
 buildbot:
 	@make -C .. buildbot
 cleanbin:
-	@rm -f *.o *.out*
+	@make -C .. cleanbin
 cleandat:
-	@rm -f *.dat
+	@make -C .. cleandat
 cleanlib:
-	@rm -f *.a *.so
+	@make -C .. cleanlib
 cleanreg:
-	@rm -f *.reg
+	@make -C .. cleanreg
 cleanall:
-	make cleanbin
-	make cleandat
-	make cleanlib
-	make cleanreg
+	@make -C .. cleanall
 
 run_laplace: laplace
 	./$< -n 10000 -a -v
