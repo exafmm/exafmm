@@ -102,7 +102,7 @@ namespace exafmm {
       if (record[key] != 0 && verbose) std::cout << "entry exists" << std::endl;
       double threshold = 1 + 1e-8 + 0.01;
       if ((record[key] == 0 || value <= threshold*record[key]) && (average < 5e-4) &&
-        (record2[key] == 0 || value2 <= threshold*record2[key]) && (average < 5e-3)) {
+          (record2[key] == 0 || value2 <= threshold*record2[key]) && (average < 5e-3)) {
         pass = true;
         record[key] = value;
         record2[key] = value2;
@@ -110,9 +110,9 @@ namespace exafmm {
 
       if (!pass) {
         std::cout << "Accuracy regression failed: " <<
-              std::scientific << value << " / " << record[key] << std::endl;
+          std::scientific << value << " / " << record[key] << std::endl;
         std::cout << "                            " <<
-              value2 << " / " << record2[key] << std::endl;
+          value2 << " / " << record2[key] << std::endl;
       } else {
         std::ofstream ofile(name.str().c_str());
         ofile << record.size() << std::endl;
@@ -145,34 +145,34 @@ namespace exafmm {
           ifile >> record2[readKey];
         }
       }
-    }
 
-    if (record[key] != 0 && verbose) std::cout << "entry exists" << std::endl;
-    double threshold = 1 + 1e-8 + 0.01;
-    if (record[key] == 0) {
-      pass = true;
-      record[key] = value;
-      record2[key] = 1;
-    } else if (value <= threshold*record[key]) {
-      pass = true;
-      record[key] = (record[key] * record2[key] + value) / (record2[key] + 1);
-      record2[key] += 1;
-    }
-
-    if (!pass) {
-      std::cout << "Time regression failed: " <<
-        value << " / " << record[key] << std::endl;
-    } else {
-      std::ofstream ofile(name.str().c_str());
-      ofile << record.size() << std::endl;
-      R_iter R2 = record2.begin();
-      for (R_iter R=record.begin(); R!=record.end(); R++,R2++) {
-        ofile << R->first << " " << R->second;
-        ofile << " " << (int)(R2->second);
-        ofile << std::endl;
+      if (record[key] != 0 && verbose) std::cout << "entry exists" << std::endl;
+      double threshold = 1 + 1e-8 + 0.01;
+      if (record[key] == 0) {
+        pass = true;
+        record[key] = value;
+        record2[key] = 1;
+      } else if (value <= threshold*record[key]) {
+        pass = true;
+        record[key] = (record[key] * record2[key] + value) / (record2[key] + 1);
+        record2[key] += 1;
       }
+
+      if (!pass) {
+        std::cout << "Time regression failed: " <<
+          value << " / " << record[key] << std::endl;
+      } else {
+        std::ofstream ofile(name.str().c_str());
+        ofile << record.size() << std::endl;
+        R_iter R2 = record2.begin();
+        for (R_iter R=record.begin(); R!=record.end(); R++,R2++) {
+          ofile << R->first << " " << R->second;
+          ofile << " " << (int)(R2->second);
+          ofile << std::endl;
+        }
+      }
+      return pass;
     }
-    return pass;
   };
 }
 #endif

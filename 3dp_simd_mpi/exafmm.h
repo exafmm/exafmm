@@ -4,30 +4,22 @@
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
+#include "vec.h"
 
 namespace exafmm {
   // Basic type definitions
-  typedef double real_t;                                        //!< Floating point type
+  typedef double real_t;                                        //!< Floating point type is double precision
   typedef std::complex<real_t> complex_t;                       //!< Complex type
-  const real_t EPS = 1e-16;                                     // Double precision epsilon
+  typedef vec<3,real_t> vec3;                                   //!< Vector of 3 real_t types
 
   //! Structure of bodies
   struct Body {
-    real_t X[3];                                                //!< Position
+    vec3 X;                                                     //!< Position
     real_t q;                                                   //!< Charge
     real_t p;                                                   //!< Potential
-    real_t F[3];                                                //!< Force
-    int irank;                                                  //!< Initial rank numbering for partitioning back
-    real_t weight;                                              //!< Weight for partitioning
+    vec3 F;                                                     //!< Force
   };
   typedef std::vector<Body> Bodies;                             //!< Vector of bodies
-  typedef typename Bodies::iterator B_iter;
-
-  //! Min & max bounds of bounding box
-  struct Bounds {
-    real_t Xmin[3];                                             //!< Minimum value of coordinates
-    real_t Xmax[3];                                             //!< Maximum value of coordinates
-  };
 
   //! Structure of cells
   struct Cell {
@@ -35,7 +27,7 @@ namespace exafmm {
     int NBODY;                                                  //!< Number of descendant bodies
     Cell * CHILD;                                               //!< Pointer of first child cell
     Body * BODY;                                                //!< Pointer of first body
-    real_t X[3];                                                //!< Cell center
+    vec3 X;                                                     //!< Cell center
     real_t R;                                                   //!< Cell radius
 #if EXAFMM_LAZY
     std::vector<Cell*> listM2L;                                 //!< M2L interaction list
@@ -48,7 +40,7 @@ namespace exafmm {
   };
   typedef std::vector<Cell> Cells;                              //!< Vector of cells
 
-  //! Global variables
+  // Global variables
   int P;                                                        //!< Order of expansions
   int NTERM;                                                    //!< Number of coefficients
   int ncrit;                                                    //!< Number of bodies per leaf cell
@@ -56,12 +48,6 @@ namespace exafmm {
   int iX[3];                                                    //!< 3-D periodic index
   real_t cycle;                                                 //!< Cycle of periodic boundary condition
   real_t theta;                                                 //!< Multipole acceptance criterion
-  real_t dX[3];                                                 //!< Distance vector
-#pragma omp threadprivate(iX,dX)                                //!< Make global variables private
-
-  //!< L2 norm of vector X
-  inline real_t norm(const real_t * X) {
-    return X[0] * X[0] + X[1] * X[1] + X[2] * X[2];             // L2 norm
-  }
+#pragma omp threadprivate(iX)                                   //!< Make global variables private
 }
 #endif
