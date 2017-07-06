@@ -104,7 +104,7 @@ namespace exafmm {
     {
       while (1) {
         int option_index;
-        int c = getopt_long(argc, argv, "ac:d:hn:P:t:v",
+        int c = getopt_long(argc, argv, "ac:d:hn:p:P:t:v",
                             long_options, &option_index);
         if (c == -1) break;
         switch (c) {
