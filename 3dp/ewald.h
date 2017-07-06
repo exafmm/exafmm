@@ -21,132 +21,143 @@ namespace exafmm {
   //! Forward DFT
   void dft(Waves & waves, Bodies & bodies) {
 #pragma omp parallel for
-    for (size_t w=0; w<waves.size(); w++) {                     // Loop over waves
-      waves[w].REAL = waves[w].IMAG = 0;                        //  Initialize waves
-      for (size_t b=0; b<bodies.size(); b++) {                  //  Loop over bodies
-        real_t th = 0;                                          //   Initialize phase
-        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];//  Determine phase
-        waves[w].REAL += bodies[b].q * std::cos(th);            //   Accumulate real component
-        waves[w].IMAG += bodies[b].q * std::sin(th);            //   Accumulate imaginary component
-      }                                                         //  End loop over bodies
-    }                                                           // End loop over waves
+    for (size_t w=0; w<waves.size(); w++) {
+      waves[w].REAL = waves[w].IMAG = 0;
+      for (size_t b=0; b<bodies.size(); b++) {
+        real_t th = 0;
+        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];
+        waves[w].REAL += bodies[b].q * std::cos(th);
+        waves[w].IMAG += bodies[b].q * std::sin(th);
+      }
+    }
   }
 
   //! Inverse DFT
   void idft(Waves & waves, Bodies & bodies) {
 #pragma omp parallel for
-    for (size_t b=0; b<bodies.size(); b++) {                    // Loop over bodies
-      real_t p = 0;                                             //  Initialize potential
-      vec3 F = 0;                                               //  Initialize force
-      for (size_t w=0; w<waves.size(); w++) {                   //   Loop over waves
-        real_t th = 0;                                          //    Initialzie phase
-        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];// Determine phase
-        real_t dtmp = waves[w].REAL * std::sin(th) - waves[w].IMAG * std::cos(th);// Temporary value
-        p += waves[w].REAL * std::cos(th) + waves[w].IMAG * std::sin(th);// Accumulate potential
-        for (int d=0; d<3; d++) F[d] -= dtmp * waves[w].K[d];   //   Accumulate force
-      }                                                         //  End loop over waves
-      for (int d=0; d<3; d++) F[d] *= scale[d];                 //  Scale forces
-      bodies[b].p += p;                                         //  Copy potential to bodies
-      bodies[b].F += F;                                         //  Copy force to bodies
-    }                                                           // End loop over bodies
+    for (size_t b=0; b<bodies.size(); b++) {
+      real_t p = 0;
+      vec3 F = 0;
+      for (size_t w=0; w<waves.size(); w++) {
+        real_t th = 0;
+        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];
+        real_t dtmp = waves[w].REAL * std::sin(th) - waves[w].IMAG * std::cos(th);
+        p += waves[w].REAL * std::cos(th) + waves[w].IMAG * std::sin(th);
+        for (int d=0; d<3; d++) F[d] -= dtmp * waves[w].K[d];
+      }
+      for (int d=0; d<3; d++) F[d] *= scale[d];
+      bodies[b].p += p;
+      bodies[b].F += F;
+    }
   }
 
   //! Initialize wave vector
   Waves initWaves() {
-    for (int d=0; d<3; d++) scale[d]= 2 * M_PI / cycle;         // Scale conversion
-    Waves waves;                                                // Initialzie wave vector
-    int kmaxsq = ksize * ksize;                                 // kmax squared
-    int kmax = ksize;                                           // kmax as integer
-    for (int l=0; l<=kmax; l++) {                               // Loop over x component
-      int mmin = -kmax;                                         //  Determine minimum y component
-      if (l==0) mmin = 0;                                       //  Exception for minimum y component
-      for (int m=mmin; m<=kmax; m++) {                          //  Loop over y component
-        int nmin = -kmax;                                       //   Determine minimum z component
-        if (l==0 && m==0) nmin=1;                               //   Exception for minimum z component
-        for (int n=nmin; n<=kmax; n++) {                        //   Loop over z component
-          real_t ksq = l * l + m * m + n * n;                   //    Wave number squared
-          if (ksq <= kmaxsq) {                                  //    If wave number is below kmax
-            Wave wave;                                          //     Initialzie wave structure
-            wave.K[0] = l;                                      //     x component of k
-            wave.K[1] = m;                                      //     y component of k
-            wave.K[2] = n;                                      //     z component of k
-            wave.REAL = wave.IMAG = 0;                          //     Initialize amplitude
-            waves.push_back(wave);                              //     Push wave to vector
-          }                                                     //    End if for wave number
-        }                                                       //   End loop over z component
-      }                                                         //  End loop over y component
-    }                                                           // End loop over x component
-    return waves;                                               // Return wave vector
+    for (int d=0; d<3; d++) scale[d]= 2 * M_PI / cycle;
+    Waves waves;
+    int kmaxsq = ksize * ksize;
+    int kmax = ksize;
+    for (int l=0; l<=kmax; l++) {
+      int mmin = -kmax;
+      if (l==0) mmin = 0;
+      for (int m=mmin; m<=kmax; m++) {
+        int nmin = -kmax;
+        if (l==0 && m==0) nmin=1;
+        for (int n=nmin; n<=kmax; n++) {
+          real_t ksq = l * l + m * m + n * n;
+          if (ksq <= kmaxsq) {
+            Wave wave;
+            wave.K[0] = l;
+            wave.K[1] = m;
+            wave.K[2] = n;
+            wave.REAL = wave.IMAG = 0;
+            waves.push_back(wave);
+          }
+        }
+      }
+    }
+    return waves;
   }
 
   //! Ewald real part P2P kernel
   void realP2P(Cell * Ci, Cell * Cj) {
-    for (Body * Bi=Ci->BODY; Bi!=Ci->BODY+Ci->NBODY; Bi++) {    // Loop over target bodies
-      for (Body * Bj=Cj->BODY; Bj!=Cj->BODY+Cj->NBODY; Bj++) {  //  Loop over source bodies
+    for (Body * Bi=Ci->BODY; Bi!=Ci->BODY+Ci->NBODY; Bi++) {
+      for (Body * Bj=Cj->BODY; Bj!=Cj->BODY+Cj->NBODY; Bj++) {
         vec3 dX;
-        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - iX[d] * cycle;// Distance vector from source to target
-        real_t R2 = norm(dX);                                   //   R^2
-        if (0 < R2 && R2 < cutoff * cutoff) {                   //   Exclude self interaction and cutoff
-          real_t R2s = R2 * alpha * alpha;                      //    (R * alpha)^2
-          real_t Rs = std::sqrt(R2s);                           //    R * alpha
-          real_t invRs = 1 / Rs;                                //    1 / (R * alpha)
-          real_t invR2s = invRs * invRs;                        //    1 / (R * alpha)^2
-          real_t invR3s = invR2s * invRs;                       //    1 / (R * alpha)^3
+        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - iX[d] * cycle;
+        real_t R2 = norm(dX);
+        if (0 < R2 && R2 < cutoff * cutoff) {
+          real_t R2s = R2 * alpha * alpha;
+          real_t Rs = std::sqrt(R2s);
+          real_t invRs = 1 / Rs;
+          real_t invR2s = invRs * invRs;
+          real_t invR3s = invR2s * invRs;
           real_t dtmp = Bj->q * (M_2_SQRTPI * std::exp(-R2s) * invR2s + erfc(Rs) * invR3s);
-          dtmp *= alpha * alpha * alpha;                        //    Scale temporary value
-          Bi->p += Bj->q * erfc(Rs) * invRs * alpha;            //    Ewald real potential
-          Bi->F -= dX * dtmp;                                   //    Ewald real force
-        }                                                       //   End if for self interaction
-      }                                                         //  End loop over source bodies
-    }                                                           // End loop over target bodies
+          dtmp *= alpha * alpha * alpha;
+          Bi->p += Bj->q * erfc(Rs) * invRs * alpha;
+          Bi->F -= dX * dtmp;
+        }
+      }
+    }
   }
 
-  void neighbor(Cell * Ci, Cell * Cj) {                         // Traverse tree to find neighbor
-    vec3 dX = Ci->X - Cj->X;                                    //  Distance vector from source to target
-    for (int d=0; d<3; d++) {                                   //  Loop over dimensions
-      iX[d] = 0;                                                //   Initialize periodic index
-      if(dX[d] < -cycle / 2) iX[d]--;                           //   Wrap periodic index backward
-      if(dX[d] >  cycle / 2) iX[d]++;                           //   Wrap periodic index forward
-      dX[d] -= iX[d] * cycle;                                   //   Wrap distance vector
-    }                                                           //  End loop over dimensions
-    real_t R = std::sqrt(norm(dX));                             //  Scalar distance
-    if (R - Ci->R - Cj->R < sqrtf(3) * cutoff) {                //  If cells are close
-      if(Cj->NCHILD == 0) realP2P(Ci, Cj);                      //   Ewald real part
-      for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {// Loop over cell's children
-        neighbor(Ci, cj);                                       //    Instantiate recursive functor
-      }                                                         //   End loop over cell's children
-    }                                                           //  End if for far cells
-  }                                                             // End overload operator()
+  //! Get leaf cells
+  void getLeaf(Cells & ileafs, Cell * Ci) {
+    if (Ci->NCHILD == 0) ileafs.push_back(*Ci);
+    for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {
+      getLeaf(ileafs, ci);
+    }
+  }
+
+  //! Find neighbor cell
+  void neighbor(Cell * Ci, Cell * Cj) {
+    vec3 dX = Ci->X - Cj->X;
+    for (int d=0; d<3; d++) {
+      iX[d] = 0;
+      if(dX[d] < -cycle / 2) iX[d]--;
+      if(dX[d] >  cycle / 2) iX[d]++;
+      dX[d] -= iX[d] * cycle;
+    }
+    real_t R = std::sqrt(norm(dX));
+    if (R - Ci->R - Cj->R < sqrtf(3) * cutoff) {
+      if(Cj->NCHILD == 0) realP2P(Ci, Cj);
+      for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {
+        neighbor(Ci, cj);
+      }
+    }
+  }
 
   //! Ewald real part
-  void realPart(Cell * Ci, Cell * Cj) {
-    if (Ci->NCHILD == 0) neighbor(Ci, Cj);                      // If target cell is leaf, find neighbors
-    for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) { // Loop over target child cells
-      realPart(ci, Cj);                                         //  Recursively subdivide target cells
-    }                                                           // End loop over target cells
+  void realPart(Cells & icells, Cells & jcells) {
+    Cells ileafs;
+    getLeaf(ileafs, &icells[0]);
+#pragma omp parallel for
+    for (int i=0; i<ileafs.size(); i++) {
+      neighbor(&ileafs[i], &jcells[0]);
+    }
   }
 
   //! Ewald wave part
   void wavePart(Bodies & bodies, Bodies & jbodies) {
-    Waves waves = initWaves();                                  // Initialize wave vector
-    dft(waves,jbodies);                                         // Apply DFT to bodies to get waves
-    real_t coef = 2 / sigma / cycle / cycle / cycle;            // First constant
-    real_t coef2 = 1 / (4 * alpha * alpha);                     // Second constant
-    for (size_t w=0; w<waves.size(); w++) {                     // Loop over waves
-      for (int d=0; d<3; d++) K[d] = waves[w].K[d] * scale[d];  //  Wave number scaled
-      real_t K2 = K[0] * K[0] + K[1] * K[1] + K[2] * K[2];      //  Wave number squared
-      real_t factor = coef * std::exp(-K2 * coef2) / K2;        //  Wave factor
-      waves[w].REAL *= factor;                                  //  Apply wave factor to real part
-      waves[w].IMAG *= factor;                                  //  Apply wave factor to imaginary part
-    }                                                           // End loop over waves
-    idft(waves,bodies);                                         // Inverse DFT
+    Waves waves = initWaves();
+    dft(waves,jbodies);
+    real_t coef = 2 / sigma / cycle / cycle / cycle;
+    real_t coef2 = 1 / (4 * alpha * alpha);
+    for (size_t w=0; w<waves.size(); w++) {
+      for (int d=0; d<3; d++) K[d] = waves[w].K[d] * scale[d];
+      real_t K2 = K[0] * K[0] + K[1] * K[1] + K[2] * K[2];
+      real_t factor = coef * std::exp(-K2 * coef2) / K2;
+      waves[w].REAL *= factor;
+      waves[w].IMAG *= factor;
+    }
+    idft(waves,bodies);
   }
 
   //! Subtract self term
   void selfTerm(Bodies & bodies) {
-    for (size_t b=0; b<bodies.size(); b++) {                    // Loop over all bodies
-      bodies[b].p -= M_2_SQRTPI * bodies[b].q * alpha;          //  Self term of Ewald real part
-    }                                                           // End loop over all bodies in cell
+    for (size_t b=0; b<bodies.size(); b++) {
+      bodies[b].p -= M_2_SQRTPI * bodies[b].q * alpha;
+    }
   }
 }
 #endif

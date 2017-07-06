@@ -6,18 +6,17 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  Args args(argc, argv);                                        // Argument parser
-  ncrit = args.ncrit;                                           // Number of bodies per leaf cell
-  const int numBodies = args.numBodies;                         // Number of bodies
-  const char * distribution = args.distribution;                // Type of distribution
+  Args args(argc, argv);
+  ncrit = args.ncrit;
+  const int numBodies = args.numBodies;
+  const char * distribution = args.distribution;
 
-  Bodies bodies = initBodies(numBodies, distribution);          // Initialize bodies
-  for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;       // Set unit charge
+  Bodies bodies = initBodies(numBodies, distribution);
+  for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
-  Cells cells = buildTree(bodies);                              // Build tree
-  test::upwardPass(&cells[0]);                                  // Upward pass
-  
-  // Check Answer
+  Cells cells = buildTree(bodies);
+  test::upwardPass(&cells[0]);
+
   printf("%-20s : %i\n", "Num of Bodies", numBodies);
   printf("--- %-18s ------------\n", "Checking monopole");
   assert(numBodies == std::real(cells[0].M[0]));

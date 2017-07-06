@@ -8,22 +8,21 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  Args args(argc, argv);                                        // Argument parser
-  theta = args.theta;                                           // Multipole acceptance criterion
-  ncrit = args.ncrit;                                           // Number of bodies per leaf cell
-  const int numBodies = args.numBodies;                         // Number of bodies
-  const char * distribution = args.distribution;                // Type of distribution
+  Args args(argc, argv);
+  theta = args.theta;
+  ncrit = args.ncrit;
+  const int numBodies = args.numBodies;
+  const char * distribution = args.distribution;
 
-  Bodies bodies = initBodies(numBodies, distribution);          // Initialize bodies
-  for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;       // Set unit charge
+  Bodies bodies = initBodies(numBodies, distribution);
+  for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
-  Cells cells = buildTree(bodies);                              // Build tree
-  test::upwardPass(&cells[0]);                                  // Upward pass
-  getList(&cells[0], &cells[0]);                                // Create interaction list
-  test::evaluate(cells);                                        // Horizontal pass
-  test::downwardPass(&cells[0]);                                // Downward pass
-  
-  // Check answer
+  Cells cells = buildTree(bodies);
+  test::upwardPass(&cells[0]);
+  getList(&cells[0], &cells[0]);
+  test::evaluate(cells);
+  test::downwardPass(&cells[0]);
+
   printf("%-20s : %i\n", "Num of Bodies", numBodies);
   printf("--- %-18s ------------\n", "Checking potential");
   for (size_t b=0; b<bodies.size(); b++) assert(numBodies == bodies[b].p);

@@ -15,22 +15,21 @@ namespace exafmm {
     {"distribution", required_argument, 0, 'd'},
     {"help",         no_argument,       0, 'h'},
     {"numBodies",    required_argument, 0, 'n'},
+    {"path",         required_argument, 0, 'p'},
     {"P",            required_argument, 0, 'P'},
     {"theta",        required_argument, 0, 't'},
     {"verbose",      no_argument,       0, 'v'},
     {0, 0, 0, 0}
   };
 
-  //! Argument parser class
-  /*!
-    Parse and set the parameters of FMM and bodies from argv
-  */
+  //! Parse and set the parameters of FMM and bodies from argv
   class Args {
   public:
     int accuracy;                               //!< Regression for accuracy only
-    int ncrit;                                  //!< Number of bodies per leaf cell 
+    int ncrit;                                  //!< Number of bodies per leaf cell
     const char * distribution;                  //!< Body Distribution
     int numBodies;                              //!< Number of bodies
+    const char * path;                          //!< Path to save files
     int P;                                      //!< Order of expansions
     double theta;                               //!< Multipole acceptance criterion
     int verbose;                                //!< Verbose mode
@@ -46,6 +45,7 @@ namespace exafmm {
               " --distribution (-d) [c/l/o/p/s] : lattice, cube, sphere, octant, plummer (%s)\n"
               " --help (-h)                     : Show this help document\n"
               " --numBodies (-n)                : Number of bodies (%d)\n"
+              " --path (-p)                     : Path to save files (%s)\n"
               " --P (-P) not working            : Order of expansion (%d)\n"
               " --theta (-t)                    : Multipole acceptance criterion (%f)\n"
               " --verbose (-v)                  : Print information to screen (%d)\n",
@@ -54,16 +54,13 @@ namespace exafmm {
               ncrit,
               distribution,
               numBodies,
+              path,
               P,
               theta,
               verbose);
     }
 
     //! Parse body distribution from option-argument (optarg)
-    /*!
-      \param arg a pointer to optarg
-      \return a string of distribution name
-    */
     const char * parseDistribution(const char * arg) {
       switch (arg[0]) {
         case 'c': return "cube";
@@ -79,10 +76,6 @@ namespace exafmm {
     }
 
     //! Get the integer (value) mapped to body distribution (key)
-    /*!
-      \param _distribution body distribution string
-      \return the associated integer
-    */
     uint64_t getDistNum(const char * _distribution) {
       switch (_distribution[0]) {
         case 'c': return 0;
@@ -98,22 +91,20 @@ namespace exafmm {
     }
 
   public:
-    //! Constructor
-    /*!
-      Set default values to FMM parameters and parse argv for user-defined options
-    */
+    //! Set default values to FMM parameters and parse argv for user-defined options
     Args(int argc=0, char ** argv=NULL)
-      : accuracy(0),
-        ncrit(64), 
+      : accuracy(1),
+        ncrit(64),
         distribution("cube"),
-        numBodies(1000000),
+        numBodies(10000),
+        path("./"),
         P(10),
         theta(.4),
-        verbose(0) 
+        verbose(0)
     {
       while (1) {
         int option_index;
-        int c = getopt_long(argc, argv, "ac:d:hn:P:t:v",
+        int c = getopt_long(argc, argv, "ac:d:hn:p:P:t:v",
                             long_options, &option_index);
         if (c == -1) break;
         switch (c) {
@@ -132,6 +123,9 @@ namespace exafmm {
           case 'n':
             numBodies = atoi(optarg);
             break;
+          case 'p':
+            path = optarg;
+            break;
           case 'P':
             P = atoi(optarg);
             break;
@@ -148,12 +142,7 @@ namespace exafmm {
       }
     }
 
-    //! Calculate key based on arguments
-    /*!
-      Use bit masking to store arguments information in key, which will be
-      used in regression test to identify different runs
-      \return key
-    */
+    //! Use bit masking to store arguments information in key, used in regression test to identify different runs
     uint64_t getKey() {
       uint64_t key = 0;
       key |= uint64_t(round(log(ncrit)/log(2)));                // [1-4] bit
@@ -165,9 +154,6 @@ namespace exafmm {
     }
 
     //! Print formatted output for arguments
-    /*!
-      \param stringLength field width for output
-    */
     void print(int stringLength) {
       if (verbose) {
         std::cout << std::setw(stringLength) << std::fixed << std::left
@@ -178,6 +164,8 @@ namespace exafmm {
                   << "distribution" << " : " << distribution << std::endl
                   << std::setw(stringLength)
                   << "numBodies" << " : " << numBodies << std::endl
+                  << std::setw(stringLength)
+                  << "path" << " : " << path << std::endl
                   << std::setw(stringLength)
                   << "P" << " : " << P << std::endl
                   << std::setw(stringLength)

@@ -3,44 +3,17 @@
 /* Enable assertion. */
 #undef EXAFMM_ASSERT
 
-/* Count number of M2L and P2P kernel calls. */
-#undef EXAFMM_COUNT_KERNEL
-
-/* Count interaction list per cell. */
-#undef EXAFMM_COUNT_LIST
-
 /* Define to enable extra debugging options. */
 #undef EXAFMM_DEBUG
 
-/* Define to enable MIC optimizations. */
-#undef EXAFMM_HAVE_MIC
-
 /* Define if you have the MPI library. */
 #undef EXAFMM_HAVE_MPI
-
-/* Define to enable ARM NEON optimizations. */
-#undef EXAFMM_HAVE_NEON
 
 /* Use OpenMP */
 #undef EXAFMM_HAVE_OPENMP
 
 /* Define to compile in single precision. */
 #undef EXAFMM_SINGLE
-
-/* Enable Kahan summation. */
-#undef EXAFMM_USE_KAHAN
-
-/* Enable PAPI performance counter. */
-#undef EXAFMM_USE_PAPI
-
-/* Disable SIMD optimizations. */
-#undef EXAFMM_USE_SIMD
-
-/* Enable thread tracing. */
-#undef EXAFMM_USE_TRACE
-
-/* Enable weight for partitioning. */
-#undef EXAFMM_USE_WEIGHT
 
 /* Support Altivec instructions */
 #undef HAVE_ALTIVEC

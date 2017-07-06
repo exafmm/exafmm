@@ -7,8 +7,8 @@
 #include "vec.h"
 
 namespace exafmm {
-  // Basic type definitions
-  typedef double real_t;                                        //!< Floating point type is double precision
+  //! Basic type definitions
+  typedef double real_t;                                        //!< Floating point type
   typedef std::complex<real_t> complex_t;                       //!< Complex type
   typedef vec<3,real_t> vec3;                                   //!< Vector of 3 real_t types
 
@@ -38,7 +38,7 @@ namespace exafmm {
   };
   typedef std::vector<Cell> Cells;                              //!< Vector of cells
 
-  // Global variables
+  //! Global variables
   int P;                                                        //!< Order of expansions
   int NTERM;                                                    //!< Number of coefficients
   int ncrit;                                                    //!< Number of bodies per leaf cell

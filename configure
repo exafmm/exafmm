@@ -594,12 +594,6 @@ EXAFMM_HAVE_INTEL_FALSE
 EXAFMM_HAVE_INTEL_TRUE
 EXAFMM_HAVE_CRAY_FALSE
 EXAFMM_HAVE_CRAY_TRUE
-EXAFMM_HAVE_SX_FALSE
-EXAFMM_HAVE_SX_TRUE
-EXAFMM_HAVE_FX_FALSE
-EXAFMM_HAVE_FX_TRUE
-EXAFMM_HAVE_BG_FALSE
-EXAFMM_HAVE_BG_TRUE
 ax_compiler_cxxflags
 COMPILER_CXXFLAGS
 SED
@@ -607,26 +601,6 @@ EXAFMM_DEBUG_FALSE
 EXAFMM_DEBUG_TRUE
 EXAFMM_ASSERT_FALSE
 EXAFMM_ASSERT_TRUE
-EXAFMM_COUNT_LIST_FALSE
-EXAFMM_COUNT_LIST_TRUE
-EXAFMM_COUNT_KERNEL_FALSE
-EXAFMM_COUNT_KERNEL_TRUE
-EXAFMM_USE_TRACE_FALSE
-EXAFMM_USE_TRACE_TRUE
-EXAFMM_USE_PAPI_FALSE
-EXAFMM_USE_PAPI_TRUE
-EXAFMM_USE_KAHAN_FALSE
-EXAFMM_USE_KAHAN_TRUE
-EXAFMM_USE_WEIGHT_FALSE
-EXAFMM_USE_WEIGHT_TRUE
-NEON_CXXFLAGS
-EXAFMM_HAVE_NEON_FALSE
-EXAFMM_HAVE_NEON_TRUE
-MIC_CXXFLAGS
-EXAFMM_HAVE_MIC_FALSE
-EXAFMM_HAVE_MIC_TRUE
-EXAFMM_USE_SIMD_FALSE
-EXAFMM_USE_SIMD_TRUE
 SIMD_FLAGS
 host_os
 host_vendor
@@ -757,15 +731,6 @@ enable_mpi
 enable_single
 enable_float
 enable_simd_ext
-enable_simd
-enable_mic
-enable_neon
-enable_weight
-enable_kahan
-enable_papi
-enable_trace
-enable_count_kernel
-enable_count_list
 enable_assert
 enable_debug
 '
@@ -1412,22 +1377,12 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --disable-openmp        disable OpenMP
-  --disable-mpi           do not compile exaFMM MPI library
-  --enable-single         compile exaFMM in single precision
+  --disable-mpi           do not compile with MPI
+  --enable-single         compile in single precision
   --enable-float          synonym for --enable-single
-  --disable-simd-ext      disable SIMD optimizations supported by compiler
-                          (SSE3, AVX, AVX2)
-  --disable-simd          disable SIMD optimizations specific to exaFMM
-  --enable-mic            enable MIC optimizations
-  --enable-neon           enable ARM NEON optimizations
-  --enable-weight         enable weight for partitioning
-  --enable-kahan          enable Kahan summation
-  --enable-papi           enable PAPI performance counter
-  --enable-trace          enable thread tracing
-  --enable-count-kernel   count number of M2L and P2P kernel calls
-  --enable-count-list     count interaction list per cell
+  --disable-simd-ext      disable SIMD
   --enable-assert         enable assertion
-  --enable-debug          compile with extra runtime checks for debugging
+  --enable-debug          compile in debugging mode
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -2178,7 +2133,7 @@ ac_config_files="$ac_config_files Makefile 2d/Makefile 3d/Makefile 3dp/Makefile 
 ac_config_headers="$ac_config_headers config.h"
 
 
-am__api_version='1.15'
+am__api_version='1.14'
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -2350,8 +2305,8 @@ test "$program_suffix" != NONE &&
 ac_script='s/[\\$]/&&/g;s/;s,x,x,$//'
 program_transform_name=`$as_echo "$program_transform_name" | sed "$ac_script"`
 
-# Expand $ac_aux_dir to an absolute path.
-am_aux_dir=`cd "$ac_aux_dir" && pwd`
+# expand $ac_aux_dir to an absolute path
+am_aux_dir=`cd $ac_aux_dir && pwd`
 
 if test x"${MISSING+set}" != xset; then
   case $am_aux_dir in
@@ -2370,7 +2325,7 @@ else
 $as_echo "$as_me: WARNING: 'missing' script is too old or missing" >&2;}
 fi
 
-if test x"${install_sh+set}" != xset; then
+if test x"${install_sh}" != xset; then
   case $am_aux_dir in
   *\ * | *\	*)
     install_sh="\${SHELL} '$am_aux_dir/install-sh'" ;;
@@ -2698,8 +2653,8 @@ MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 # <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
 mkdir_p='$(MKDIR_P)'
 
-# We need awk for the "check" target (and possibly the TAP driver).  The
-# system "awk" is bad on some platforms.
+# We need awk for the "check" target.  The system "awk" is bad on
+# some platforms.
 # Always define AMTAR for backward compatibility.  Yes, it's still used
 # in the wild :-(  We should find a proper way to deprecate it ...
 AMTAR='$${TAR-tar}'
@@ -2757,7 +2712,6 @@ END
   fi
 fi
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
 $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
     # Check whether --enable-maintainer-mode was given.
@@ -2798,7 +2752,7 @@ if test -z "$CXX"; then
     CXX=$CCC
   else
     if test -n "$ac_tool_prefix"; then
-  for ac_prog in xlC_r xlC FCCpx FCC sxc++ CC icpc g++
+  for ac_prog in CC icpc g++
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -2842,7 +2796,7 @@ fi
 fi
 if test -z "$CXX"; then
   ac_ct_CXX=$CXX
-  for ac_prog in xlC_r xlC FCCpx FCC sxc++ CC icpc g++
+  for ac_prog in CC icpc g++
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3491,7 +3445,7 @@ ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 if test -n "$ac_tool_prefix"; then
-  for ac_prog in xlf90_r xlf90 frtpx frt sxf90 ftn ifort gfortran
+  for ac_prog in ftn ifort gfortran
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -3535,7 +3489,7 @@ fi
 fi
 if test -z "$FC"; then
   ac_ct_FC=$FC
-  for ac_prog in xlf90_r xlf90 frtpx frt sxf90 ftn ifort gfortran
+  for ac_prog in ftn ifort gfortran
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -5393,7 +5347,7 @@ main ()
      int op = , eax, edx;
      FILE *f;
       /* Opcodes for xgetbv */
-      __asm__ __volatile__ (".byte 0x0f, 0x01, 0xd0"
+      __asm__(".byte 0x0f, 0x01, 0xd0"
         : "=a" (eax), "=d" (edx)
         : "c" (op));
      f = fopen("conftest_xgetbv", "w"); if (!f) return 1;
@@ -6022,7 +5976,7 @@ main ()
      int op = 0x00000000, eax, edx;
      FILE *f;
       /* Opcodes for xgetbv */
-      __asm__ __volatile__ (".byte 0x0f, 0x01, 0xd0"
+      __asm__(".byte 0x0f, 0x01, 0xd0"
         : "=a" (eax), "=d" (edx)
         : "c" (op));
      f = fopen("conftest_xgetbv", "w"); if (!f) return 1;
@@ -6296,215 +6250,6 @@ $as_echo "$ax_cv_cxx_compiler_vendor" >&6; }
 
 fi
 
-# SIMD optimization specific to exaFMM
-# Check whether --enable-simd was given.
-if test "${enable_simd+set}" = set; then :
-  enableval=$enable_simd; use_simd=$enableval
-else
-  use_simd=yes
-fi
-
-if test "$use_simd" = "no"; then
-
-$as_echo "#define EXAFMM_USE_SIMD 0" >>confdefs.h
-
-fi
- if test "$use_simd" = "yes"; then
-  EXAFMM_USE_SIMD_TRUE=
-  EXAFMM_USE_SIMD_FALSE='#'
-else
-  EXAFMM_USE_SIMD_TRUE='#'
-  EXAFMM_USE_SIMD_FALSE=
-fi
-
-
-# MIC
-# Check whether --enable-mic was given.
-if test "${enable_mic+set}" = set; then :
-  enableval=$enable_mic; have_mic=$enableval
-else
-  have_mic=no
-fi
-
-if test "$have_mic" = "yes"; then
-
-$as_echo "#define EXAFMM_HAVE_MIC 1" >>confdefs.h
-
-   if test "$PRECISION" != "d" -a "$PRECISION" != "s"; then
-      as_fn_error $? "MIC requires single or double precision" "$LINENO" 5
-   fi
-   MIC_CXXFLAGS=-mmic
-fi
- if test "$have_mic" = "yes"; then
-  EXAFMM_HAVE_MIC_TRUE=
-  EXAFMM_HAVE_MIC_FALSE='#'
-else
-  EXAFMM_HAVE_MIC_TRUE='#'
-  EXAFMM_HAVE_MIC_FALSE=
-fi
-
-
-
-# Neon
-# Check whether --enable-neon was given.
-if test "${enable_neon+set}" = set; then :
-  enableval=$enable_neon; have_neon=$enableval
-else
-  have_n\
-eon=no
-fi
-
-if test "$have_neon" = "yes"; then
-
-$as_echo "#define EXAFMM_HAVE_NEON 1" >>confdefs.h
-
-   if test "$PRECISION" != "s"; then
-      as_fn_error $? "NEON requires single precision" "$LINENO" 5
-   fi
-   NEON_CXXFLAGS=-mneon
-fi
- if test "$have_neon" = "yes"; then
-  EXAFMM_HAVE_NEON_TRUE=
-  EXAFMM_HAVE_NEON_FALSE='#'
-else
-  EXAFMM_HAVE_NEON_TRUE='#'
-  EXAFMM_HAVE_NEON_FALSE=
-fi
-
-
-
-# Weights for partitioning
-# Check whether --enable-weight was given.
-if test "${enable_weight+set}" = set; then :
-  enableval=$enable_weight; use_weight=$enableval
-else
-  use_weight=no
-fi
-
-if test "$use_weight" = "yes"; then
-
-$as_echo "#define EXAFMM_USE_WEIGHT 1" >>confdefs.h
-
-fi
- if test "$use_weight" = "yes"; then
-  EXAFMM_USE_WEIGHT_TRUE=
-  EXAFMM_USE_WEIGHT_FALSE='#'
-else
-  EXAFMM_USE_WEIGHT_TRUE='#'
-  EXAFMM_USE_WEIGHT_FALSE=
-fi
-
-
-# Kahan summation
-# Check whether --enable-kahan was given.
-if test "${enable_kahan+set}" = set; then :
-  enableval=$enable_kahan; use_kahan=$enableval
-else
-  use_kahan=no
-fi
-
-if test "$use_kahan" = "yes"; then
-
-$as_echo "#define EXAFMM_USE_KAHAN 1" >>confdefs.h
-
-fi
- if test "$use_kahan" = "yes"; then
-  EXAFMM_USE_KAHAN_TRUE=
-  EXAFMM_USE_KAHAN_FALSE='#'
-else
-  EXAFMM_USE_KAHAN_TRUE='#'
-  EXAFMM_USE_KAHAN_FALSE=
-fi
-
-
-# PAPI
-# Check whether --enable-papi was given.
-if test "${enable_papi+set}" = set; then :
-  enableval=$enable_papi; use_papi=$enableval
-else
-  use_papi=no
-fi
-
-if test "$use_papi" = "yes"; then
-
-$as_echo "#define EXAFMM_USE_PAPI 1" >>confdefs.h
-
-fi
- if test "$use_papi" = "yes"; then
-  EXAFMM_USE_PAPI_TRUE=
-  EXAFMM_USE_PAPI_FALSE='#'
-else
-  EXAFMM_USE_PAPI_TRUE='#'
-  EXAFMM_USE_PAPI_FALSE=
-fi
-
-
-# Trace
-# Check whether --enable-trace was given.
-if test "${enable_trace+set}" = set; then :
-  enableval=$enable_trace; use_trace=$enableval
-else
-  use_trace=no
-fi
-
-if test "$use_trace" = "yes"; then
-
-$as_echo "#define EXAFMM_USE_TRACE 1" >>confdefs.h
-
-fi
- if test "$use_trace" = "yes"; then
-  EXAFMM_USE_TRACE_TRUE=
-  EXAFMM_USE_TRACE_FALSE='#'
-else
-  EXAFMM_USE_TRACE_TRUE='#'
-  EXAFMM_USE_TRACE_FALSE=
-fi
-
-
-# Count number of M2L and P2P kernel calls
-# Check whether --enable-count-kernel was given.
-if test "${enable_count_kernel+set}" = set; then :
-  enableval=$enable_count_kernel; use_count_kernel=$enableval
-else
-  use_count_kernel=no
-fi
-
-if test "$use_count_kernel" = "yes"; then
-
-$as_echo "#define EXAFMM_COUNT_KERNEL 1" >>confdefs.h
-
-fi
- if test "$use_count_kernel" = "yes"; then
-  EXAFMM_COUNT_KERNEL_TRUE=
-  EXAFMM_COUNT_KERNEL_FALSE='#'
-else
-  EXAFMM_COUNT_KERNEL_TRUE='#'
-  EXAFMM_COUNT_KERNEL_FALSE=
-fi
-
-
-# Count interaction list
-# Check whether --enable-count-list was given.
-if test "${enable_count_list+set}" = set; then :
-  enableval=$enable_count_list; use_count_list=$enableval
-else
-  use_count_list=no
-fi
-
-if test "$use_count_list" = "yes"; then
-
-$as_echo "#define EXAFMM_COUNT_LIST 1" >>confdefs.h
-
-fi
- if test "$use_count_list" = "yes"; then
-  EXAFMM_COUNT_LIST_TRUE=
-  EXAFMM_COUNT_LIST_FALSE='#'
-else
-  EXAFMM_COUNT_LIST_TRUE='#'
-  EXAFMM_COUNT_LIST_FALSE=
-fi
-
-
 # Assertion
 # Check whether --enable-assert was given.
 if test "${enable_assert+set}" = set; then :
@@ -6677,6 +6422,28 @@ $as_echo "$ac_cv_path_SED" >&6; }
  SED="$ac_cv_path_SED"
   rm -f conftest.sed
 
+if ${CXXFLAGS+:} false; then :
+  case " $CXXFLAGS " in
+    *"  "*)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : CXXFLAGS already contains "; } >&5
+  (: CXXFLAGS already contains ) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+      ;;
+    *)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : CXXFLAGS=\"\$CXXFLAGS \""; } >&5
+  (: CXXFLAGS="$CXXFLAGS ") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+      CXXFLAGS="$CXXFLAGS "
+      ;;
+   esac
+else
+  CXXFLAGS=""
+fi
+
 
 
 
@@ -6765,8 +6532,6 @@ fi
     # Base flags
 
 
-
-
 for flag in         -O0         -g     ; do
   as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags_$ax_compiler_flags_test_$flag" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $flag" >&5
@@ -6800,36 +6565,26 @@ eval ac_res=\$$as_CACHEVAR
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-
-if ${ax_compiler_cxxflags+:} false; then :
-
-  case " $ax_compiler_cxxflags " in #(
-  *" $flag "*) :
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
+  if ${ax_compiler_cxxflags+:} false; then :
+  case " $ax_compiler_cxxflags " in
+    *" $flag "*)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
   (: ax_compiler_cxxflags already contains $flag) 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } ;; #(
-  *) :
-
-     as_fn_append ax_compiler_cxxflags " $flag"
-     { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
+  test $ac_status = 0; }
+      ;;
+    *)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }
-     ;;
-esac
-
+      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
+      ;;
+   esac
 else
-
-  ax_compiler_cxxflags=$flag
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-
+  ax_compiler_cxxflags="$flag"
 fi
 
 else
@@ -6841,8 +6596,6 @@ done
 
     # http://stackoverflow.com/questions/3375697/useful-gcc-flags-for-c
     # http://stackoverflow.com/questions/5088460/flags-to-enable-thorough-and-verbose-g-warnings
-
-
 
 
 for flag in          $ax_compiler_flags_test         "-check all"         "-debug all" 	"-diag-disable remark" 	-fmudflap 	-fno-strict-aliasing 	-fsanitize=address 	-fsanitize=leak 	-fstack-protector 	-ftrapuv 	-ftrapv 	-traceback 		-Wall 	-Warray-bounds         -Wbad-function-cast 		-Wcast-align 	-Wcast-qual 	-Wextra 	-Wfatal-errors 		-Wformat=2 	-Wformat-nonliteral 	-Wformat-security 	-Winit-self 	-Winline 	-Wmissing-format-attribute 	-Wmissing-include-dirs 	-Wmissing-noreturn         -Wnested-externs 	-Wno-missing-field-initializers 	-Wno-overloaded-virtual         -Wno-unused-local-typedefs 	-Wno-unused-parameter         -Wno-unused-variable 		-Wpointer-arith 	-Wredundant-decls 	-Wreturn-type 	-Wshadow 	-Wsign-compare 	-Wstrict-aliasing 	-Wstrict-overflow=5 	-Wstrict-prototype 		-Wswitch-enum 		-Wuninitialized 	-Wunreachable-code 	-Wunused-but-set-variable 	-Wwrite-strings     ; do
@@ -6878,36 +6631,26 @@ eval ac_res=\$$as_CACHEVAR
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-
-if ${ax_compiler_cxxflags+:} false; then :
-
-  case " $ax_compiler_cxxflags " in #(
-  *" $flag "*) :
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
+  if ${ax_compiler_cxxflags+:} false; then :
+  case " $ax_compiler_cxxflags " in
+    *" $flag "*)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
   (: ax_compiler_cxxflags already contains $flag) 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } ;; #(
-  *) :
-
-     as_fn_append ax_compiler_cxxflags " $flag"
-     { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
+  test $ac_status = 0; }
+      ;;
+    *)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }
-     ;;
-esac
-
+      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
+      ;;
+   esac
 else
-
-  ax_compiler_cxxflags=$flag
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-
+  ax_compiler_cxxflags="$flag"
 fi
 
 else
@@ -6926,8 +6669,6 @@ done
   -Wno-*=*) :
      ;; #(
   -Wno-*) :
-
-
 
 
 
@@ -6964,36 +6705,26 @@ eval ac_res=\$$as_CACHEVAR
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-
-if ${ax_compiler_cxxflags+:} false; then :
-
-  case " $ax_compiler_cxxflags " in #(
-  *" $flag "*) :
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
+  if ${ax_compiler_cxxflags+:} false; then :
+  case " $ax_compiler_cxxflags " in
+    *" $flag "*)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
   (: ax_compiler_cxxflags already contains $flag) 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } ;; #(
-  *) :
-
-     as_fn_append ax_compiler_cxxflags " $flag"
-     { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
+  test $ac_status = 0; }
+      ;;
+    *)
+      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }
-     ;;
-esac
-
+      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
+      ;;
+   esac
 else
-
-  ax_compiler_cxxflags=$flag
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-
+  ax_compiler_cxxflags="$flag"
 fi
 
 else
@@ -7030,36 +6761,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 $as_echo "$as_me: Vendor   : $ax_cv_cxx_compiler_vendor" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: CXX      : $CXX" >&5
 $as_echo "$as_me: CXX      : $CXX" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: CXXFLAGS : $COMPILER_CXXFLAGS" >&5
-$as_echo "$as_me: CXXFLAGS : $COMPILER_CXXFLAGS" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: FC       : $FC" >&5
 $as_echo "$as_me: FC       : $FC" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: FCFLAGS  : $COMPILER_FCFLAGS" >&5
-$as_echo "$as_me: FCFLAGS  : $COMPILER_FCFLAGS" >&6;}
-
- if test "$ax_cv_cxx_compiler_vendor" = "ibm"; then
-  EXAFMM_HAVE_BG_TRUE=
-  EXAFMM_HAVE_BG_FALSE='#'
-else
-  EXAFMM_HAVE_BG_TRUE='#'
-  EXAFMM_HAVE_BG_FALSE=
-fi
-
- if test "$ax_cv_cxx_compiler_vendor" = "fujitsu"; then
-  EXAFMM_HAVE_FX_TRUE=
-  EXAFMM_HAVE_FX_FALSE='#'
-else
-  EXAFMM_HAVE_FX_TRUE='#'
-  EXAFMM_HAVE_FX_FALSE=
-fi
-
- if test "$ax_cv_cxx_compiler_vendor" = "nec"; then
-  EXAFMM_HAVE_SX_TRUE=
-  EXAFMM_HAVE_SX_FALSE='#'
-else
-  EXAFMM_HAVE_SX_TRUE='#'
-  EXAFMM_HAVE_SX_FALSE=
-fi
 
  if test "$CXX" = "CC"; then
   EXAFMM_HAVE_CRAY_TRUE=
@@ -7247,60 +6950,12 @@ if test -z "${EXAFMM_SINGLE_TRUE}" && test -z "${EXAFMM_SINGLE_FALSE}"; then
   as_fn_error $? "conditional \"EXAFMM_SINGLE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${EXAFMM_USE_SIMD_TRUE}" && test -z "${EXAFMM_USE_SIMD_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_USE_SIMD\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_HAVE_MIC_TRUE}" && test -z "${EXAFMM_HAVE_MIC_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_HAVE_MIC\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_HAVE_NEON_TRUE}" && test -z "${EXAFMM_HAVE_NEON_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_HAVE_NEON\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_USE_WEIGHT_TRUE}" && test -z "${EXAFMM_USE_WEIGHT_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_USE_WEIGHT\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_USE_KAHAN_TRUE}" && test -z "${EXAFMM_USE_KAHAN_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_USE_KAHAN\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_USE_PAPI_TRUE}" && test -z "${EXAFMM_USE_PAPI_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_USE_PAPI\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_USE_TRACE_TRUE}" && test -z "${EXAFMM_USE_TRACE_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_USE_TRACE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_COUNT_KERNEL_TRUE}" && test -z "${EXAFMM_COUNT_KERNEL_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_COUNT_KERNEL\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_COUNT_LIST_TRUE}" && test -z "${EXAFMM_COUNT_LIST_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_COUNT_LIST\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${EXAFMM_ASSERT_TRUE}" && test -z "${EXAFMM_ASSERT_FALSE}"; then
   as_fn_error $? "conditional \"EXAFMM_ASSERT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXAFMM_DEBUG_TRUE}" && test -z "${EXAFMM_DEBUG_FALSE}"; then
   as_fn_error $? "conditional \"EXAFMM_DEBUG\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_HAVE_BG_TRUE}" && test -z "${EXAFMM_HAVE_BG_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_HAVE_BG\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_HAVE_FX_TRUE}" && test -z "${EXAFMM_HAVE_FX_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_HAVE_FX\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${EXAFMM_HAVE_SX_TRUE}" && test -z "${EXAFMM_HAVE_SX_FALSE}"; then
-  as_fn_error $? "conditional \"EXAFMM_HAVE_SX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXAFMM_HAVE_CRAY_TRUE}" && test -z "${EXAFMM_HAVE_CRAY_FALSE}"; then

@@ -12,92 +12,83 @@
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
-  Args args(argc, argv);                              // Argument parser
-  P = args.P;                                         // Order of expansions
-  theta = args.theta;                                 // Multipole acceptance criterion
-  ncrit = args.ncrit;                                 // Number of bodies per leaf cell
-  const int numBodies = args.numBodies;               // Number of bodies
-  const char * distribution = args.distribution;      // Type of distribution
+  Args args(argc, argv);
+  P = args.P;
+  theta = args.theta;
+  ncrit = args.ncrit;
+  const int numBodies = args.numBodies;
+  const char * distribution = args.distribution;
 
-  // Print arguments 
   if (args.verbose) {
-    printf("--- %-16s ------------\n", "FMM Parameter");
+    printf("--- %-20s --------\n", "FMM Parameter");
     args.print(20);
   }
 
-  // FMM
-  int repeat = 10;                                    // Number of runs for time regression test
-  Verify verify;                                      // Initialize verify object
-  verify.verbose = args.verbose;                      // Set verbosity
-  bool isAccuracy = true;                             // Flag for checking accuracy
-  double totalFMM = 0;                                // Initialize total FMM time
-  for (int t=0; t<repeat; t++) {                      // Loop over identical runs for time regression
-    printf("--- %-16s ------------\n", "FMM Profiling");
-    printf("--- %-17s %d ---------\n", "Time average loop", t);
-    // Initialize bodies
-    start("Initialize bodies");                       //  Start timer
-    Bodies bodies = initBodies(numBodies, distribution); //  Initialize bodies
-    stop("Initialize bodies");                        //  Stop timer
+  int repeat = 10;
+  Verify verify(args.path);
+  verify.verbose = args.verbose;
+  bool isAccuracy = true;
+  double totalFMM = 0;
+  for (int t=0; t<repeat; t++) {
+    printf("--- %-20s --------\n", "FMM Profiling");
+    printf("--- %-17s %2d --------\n", "Time average loop", t);
+    start("Initialize bodies");
+    Bodies bodies = initBodies(numBodies, distribution);
+    stop("Initialize bodies");
+    start("Total FMM");
+    start("Build tree");
+    Cells cells = buildTree(bodies);
+    stop("Build tree");
+    start("P2M & M2M");
+    upwardPass(cells);
+    stop("P2M & M2M");
+    start("M2L & P2P");
+    horizontalPass(cells, cells);
+    stop("M2L & P2P");
+    start("L2L & L2P");
+    downwardPass(cells);
+    stop("L2L & L2P");
+    totalFMM += stop("Total FMM");
 
-    start("Total FMM");                               //  Start FMM timer
-    // Build tree
-    start("Build tree");                              //  Start timer
-    Cells cells = buildTree(bodies);                  //  Build tree
-    stop("Build tree");                               //  Stop timer
+    if (isAccuracy) {
+      start("Direct N-Body");
+      const int numTargets = 10;
+      Bodies jbodies = bodies;
+      if (numBodies > numTargets) {
+        int stride = bodies.size() / numTargets;
+        for (int b=0; b<numTargets; b++) {
+          bodies[b] = bodies[b*stride];
+        }
+        bodies.resize(numTargets);
+      }
+      Bodies bodies2 = bodies;
+      for (size_t b=0; b<bodies.size(); b++) {
+        bodies[b].p = 0;
+        bodies[b].F = 0;
+      }
+      direct(bodies, jbodies);
+      stop("Direct N-Body");
 
-    // FMM evaluation
-    start("P2M & M2M");                               //  Start timer
-    upwardPass(cells);                                //  Upward pass for P2M, M2M
-    stop("P2M & M2M");                                //  Stop timer
-    start("M2L & P2P");                               //  Start timer
-    horizontalPass(cells, cells);                     //  Horizontal pass for M2L, P2P
-    stop("M2L & P2P");                                //  Stop timer
-    start("L2L & L2P");                               //  Start timer
-    downwardPass(cells);                              //  Downward pass for L2L, L2P
-    stop("L2L & L2P");                                //  Stop timer
-    totalFMM += stop("Total FMM");                    //  Stop FMM timer
-
-    if (isAccuracy) {                                 //  If perform accuracy regression test
-      // Direct N-Body
-      start("Direct N-Body");                         //   Start timer
-      const int numTargets = 10;                      //   Number of targets for checking answer
-      Bodies jbodies = bodies;                        //   Save bodies in jbodies
-      if (numBodies > numTargets) {                   //   If bodies are more than sampled targets
-        int stride = bodies.size() / numTargets;      //    Stride of sampling
-        for (int b=0; b<numTargets; b++) {            //    Loop over target samples
-          bodies[b] = bodies[b*stride];               //     Sample targets
-        }                                             //    End loop over target samples
-        bodies.resize(numTargets);                    //    Resize bodies
-      }                                               //   End if
-      Bodies bodies2 = bodies;                        //   Backup bodies
-      for (size_t b=0; b<bodies.size(); b++) {        //   Loop over bodies
-        bodies[b].p = 0;                              //    Clear potential
-        bodies[b].F = 0;                              //    Clear force
-      }                                               //   End loop over bodies
-      direct(bodies, jbodies);                        //   Direct N-Body
-      stop("Direct N-Body");                          //   Stop timer
-
-      // Verify result
       double pDif = verify.getDifScalar(bodies, bodies2);
       double pNrm = verify.getNrmScalar(bodies2);
       double pRel = std::sqrt(pDif/pNrm);
       double FDif = verify.getDifVector(bodies, bodies2);
       double FNrm = verify.getNrmVector(bodies2);
       double FRel = std::sqrt(FDif/FNrm);
-      printf("--- %-16s ------------\n", "FMM vs. direct");
-      printf("%-20s : %8.5e s\n","Rel. L2 Error (p)", pRel); //   Print potential error
-      printf("%-20s : %8.5e s\n","Rel. L2 Error (F)", FRel); //   Print force error
-      isAccuracy = false;                                    //   Set accuracy check flag to false
-      printf("--- %-19s ---------\n", "Accuracy regression");
-      bool pass = verify.accuracyRegression(args.getKey(), pRel, FRel); //   Accuracy regression test
-      if (pass) std::cout << "passed accuracy regression" << std::endl;
+      printf("--- %-20s --------\n", "FMM vs. direct");
+      printf("%-20s : %7.4e\n","Rel. L2 Error (p)", pRel);
+      printf("%-20s : %7.4e\n","Rel. L2 Error (F)", FRel);
+      isAccuracy = false;
+      printf("--- %-20s --------\n", "Accuracy regression");
+      bool pass = verify.accuracyRegression(args.getKey(), pRel, FRel);
+      if (pass) printf("Passed accuracy regression\n");
       else abort();
-      if (args.accuracy) std::exit(0);                //   Finish execution if only needs accuracy regression
-    }                                                 //  End if perform accuracy regression test
-  }                                                   // End loop over identical runs for time regression
-  double averageFMM = totalFMM / repeat;              // Average FMM time
-  bool pass = verify.timeRegression(args.getKey(), averageFMM);         // Time regression test
-  if (pass) std::cout << "passed time regression" << std::endl;
+      if (args.accuracy) std::exit(0);
+    }
+  }
+  double averageFMM = totalFMM / repeat;
+  bool pass = verify.timeRegression(args.getKey(), averageFMM);
+  if (pass) printf("Passed time regression\n");
   else abort();
   return 0;
 }
