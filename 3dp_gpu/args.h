@@ -15,6 +15,7 @@ namespace exafmm {
     {"distribution", required_argument, 0, 'd'},
     {"help",         no_argument,       0, 'h'},
     {"numBodies",    required_argument, 0, 'n'},
+    {"path",         required_argument, 0, 'p'},
     {"P",            required_argument, 0, 'P'},
     {"theta",        required_argument, 0, 't'},
     {"verbose",      no_argument,       0, 'v'},
@@ -28,6 +29,7 @@ namespace exafmm {
     int ncrit;                                  //!< Number of bodies per leaf cell
     const char * distribution;                  //!< Body Distribution
     int numBodies;                              //!< Number of bodies
+    const char * path;                          //!< Path to save files
     int P;                                      //!< Order of expansions
     double theta;                               //!< Multipole acceptance criterion
     int verbose;                                //!< Verbose mode
@@ -43,6 +45,7 @@ namespace exafmm {
               " --distribution (-d) [c/l/o/p/s] : lattice, cube, sphere, octant, plummer (%s)\n"
               " --help (-h)                     : Show this help document\n"
               " --numBodies (-n)                : Number of bodies (%d)\n"
+              " --path (-p)                     : Path to save files (%s)\n"
               " --P (-P) not working            : Order of expansion (%d)\n"
               " --theta (-t)                    : Multipole acceptance criterion (%f)\n"
               " --verbose (-v)                  : Print information to screen (%d)\n",
@@ -51,6 +54,7 @@ namespace exafmm {
               ncrit,
               distribution,
               numBodies,
+              path,
               P,
               theta,
               verbose);
@@ -93,6 +97,7 @@ namespace exafmm {
         ncrit(64),
         distribution("cube"),
         numBodies(10000),
+        path("./"),
         P(10),
         theta(.4),
         verbose(0)
@@ -117,6 +122,9 @@ namespace exafmm {
             abort();
           case 'n':
             numBodies = atoi(optarg);
+            break;
+          case 'p':
+            path = optarg;
             break;
           case 'P':
             P = atoi(optarg);
@@ -156,6 +164,8 @@ namespace exafmm {
                   << "distribution" << " : " << distribution << std::endl
                   << std::setw(stringLength)
                   << "numBodies" << " : " << numBodies << std::endl
+                  << std::setw(stringLength)
+                  << "path" << " : " << path << std::endl
                   << std::setw(stringLength)
                   << "P" << " : " << P << std::endl
                   << std::setw(stringLength)

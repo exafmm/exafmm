@@ -32,7 +32,7 @@ int main(int argc, char ** argv) {
   }
 
   int repeat = 10;
-  Verify verify;
+  Verify verify(args.path);
   verify.verbose = args.verbose;
   bool isAccuracy = true;
   double totalFMM = 0;
