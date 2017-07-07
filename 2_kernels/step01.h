@@ -1,6 +1,6 @@
 #ifndef kernel_h
 #define kernel_h
-#include "exafmm.h"
+#include "exafmm2d.h"
 
 namespace exafmm {
   //!< P2P kernel between cells Ci and Cj
