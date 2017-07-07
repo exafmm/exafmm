@@ -3,18 +3,18 @@ import os
 import subprocess
 
 # the range of each parameter
-param_range = { 'n': ['2', '10', '100', '1000', '10000', '100000', '1000000', '10000000'],
-                'P': ['4', '10', '20', '30', '40'],
+param_range = { 'n': ['2', '10', '100', '1000', '10000', '100000', '1000000'],
+                'P': ['5', '10', '20', '30', '40'],
                 't': ['0.5', '0.4', '0.3', '0.2'],
                 'd': ['c', 's', 'o', 'p'] }
 
 # the parameters of each test
-test_params = { 'laplace_kernel': 'P',
+test_params = { 'kernel': 'P',
                 'tree': 'nd',
                 'list': 'ntd',
-                'laplace': 'nPtd' }
+                'fmm': 'nPtd' }
 
-exedir_list = ['2d', '3d', '3dp']
+exedir_list = ['2d', '3d', '3dp', '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
 logfile = open('nightly.log', 'w')
 
 # loop over each directory
