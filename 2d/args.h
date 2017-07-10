@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include "print.h"
 #include <getopt.h>
 #include <iostream>
 #include <iomanip>
@@ -100,7 +101,7 @@ namespace exafmm {
         path("./"),
         P(10),
         theta(.4),
-        verbose(0)
+        verbose(1)
     {
       while (1) {
         int option_index;
@@ -154,25 +155,16 @@ namespace exafmm {
     }
 
     //! Print formatted output for arguments
-    void print(int stringLength) {
+    void show() {
       if (verbose) {
-        std::cout << std::setw(stringLength) << std::fixed << std::left
-                  << "accuracy" << " : " << accuracy << std::endl
-                  << std::setw(stringLength)
-                  << "ncrit" << " : " << ncrit << std::endl
-                  << std::setw(stringLength)
-                  << "distribution" << " : " << distribution << std::endl
-                  << std::setw(stringLength)
-                  << "numBodies" << " : " << numBodies << std::endl
-                  << std::setw(stringLength)
-                  << "path" << " : " << path << std::endl
-                  << std::setw(stringLength)
-                  << "P" << " : " << P << std::endl
-                  << std::setw(stringLength)
-                  << "theta" << " : " << theta << std::endl
-                  << std::setw(stringLength)
-                  << "verbose" << " : " << verbose << std::endl
-                  << std::setw(stringLength);
+        print("accuracy", accuracy);
+        print("ncrit", ncrit);
+        print("distribution", distribution);
+        print("numBodies", numBodies);
+        print("path", path);
+        print("P", P);
+        print("theta", theta);
+        print("verbose", verbose);
       }
     }
   };

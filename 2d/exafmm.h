@@ -8,7 +8,13 @@
 
 namespace exafmm {
   //! Basic type definitions
-  typedef double real_t;                                        //!< Floating point type
+#if EXAFMM_SINGLE
+  typedef float real_t;                                         //!< Floating point type is single precision
+  const real_t EPS = 1e-8f;                                     //!< Single precision epsilon
+#else
+  typedef double real_t;                                        //!< Floating point type is double precision
+  const real_t EPS = 1e-16;                                     //!< Double precision epsilon
+#endif
   typedef std::complex<real_t> complex_t;                       //!< Complex type
   typedef vec<2,real_t> vec2;                                   //!< Vector of 2 real_t types
 

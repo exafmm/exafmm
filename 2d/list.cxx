@@ -23,9 +23,9 @@ int main(int argc, char ** argv) {
   test::evaluate(cells);
   test::downwardPass(&cells[0]);
 
-  printf("%-20s : %i\n", "Num of Bodies", numBodies);
-  printf("--- %-18s ------------\n", "Checking potential");
+  print("numBodies", numBodies);
+  print("bodies[0].p", bodies[0].p);
   for (size_t b=0; b<bodies.size(); b++) assert(numBodies == bodies[b].p);
-  printf("--- %-18s ------------\n", "Assertion Passed!");
+  print("Assertion passed");
   return 0;
 }
