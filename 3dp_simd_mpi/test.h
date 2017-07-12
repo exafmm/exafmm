@@ -46,7 +46,8 @@ namespace exafmm {
   }
 
   void horizontalPass(Cell * Ci, Cell * Cj) {
-    vec3 dX = Ci->X - Cj->X;
+    vec3 dX;
+    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
     real_t R2 = norm(dX) * THETA * THETA;
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
@@ -60,6 +61,55 @@ namespace exafmm {
       for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {
         horizontalPass(Ci, cj);
       }
+    }
+  }
+
+  //! Horizontal pass for periodic images
+  void periodic(Cell * Ci0, Cell * Cj0) {
+    Cells pcells(27);
+    for (size_t c=0; c<pcells.size(); c++) {
+      pcells[c].M.resize(NTERM, 0.0);
+      pcells[c].L.resize(NTERM, 0.0);
+    }
+    Cell * Ci = &pcells.back();
+    *Ci = *Cj0;
+    Ci->CHILD = &pcells[0];
+    Ci->NCHILD = 26;
+    for (int level=0; level<IMAGES-1; level++) {
+      for (int ix=-1; ix<=1; ix++) {
+        for (int iy=-1; iy<=1; iy++) {
+          for (int iz=-1; iz<=1; iz++) {
+            if (ix != 0 || iy != 0 || iz != 0) {
+              for (int cx=-1; cx<=1; cx++) {
+                for (int cy=-1; cy<=1; cy++) {
+                  for (int cz=-1; cz<=1; cz++) {
+                    IX[0] = ix * 3 + cx;
+                    IX[1] = iy * 3 + cy;
+                    IX[2] = iz * 3 + cz;
+                    M2L(Ci0, Ci);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      Cell * Cj = &pcells[0];
+      for (int ix=-1; ix<=1; ix++) {
+        for (int iy=-1; iy<=1; iy++) {
+          for (int iz=-1; iz<=1; iz++) {
+            if (ix != 0 || iy != 0 || iz != 0) {
+              Cj->X[0] = Ci->X[0] + ix * CYCLE;
+              Cj->X[1] = Ci->X[1] + iy * CYCLE;
+              Cj->X[2] = Ci->X[2] + iz * CYCLE;
+              Cj->M = Ci->M;
+              Cj++;
+            }
+          }
+        }
+      }
+      M2M(Ci);
+      CYCLE *= 3;
     }
   }
 
