@@ -8,6 +8,7 @@ using namespace exafmm;
 int main(int argc, char ** argv) {
   Args args(argc, argv);
   ncrit = args.ncrit;
+  verbose = args.verbose;
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
 

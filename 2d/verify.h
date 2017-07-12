@@ -1,23 +1,15 @@
 #ifndef verify_h
 #define verify_h
 #include <fstream>
-#include <map>
 #include "exafmm.h"
 
 namespace exafmm {
   class Verify {
-    typedef std::map<uint64_t,double> Record;
-    typedef Record::iterator R_iter;
-
   private:
     const char * path;
 
   public:
-    bool verbose;
-    double average, average2;
-
-    Verify() : path("./"), average(0), average2(0) {}
-    Verify(const char * _path) : path(_path), average(0), average2(0) {}
+    Verify(const char * _path="./") : path(_path) {}
 
     double getSumScalar(const Bodies & bodies) {
       double v = 0;

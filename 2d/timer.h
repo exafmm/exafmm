@@ -5,8 +5,8 @@
 #include <sys/time.h>
 
 namespace exafmm {
-  static timeval t;
-  static std::map<std::string,timeval> timer;
+  timeval t;
+  std::map<std::string,timeval> timer;
 
   void start(std::string event) {
     gettimeofday(&t, NULL);

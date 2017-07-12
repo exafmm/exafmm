@@ -6,7 +6,7 @@ using namespace exafmm;
 int main(int argc, char ** argv) {
   Args args(argc, argv);
   P = args.P;
-  Verify verify;
+  verbose = args.verbose;
 
   //! P2M
   Bodies jbodies(1);
@@ -74,6 +74,7 @@ int main(int argc, char ** argv) {
   P2P(Ci, Cj);
 
   //! Verify results
+  Verify verify;
   double pDif = verify.getDifScalar(bodies, bodies2);
   double pNrm = verify.getNrmScalar(bodies2);
   double pRel = std::sqrt(pDif/pNrm);

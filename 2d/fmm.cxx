@@ -16,6 +16,7 @@ int main(int argc, char ** argv) {
   P = args.P;
   theta = args.theta;
   ncrit = args.ncrit;
+  verbose = args.verbose;
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
 
@@ -61,7 +62,6 @@ int main(int argc, char ** argv) {
   stop("Direct N-Body");
 
   Verify verify(args.path);
-  verify.verbose = args.verbose;
   double pDif = verify.getDifScalar(bodies, bodies2);
   double pNrm = verify.getNrmScalar(bodies2);
   double pRel = std::sqrt(pDif/pNrm);
