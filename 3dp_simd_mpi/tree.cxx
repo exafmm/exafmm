@@ -8,6 +8,7 @@ using namespace exafmm;
 int main(int argc, char ** argv) {
   Args args(argc, argv);
   ncrit = args.ncrit;
+  verbose = args.verbose;
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
 
@@ -17,9 +18,9 @@ int main(int argc, char ** argv) {
   Cells cells = buildTree(bodies);
   test::upwardPass(&cells[0]);
 
-  printf("%-20s : %i\n", "Num of Bodies", numBodies);
-  printf("--- %-18s ------------\n", "Checking monopole");
+  print("numBodies", numBodies);
+  print("cells[0].M[0]", cells[0].M[0]);
   assert(numBodies == std::real(cells[0].M[0]));
-  printf("--- %-18s ------------\n", "Assertion Passed!");
+  print("Assertion passed");
   return 0;
 }
