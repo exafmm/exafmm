@@ -27,7 +27,7 @@ namespace exafmm {
   //! Recursive call to dual tree traversal for list construction
   void getList(Cell * Ci, Cell * Cj) {
     vec2 dX = Ci->X - Cj->X;
-    real_t R2 = norm(dX) * theta * theta;
+    real_t R2 = norm(dX) * THETA * THETA;
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       Ci->listM2L.push_back(Cj);
     } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {

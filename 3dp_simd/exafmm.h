@@ -49,11 +49,11 @@ namespace exafmm {
   //! Global variables
   int P;                                        //!< Order of expansions
   int NTERM;                                    //!< Number of coefficients
-  int ncrit;                                    //!< Number of bodies per leaf cell
-  int images;                                   //!< Number of periodic image sublevels
-  int iX[3];                                    //!< 3-D periodic index
-  real_t cycle;                                 //!< Cycle of periodic boundary condition
-  real_t theta;                                 //!< Multipole acceptance criterion
-#pragma omp threadprivate(iX)                   //!< Make global variables private
+  int NCRIT;                                    //!< Number of bodies per leaf cell
+  int IMAGES;                                   //!< Number of periodic image sublevels
+  int IX[3];                                    //!< 3-D periodic index
+  real_t CYCLE;                                 //!< Cycle of periodic boundary condition
+  real_t THETA;                                 //!< Multipole acceptance criterion
+#pragma omp threadprivate(IX)                   //!< Make global variables private
 }
 #endif

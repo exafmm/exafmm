@@ -47,7 +47,7 @@ namespace exafmm {
   //! Global variables
   int P;                                        //!< Order of expansions
   int NTERM;                                    //!< Number of coefficients
-  int ncrit;                                    //!< Number of bodies per leaf cell
-  real_t theta;                                 //!< Multipole acceptance criterion
+  int NCRIT;                                    //!< Number of bodies per leaf cell
+  real_t THETA;                                 //!< Multipole acceptance criterion
 }
 #endif

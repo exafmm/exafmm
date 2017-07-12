@@ -5,12 +5,12 @@
 #include <iostream>
 
 namespace exafmm {
-  bool verbose = true;                          //!< Print to screen
+  bool VERBOSE = true;                          //!< Print to screen
   static const int stringLength = 20;           //!< Length of formatted string
   static const int decimal = 7;                 //!< Decimal precision
 
   void print(std::string s) {
-    if (verbose) {
+    if (VERBOSE) {
       s += " ";
       std::cout << "--- " << std::setw(stringLength) << std::left
                 << std::setfill('-') << s << std::setw(decimal+1) << "-"
@@ -20,7 +20,7 @@ namespace exafmm {
 
   template<typename T>
   void print(std::string s, T v, bool fixed=true) {
-    if (verbose) {
+    if (VERBOSE) {
       std::cout << std::setw(stringLength) << std::left << s << " : ";
       if(fixed)
         std::cout << std::setprecision(decimal) << std::fixed;

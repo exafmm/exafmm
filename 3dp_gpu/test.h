@@ -2,12 +2,7 @@
 #define test_h
 #include "exafmm.h"
 
-namespace test {
-  using exafmm::Cell;
-  using exafmm::Body;
-  using exafmm::Cells;
-  using exafmm::Cells;
-
+namespace exafmm {
   void P2M(Cell * C) {
     for (Body * B=C->BODY; B!=C->BODY+C->NBODY; ++B) C->M[0] += B->q;
   }
@@ -42,32 +37,38 @@ namespace test {
 
   void upwardPass(Cell * Ci) {
     for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; ++Cj) {
-      test::upwardPass(Cj);
+      upwardPass(Cj);
     }
     Ci->M.resize(1, 0.0);
     Ci->L.resize(1, 0.0);
-    if (Ci->NCHILD==0) test::P2M(Ci);
-    test::M2M(Ci);
+    if (Ci->NCHILD==0) P2M(Ci);
+    M2M(Ci);
+  }
+
+  void horizontalPass(Cell * Ci, Cell * Cj) {
+    vec3 dX = Ci->X - Cj->X;
+    real_t R2 = norm(dX) * THETA * THETA;
+    if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
+      M2L(Ci, Cj);
+    } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {
+      P2P(Ci, Cj);
+    } else if (Cj->NCHILD == 0 || (Ci->R >= Cj->R && Ci->NCHILD != 0)) {
+      for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {
+        horizontalPass(ci, Cj);
+      }
+    } else {
+      for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {
+        horizontalPass(Ci, cj);
+      }
+    }
   }
 
   void downwardPass(Cell * Cj) {
-    test::L2L(Cj);
-    if (Cj->NCHILD==0) test::L2P(Cj);
+    L2L(Cj);
+    if (Cj->NCHILD==0) L2P(Cj);
     for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; ++Ci) {
-      test::downwardPass(Ci);
+      downwardPass(Ci);
     }
   }
-#if EXAFMM_LAZY
-  void evaluate(Cells & cells) {
-    for (size_t i=0; i<cells.size(); i++) {
-      for (size_t j=0; j<cells[i].listM2L.size(); j++) {
-        test::M2L(&cells[i], cells[i].listM2L[j]);
-      }
-      for (size_t j=0; j<cells[i].listP2P.size(); j++) {
-        test::P2P(&cells[i], cells[i].listP2P[j]);
-      }
-    }
-  }
-#endif
 }
 #endif

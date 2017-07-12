@@ -27,7 +27,7 @@ namespace exafmm {
   //! Recursive call to dual tree traversal for horizontal pass
   void horizontalPass(Cell * Ci, Cell * Cj) {
     vec3 dX = Ci->X - Cj->X;
-    real_t R2 = norm(dX) * theta * theta;
+    real_t R2 = norm(dX) * THETA * THETA;
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {

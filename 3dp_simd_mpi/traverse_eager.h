@@ -27,8 +27,8 @@ namespace exafmm {
   //! Recursive call to dual tree traversal for horizontal pass
   void horizontalPass(Cell * Ci, Cell * Cj) {
     vec3 dX;
-    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - iX[d] * cycle;
-    real_t R2 = norm(dX) * theta * theta;
+    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
+    real_t R2 = norm(dX) * THETA * THETA;
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {
@@ -55,7 +55,7 @@ namespace exafmm {
     *Ci = *Cj0;
     Ci->CHILD = &pcells[0];
     Ci->NCHILD = 26;
-    for (int level=0; level<images-1; level++) {
+    for (int level=0; level<IMAGES-1; level++) {
       for (int ix=-1; ix<=1; ix++) {
         for (int iy=-1; iy<=1; iy++) {
           for (int iz=-1; iz<=1; iz++) {
@@ -63,9 +63,9 @@ namespace exafmm {
               for (int cx=-1; cx<=1; cx++) {
                 for (int cy=-1; cy<=1; cy++) {
                   for (int cz=-1; cz<=1; cz++) {
-                    iX[0] = ix * 3 + cx;
-                    iX[1] = iy * 3 + cy;
-                    iX[2] = iz * 3 + cz;
+                    IX[0] = ix * 3 + cx;
+                    IX[1] = iy * 3 + cy;
+                    IX[2] = iz * 3 + cz;
                     M2L(Ci0, Ci);
                   }
                 }
@@ -79,9 +79,9 @@ namespace exafmm {
         for (int iy=-1; iy<=1; iy++) {
           for (int iz=-1; iz<=1; iz++) {
             if (ix != 0 || iy != 0 || iz != 0) {
-              Cj->X[0] = Ci->X[0] + ix * cycle;
-              Cj->X[1] = Ci->X[1] + iy * cycle;
-              Cj->X[2] = Ci->X[2] + iz * cycle;
+              Cj->X[0] = Ci->X[0] + ix * CYCLE;
+              Cj->X[1] = Ci->X[1] + iy * CYCLE;
+              Cj->X[2] = Ci->X[2] + iz * CYCLE;
               Cj->M = Ci->M;
               Cj++;
             }
@@ -89,25 +89,25 @@ namespace exafmm {
         }
       }
       M2M(Ci);
-      cycle *= 3;
+      CYCLE *= 3;
     }
   }
 
   //! Horizontal pass interface
   void horizontalPass(Cells & icells, Cells & jcells) {
-    if (images == 0) {
+    if (IMAGES == 0) {
       horizontalPass(&icells[0], &jcells[0]);
     } else {
-      for (iX[0]=-1; iX[0]<=1; iX[0]++) {
-        for (iX[1]=-1; iX[1]<=1; iX[1]++) {
-          for (iX[2]=-1; iX[2]<=1; iX[2]++) {
+      for (IX[0]=-1; IX[0]<=1; IX[0]++) {
+        for (IX[1]=-1; IX[1]<=1; IX[1]++) {
+          for (IX[2]=-1; IX[2]<=1; IX[2]++) {
             horizontalPass(&icells[0], &jcells[0]);
           }
         }
       }
-      real_t saveCycle = cycle;
+      real_t saveCycle = CYCLE;
       periodic(&icells[0], &jcells[0]);
-      cycle = saveCycle;
+      CYCLE = saveCycle;
     }
   }
 
@@ -139,16 +139,16 @@ namespace exafmm {
     Cj->BODY = &jbodies[0];
     Cj->NBODY = jbodies.size();
     int prange = 0;
-    for (int i=0; i<images; i++) {
+    for (int i=0; i<IMAGES; i++) {
       prange += int(powf(3.,i));
     }
 #pragma omp parallel for collapse(3)
     for (int ix=-prange; ix<=prange; ix++) {
       for (int iy=-prange; iy<=prange; iy++) {
         for (int iz=-prange; iz<=prange; iz++) {
-          iX[0] = ix;
-          iX[1] = iy;
-          iX[2] = iz;
+          IX[0] = ix;
+          IX[1] = iy;
+          IX[2] = iz;
           P2P(Ci, Cj);
         }
       }

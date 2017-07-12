@@ -14,9 +14,9 @@ using namespace exafmm;
 int main(int argc, char ** argv) {
   Args args(argc, argv);
   P = args.P;
-  theta = args.theta;
-  ncrit = args.ncrit;
-  verbose = args.verbose;
+  THETA = args.theta;
+  NCRIT = args.ncrit;
+  VERBOSE = args.verbose;
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
 

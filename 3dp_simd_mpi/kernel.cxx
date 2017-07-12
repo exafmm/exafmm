@@ -6,7 +6,7 @@ using namespace exafmm;
 int main(int argc, char ** argv) {
   Args args(argc, argv);
   P = args.P;
-  verbose = args.verbose;
+  VERBOSE = args.verbose;
   initKernel();
 
   //! P2M

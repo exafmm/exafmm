@@ -21,7 +21,7 @@ Use all capital for
  - Macro variables
  - Environtment values
  - Makefile variables
- - Struct elements
+ - Global variables
 
 Start with capital for
  - Class & Struct names

@@ -103,7 +103,7 @@ DIST_COMMON = $(top_srcdir)/Makefile.am.include $(srcdir)/Makefile.in \
 # Use all possible debugging flags
 @EXAFMM_DEBUG_TRUE@am__append_11 = $(COMPILER_CXXFLAGS) -DEXAFMM_DEBUG
 @EXAFMM_DEBUG_TRUE@am__append_12 = $(COMPILER_FCFLAGS) -DEXAFMM_DEBUG
-bin_PROGRAMS = tree$(EXEEXT) list$(EXEEXT) kernel$(EXEEXT) \
+bin_PROGRAMS = build_tree$(EXEEXT) traverse$(EXEEXT) kernel$(EXEEXT) \
 	fmm$(EXEEXT)
 subdir = 3dp_simd_mpi
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -122,18 +122,18 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am_build_tree_OBJECTS = build_tree-build_tree.$(OBJEXT)
+build_tree_OBJECTS = $(am_build_tree_OBJECTS)
+build_tree_LDADD = $(LDADD)
 am_fmm_OBJECTS = fmm-fmm.$(OBJEXT)
 fmm_OBJECTS = $(am_fmm_OBJECTS)
 fmm_LDADD = $(LDADD)
 am_kernel_OBJECTS = kernel-kernel.$(OBJEXT)
 kernel_OBJECTS = $(am_kernel_OBJECTS)
 kernel_LDADD = $(LDADD)
-am_list_OBJECTS = list-list.$(OBJEXT)
-list_OBJECTS = $(am_list_OBJECTS)
-list_LDADD = $(LDADD)
-am_tree_OBJECTS = tree-tree.$(OBJEXT)
-tree_OBJECTS = $(am_tree_OBJECTS)
-tree_LDADD = $(LDADD)
+am_traverse_OBJECTS = traverse-traverse.$(OBJEXT)
+traverse_OBJECTS = $(am_traverse_OBJECTS)
+traverse_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -167,10 +167,10 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(fmm_SOURCES) $(kernel_SOURCES) $(list_SOURCES) \
-	$(tree_SOURCES)
-DIST_SOURCES = $(fmm_SOURCES) $(kernel_SOURCES) $(list_SOURCES) \
-	$(tree_SOURCES)
+SOURCES = $(build_tree_SOURCES) $(fmm_SOURCES) $(kernel_SOURCES) \
+	$(traverse_SOURCES)
+DIST_SOURCES = $(build_tree_SOURCES) $(fmm_SOURCES) $(kernel_SOURCES) \
+	$(traverse_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -560,10 +560,10 @@ AM_CPPFLAGS = $(am__append_5) $(am__append_8) $(SIMD_FLAGS) \
 @EXAFMM_HAVE_CRAY_TRUE@	$(am__append_4) $(am__append_7) \
 @EXAFMM_HAVE_CRAY_TRUE@	$(am__append_12)
 AM_MAKEFLAGS = -s
-tree_SOURCES = tree.cxx
-tree_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
-list_SOURCES = list.cxx
-list_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
+build_tree_SOURCES = build_tree.cxx
+build_tree_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
+traverse_SOURCES = traverse.cxx
+traverse_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
 kernel_SOURCES = kernel.cxx
 kernel_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_EAGER
 fmm_SOURCES = fmm.cxx
@@ -647,6 +647,10 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
+build_tree$(EXEEXT): $(build_tree_OBJECTS) $(build_tree_DEPENDENCIES) $(EXTRA_build_tree_DEPENDENCIES) 
+	@rm -f build_tree$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(build_tree_OBJECTS) $(build_tree_LDADD) $(LIBS)
+
 fmm$(EXEEXT): $(fmm_OBJECTS) $(fmm_DEPENDENCIES) $(EXTRA_fmm_DEPENDENCIES) 
 	@rm -f fmm$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(fmm_OBJECTS) $(fmm_LDADD) $(LIBS)
@@ -655,13 +659,9 @@ kernel$(EXEEXT): $(kernel_OBJECTS) $(kernel_DEPENDENCIES) $(EXTRA_kernel_DEPENDE
 	@rm -f kernel$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(kernel_OBJECTS) $(kernel_LDADD) $(LIBS)
 
-list$(EXEEXT): $(list_OBJECTS) $(list_DEPENDENCIES) $(EXTRA_list_DEPENDENCIES) 
-	@rm -f list$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(list_OBJECTS) $(list_LDADD) $(LIBS)
-
-tree$(EXEEXT): $(tree_OBJECTS) $(tree_DEPENDENCIES) $(EXTRA_tree_DEPENDENCIES) 
-	@rm -f tree$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tree_OBJECTS) $(tree_LDADD) $(LIBS)
+traverse$(EXEEXT): $(traverse_OBJECTS) $(traverse_DEPENDENCIES) $(EXTRA_traverse_DEPENDENCIES) 
+	@rm -f traverse$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(traverse_OBJECTS) $(traverse_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -669,10 +669,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_tree-build_tree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmm-fmm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kernel-kernel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list-list.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree-tree.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/traverse-traverse.Po@am__quote@
 
 .cxx.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -689,6 +689,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+build_tree-build_tree.o: build_tree.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(build_tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT build_tree-build_tree.o -MD -MP -MF $(DEPDIR)/build_tree-build_tree.Tpo -c -o build_tree-build_tree.o `test -f 'build_tree.cxx' || echo '$(srcdir)/'`build_tree.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/build_tree-build_tree.Tpo $(DEPDIR)/build_tree-build_tree.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='build_tree.cxx' object='build_tree-build_tree.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(build_tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_tree-build_tree.o `test -f 'build_tree.cxx' || echo '$(srcdir)/'`build_tree.cxx
+
+build_tree-build_tree.obj: build_tree.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(build_tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT build_tree-build_tree.obj -MD -MP -MF $(DEPDIR)/build_tree-build_tree.Tpo -c -o build_tree-build_tree.obj `if test -f 'build_tree.cxx'; then $(CYGPATH_W) 'build_tree.cxx'; else $(CYGPATH_W) '$(srcdir)/build_tree.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/build_tree-build_tree.Tpo $(DEPDIR)/build_tree-build_tree.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='build_tree.cxx' object='build_tree-build_tree.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(build_tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_tree-build_tree.obj `if test -f 'build_tree.cxx'; then $(CYGPATH_W) 'build_tree.cxx'; else $(CYGPATH_W) '$(srcdir)/build_tree.cxx'; fi`
 
 fmm-fmm.o: fmm.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fmm_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fmm-fmm.o -MD -MP -MF $(DEPDIR)/fmm-fmm.Tpo -c -o fmm-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
@@ -718,33 +732,19 @@ kernel-kernel.obj: kernel.cxx
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
 
-list-list.o: list.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT list-list.o -MD -MP -MF $(DEPDIR)/list-list.Tpo -c -o list-list.o `test -f 'list.cxx' || echo '$(srcdir)/'`list.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/list-list.Tpo $(DEPDIR)/list-list.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='list.cxx' object='list-list.o' libtool=no @AMDEPBACKSLASH@
+traverse-traverse.o: traverse.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(traverse_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT traverse-traverse.o -MD -MP -MF $(DEPDIR)/traverse-traverse.Tpo -c -o traverse-traverse.o `test -f 'traverse.cxx' || echo '$(srcdir)/'`traverse.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/traverse-traverse.Tpo $(DEPDIR)/traverse-traverse.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='traverse.cxx' object='traverse-traverse.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o list-list.o `test -f 'list.cxx' || echo '$(srcdir)/'`list.cxx
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(traverse_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o traverse-traverse.o `test -f 'traverse.cxx' || echo '$(srcdir)/'`traverse.cxx
 
-list-list.obj: list.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT list-list.obj -MD -MP -MF $(DEPDIR)/list-list.Tpo -c -o list-list.obj `if test -f 'list.cxx'; then $(CYGPATH_W) 'list.cxx'; else $(CYGPATH_W) '$(srcdir)/list.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/list-list.Tpo $(DEPDIR)/list-list.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='list.cxx' object='list-list.obj' libtool=no @AMDEPBACKSLASH@
+traverse-traverse.obj: traverse.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(traverse_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT traverse-traverse.obj -MD -MP -MF $(DEPDIR)/traverse-traverse.Tpo -c -o traverse-traverse.obj `if test -f 'traverse.cxx'; then $(CYGPATH_W) 'traverse.cxx'; else $(CYGPATH_W) '$(srcdir)/traverse.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/traverse-traverse.Tpo $(DEPDIR)/traverse-traverse.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='traverse.cxx' object='traverse-traverse.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(list_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o list-list.obj `if test -f 'list.cxx'; then $(CYGPATH_W) 'list.cxx'; else $(CYGPATH_W) '$(srcdir)/list.cxx'; fi`
-
-tree-tree.o: tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tree-tree.o -MD -MP -MF $(DEPDIR)/tree-tree.Tpo -c -o tree-tree.o `test -f 'tree.cxx' || echo '$(srcdir)/'`tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tree-tree.Tpo $(DEPDIR)/tree-tree.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tree.cxx' object='tree-tree.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tree-tree.o `test -f 'tree.cxx' || echo '$(srcdir)/'`tree.cxx
-
-tree-tree.obj: tree.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tree-tree.obj -MD -MP -MF $(DEPDIR)/tree-tree.Tpo -c -o tree-tree.obj `if test -f 'tree.cxx'; then $(CYGPATH_W) 'tree.cxx'; else $(CYGPATH_W) '$(srcdir)/tree.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tree-tree.Tpo $(DEPDIR)/tree-tree.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tree.cxx' object='tree-tree.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tree-tree.obj `if test -f 'tree.cxx'; then $(CYGPATH_W) 'tree.cxx'; else $(CYGPATH_W) '$(srcdir)/tree.cxx'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(traverse_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o traverse-traverse.obj `if test -f 'traverse.cxx'; then $(CYGPATH_W) 'traverse.cxx'; else $(CYGPATH_W) '$(srcdir)/traverse.cxx'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -939,16 +939,16 @@ recheck: all
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-tree.log: tree$(EXEEXT)
-	@p='tree$(EXEEXT)'; \
-	b='tree'; \
+build_tree.log: build_tree$(EXEEXT)
+	@p='build_tree$(EXEEXT)'; \
+	b='build_tree'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-list.log: list$(EXEEXT)
-	@p='list$(EXEEXT)'; \
-	b='list'; \
+traverse.log: traverse$(EXEEXT)
+	@p='traverse$(EXEEXT)'; \
+	b='traverse'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

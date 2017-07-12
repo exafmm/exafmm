@@ -11,12 +11,12 @@ namespace exafmm {
   };
   typedef std::vector<Wave> Waves;                              //!< Vector of Wave types
 
-  static int ksize;                                             //!< Number of waves in Ewald summation
-  static real_t alpha;                                          //!< Scaling parameter for Ewald summation
-  static real_t sigma;                                          //!< Scaling parameter for Ewald summation
-  static real_t cutoff;                                         //!< Cutoff distance
+  static int KSIZE;                                             //!< Number of waves in Ewald summation
+  static real_t ALPHA;                                          //!< Scaling parameter for Ewald summation
+  static real_t SIGMA;                                          //!< Scaling parameter for Ewald summation
+  static real_t CUTOFF;                                         //!< Cutoff distance
   static real_t K[3];                                           //!< Wave number vector
-  static real_t scale[3];                                       //!< Scale vector
+  static real_t SCALE[3];                                       //!< Scale vector
 
   //! Forward DFT
   void dft(Waves & waves, Bodies & bodies) {
@@ -25,7 +25,7 @@ namespace exafmm {
       waves[w].REAL = waves[w].IMAG = 0;
       for (size_t b=0; b<bodies.size(); b++) {
         real_t th = 0;
-        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];
+        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * SCALE[d];
         waves[w].REAL += bodies[b].q * std::cos(th);
         waves[w].IMAG += bodies[b].q * std::sin(th);
       }
@@ -40,12 +40,12 @@ namespace exafmm {
       vec3 F = 0;
       for (size_t w=0; w<waves.size(); w++) {
         real_t th = 0;
-        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * scale[d];
+        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * SCALE[d];
         real_t dtmp = waves[w].REAL * std::sin(th) - waves[w].IMAG * std::cos(th);
         p += waves[w].REAL * std::cos(th) + waves[w].IMAG * std::sin(th);
         for (int d=0; d<3; d++) F[d] -= dtmp * waves[w].K[d];
       }
-      for (int d=0; d<3; d++) F[d] *= scale[d];
+      for (int d=0; d<3; d++) F[d] *= SCALE[d];
       bodies[b].p += p;
       bodies[b].F += F;
     }
@@ -53,10 +53,10 @@ namespace exafmm {
 
   //! Initialize wave vector
   Waves initWaves() {
-    for (int d=0; d<3; d++) scale[d]= 2 * M_PI / cycle;
+    for (int d=0; d<3; d++) SCALE[d]= 2 * M_PI / CYCLE;
     Waves waves;
-    int kmaxsq = ksize * ksize;
-    int kmax = ksize;
+    int kmaxsq = KSIZE * KSIZE;
+    int kmax = KSIZE;
     for (int l=0; l<=kmax; l++) {
       int mmin = -kmax;
       if (l==0) mmin = 0;
@@ -84,17 +84,17 @@ namespace exafmm {
     for (Body * Bi=Ci->BODY; Bi!=Ci->BODY+Ci->NBODY; Bi++) {
       for (Body * Bj=Cj->BODY; Bj!=Cj->BODY+Cj->NBODY; Bj++) {
         vec3 dX;
-        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - iX[d] * cycle;
+        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - IX[d] * CYCLE;
         real_t R2 = norm(dX);
-        if (0 < R2 && R2 < cutoff * cutoff) {
-          real_t R2s = R2 * alpha * alpha;
+        if (0 < R2 && R2 < CUTOFF * CUTOFF) {
+          real_t R2s = R2 * ALPHA * ALPHA;
           real_t Rs = std::sqrt(R2s);
           real_t invRs = 1 / Rs;
           real_t invR2s = invRs * invRs;
           real_t invR3s = invR2s * invRs;
           real_t dtmp = Bj->q * (M_2_SQRTPI * std::exp(-R2s) * invR2s + erfc(Rs) * invR3s);
-          dtmp *= alpha * alpha * alpha;
-          Bi->p += Bj->q * erfc(Rs) * invRs * alpha;
+          dtmp *= ALPHA * ALPHA * ALPHA;
+          Bi->p += Bj->q * erfc(Rs) * invRs * ALPHA;
           Bi->F -= dX * dtmp;
         }
       }
@@ -113,13 +113,13 @@ namespace exafmm {
   void neighbor(Cell * Ci, Cell * Cj) {
     vec3 dX = Ci->X - Cj->X;
     for (int d=0; d<3; d++) {
-      iX[d] = 0;
-      if(dX[d] < -cycle / 2) iX[d]--;
-      if(dX[d] >  cycle / 2) iX[d]++;
-      dX[d] -= iX[d] * cycle;
+      IX[d] = 0;
+      if(dX[d] < -CYCLE / 2) IX[d]--;
+      if(dX[d] >  CYCLE / 2) IX[d]++;
+      dX[d] -= IX[d] * CYCLE;
     }
     real_t R = std::sqrt(norm(dX));
-    if (R - Ci->R - Cj->R < sqrtf(3) * cutoff) {
+    if (R - Ci->R - Cj->R < sqrtf(3) * CUTOFF) {
       if(Cj->NCHILD == 0) realP2P(Ci, Cj);
       for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {
         neighbor(Ci, cj);
@@ -141,10 +141,10 @@ namespace exafmm {
   void wavePart(Bodies & bodies, Bodies & jbodies) {
     Waves waves = initWaves();
     dft(waves,jbodies);
-    real_t coef = 2 / sigma / cycle / cycle / cycle;
-    real_t coef2 = 1 / (4 * alpha * alpha);
+    real_t coef = 2 / SIGMA / CYCLE / CYCLE / CYCLE;
+    real_t coef2 = 1 / (4 * ALPHA * ALPHA);
     for (size_t w=0; w<waves.size(); w++) {
-      for (int d=0; d<3; d++) K[d] = waves[w].K[d] * scale[d];
+      for (int d=0; d<3; d++) K[d] = waves[w].K[d] * SCALE[d];
       real_t K2 = K[0] * K[0] + K[1] * K[1] + K[2] * K[2];
       real_t factor = coef * std::exp(-K2 * coef2) / K2;
       waves[w].REAL *= factor;
@@ -156,7 +156,7 @@ namespace exafmm {
   //! Subtract self term
   void selfTerm(Bodies & bodies) {
     for (size_t b=0; b<bodies.size(); b++) {
-      bodies[b].p -= M_2_SQRTPI * bodies[b].q * alpha;
+      bodies[b].p -= M_2_SQRTPI * bodies[b].q * ALPHA;
     }
   }
 }

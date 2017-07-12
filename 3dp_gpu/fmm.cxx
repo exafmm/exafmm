@@ -15,17 +15,17 @@ using namespace exafmm;
 int main(int argc, char ** argv) {
   Args args(argc, argv);
   P = args.P;
-  theta = args.theta;
-  ncrit = args.ncrit;
-  verbose = args.verbose;
+  THETA = args.theta;
+  NCRIT = args.ncrit;
+  VERBOSE = args.verbose;
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
-  cycle = 2 * M_PI;
-  images = 4;
-  ksize = 11;
-  alpha = ksize / cycle;
-  sigma = .25 / M_PI;
-  cutoff = cycle / 2;
+  CYCLE = 2 * M_PI;
+  IMAGES = 4;
+  KSIZE = 11;
+  ALPHA = KSIZE / CYCLE;
+  SIGMA = .25 / M_PI;
+  CUTOFF = CYCLE / 2;
 
   print("FMM Parameter");
   args.show();
@@ -52,7 +52,7 @@ int main(int argc, char ** argv) {
   start("Dipole correction");
   vec3 dipole = 0;
   for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q;
-  real_t coef = 4 * M_PI / (3 * cycle * cycle * cycle);
+  real_t coef = 4 * M_PI / (3 * CYCLE * CYCLE * CYCLE);
   for (size_t b=0; b<bodies.size(); b++) {
     real_t dnorm = norm(dipole);
     bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;

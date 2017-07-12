@@ -27,7 +27,7 @@ namespace exafmm {
     cell->X = X;
     cell->R = R / (1 << level);
     //! If cell is a leaf
-    if (end - begin <= ncrit) {
+    if (end - begin <= NCRIT) {
       if (direction) {
         for (int i=begin; i<end; i++) {
           buffer[i].X = bodies[i].X;

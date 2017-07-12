@@ -116,7 +116,7 @@ namespace exafmm {
       vec3 F = 0;
       for (int j=0; j<Cj->NBODY; j++) {
         vec3 dX;
-        for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d] - iX[d] * cycle;
+        for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d] - IX[d] * CYCLE;
         real_t R2 = norm(dX);
         if (R2 != 0) {
           real_t invR2 = 1.0 / R2;
@@ -179,7 +179,7 @@ namespace exafmm {
   void M2L(Cell * Ci, Cell * Cj) {
     complex_t Ynm2[4*P*P];
     vec3 dX;
-    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - iX[d] * cycle;
+    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
     real_t rho, alpha, beta;
     cart2sph(dX, rho, alpha, beta);
     evalLocal(rho, alpha, beta, Ynm2);
