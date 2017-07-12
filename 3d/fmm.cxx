@@ -47,14 +47,9 @@ int main(int argc, char ** argv) {
   start("Direct N-Body");
   const int numTargets = 10;
   Bodies jbodies = bodies;
-  if (numBodies > numTargets) {
-    int stride = bodies.size() / numTargets;
-    for (int b=0; b<numTargets; b++) {
-      bodies[b] = bodies[b*stride];
-    }
-    bodies.resize(numTargets);
-  }
+  sampleBodies(bodies, numTargets);
   Bodies bodies2 = bodies;
+  initTarget(bodies);
   for (size_t b=0; b<bodies.size(); b++) {
     bodies[b].p = 0;
     bodies[b].F = 0;

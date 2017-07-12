@@ -170,5 +170,16 @@ namespace exafmm {
     initTarget(bodies);
     return bodies;
   }
+
+  //! Sample a subset of target bodies
+  void sampleBodies(Bodies & bodies, int numTargets) {
+    if (int(bodies.size()) > numTargets) {
+      int stride = bodies.size() / numTargets;
+      for (int b=0; b<numTargets; b++) {
+        bodies[b] = bodies[b*stride];
+      }
+      bodies.resize(numTargets);
+    }
+  }
 }
 #endif
