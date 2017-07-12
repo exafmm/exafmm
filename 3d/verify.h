@@ -22,7 +22,7 @@ namespace exafmm {
     double getNrmScalar(const Bodies & bodies) {
       double v = 0;
       for (size_t b=0; b<bodies.size(); b++) {
-        v += std::abs(bodies[b].p * bodies[b].p);
+        v += bodies[b].p * bodies[b].p;
       }
       return v;
     }
@@ -30,8 +30,7 @@ namespace exafmm {
     double getDifScalar(const Bodies & bodies, const Bodies & bodies2) {
       double v = 0;
       for (size_t b=0; b<bodies.size(); b++) {
-        v += std::abs((bodies[b].p - bodies2[b].p) *
-                      (bodies[b].p - bodies2[b].p));
+        v += (bodies[b].p - bodies2[b].p) * (bodies[b].p - bodies2[b].p);
       }
       return v;
     }
@@ -39,8 +38,8 @@ namespace exafmm {
     double getRelScalar(const Bodies & bodies, const Bodies & bodies2) {
       double v = 0;
       for (size_t b=0; b<bodies.size(); b++) {
-        v += std::abs(((bodies[b].p - bodies2[b].p) * (bodies[b].p - bodies2[b].p))
-                      / (bodies2[b].p * bodies2[b].p));
+        v += (bodies[b].p - bodies2[b].p) * (bodies[b].p - bodies2[b].p)
+          / (bodies2[b].p * bodies2[b].p);
       }
       return v;
     }
@@ -48,7 +47,7 @@ namespace exafmm {
     double getNrmVector(const Bodies & bodies) {
       double v = 0;
       for (size_t b=0; b<bodies.size(); b++) {
-        v += std::abs(norm(bodies[b].F));
+        v += norm(bodies[b].F);
       }
       return v;
     }
@@ -56,9 +55,7 @@ namespace exafmm {
     double getDifVector(const Bodies & bodies, const Bodies & bodies2) {
       double v = 0;
       for (size_t b=0; b<bodies.size(); b++) {
-        v += std::abs((bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +
-                      (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]) +
-                      (bodies[b].F[2] - bodies2[b].F[2]) * (bodies[b].F[2] - bodies2[b].F[2]));
+        v += norm(bodies[b].F - bodies2[b].F);
       }
       return v;
     }
@@ -66,10 +63,7 @@ namespace exafmm {
     double getRelVector(const Bodies & bodies, const Bodies & bodies2) {
       double v = 0;
       for (size_t b=0; b<bodies.size(); b++) {
-        v += std::abs(((bodies[b].F[0] - bodies2[b].F[0]) * (bodies[b].F[0] - bodies2[b].F[0]) +
-                       (bodies[b].F[1] - bodies2[b].F[1]) * (bodies[b].F[1] - bodies2[b].F[1]) +
-                       (bodies[b].F[2] - bodies2[b].F[2]) * (bodies[b].F[2] - bodies2[b].F[2]))
-                      / norm(bodies2[b].F));
+        v += norm(bodies[b].F - bodies2[b].F) / norm(bodies2[b].F);
       }
       return v;
     }
