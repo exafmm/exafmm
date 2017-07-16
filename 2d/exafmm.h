@@ -29,10 +29,10 @@ namespace exafmm {
 
   //! Structure of cells
   struct Cell {
-    int NCHILD;                                 //!< Number of child cells
-    int NBODY;                                  //!< Number of descendant bodies
-    Cell * CHILD;                               //!< Pointer to first child cell
-    Body * BODY;                                //!< Pointer to first body
+    int numChilds;                              //!< Number of child cells
+    int numBodies;                              //!< Number of descendant bodies
+    Cell * child;                               //!< Pointer to first child cell
+    Body * body;                                //!< Pointer to first body
     vec2 X;                                     //!< Cell center
     real_t R;                                   //!< Cell radius
 #if EXAFMM_LAZY
