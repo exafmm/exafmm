@@ -19,15 +19,15 @@ int main(int argc, char ** argv) {
   Cj->X[1] = 1;
   Cj->X[2] = 1;
   Cj->R = 1;
-  Cj->BODY = &jbodies[0];
-  Cj->NBODY = jbodies.size();
+  Cj->body = &jbodies[0];
+  Cj->numBodies = jbodies.size();
   Cj->M.resize(NTERM, 0.0);
   P2M(Cj);
 
   //! M2M
   Cell * CJ = &cells[1];
-  CJ->CHILD = Cj;
-  CJ->NCHILD = 1;
+  CJ->child = Cj;
+  CJ->numChilds = 1;
   CJ->X[0] = 4;
   CJ->X[1] = 0;
   CJ->X[2] = 0;
@@ -46,8 +46,8 @@ int main(int argc, char ** argv) {
 
   //! L2L
   Cell * Ci = &cells[3];
-  CI->CHILD = Ci;
-  CI->NCHILD = 1;
+  CI->child = Ci;
+  CI->numChilds = 1;
   Ci->X[0] = -3;
   Ci->X[1] = 1;
   Ci->X[2] = 1;
@@ -63,8 +63,8 @@ int main(int argc, char ** argv) {
   bodies[0].q = 1;
   bodies[0].p = 0;
   bodies[0].F = 0;
-  Ci->BODY = &bodies[0];
-  Ci->NBODY = bodies.size();
+  Ci->body = &bodies[0];
+  Ci->numBodies = bodies.size();
   L2P(Ci);
 
   //! P2P
@@ -74,9 +74,9 @@ int main(int argc, char ** argv) {
     bodies2[b].p = 0;
     bodies2[b].F = 0;
   }
-  Cj->NBODY = jbodies.size();
-  Ci->NBODY = bodies2.size();
-  Ci->BODY = &bodies2[0];
+  Cj->numBodies = jbodies.size();
+  Ci->numBodies = bodies2.size();
+  Ci->body = &bodies2[0];
   P2P(Ci, Cj);
 
   //! Verify results

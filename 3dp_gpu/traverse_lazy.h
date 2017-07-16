@@ -6,14 +6,14 @@
 namespace exafmm {
   //! Recursive call to post-order tree traversal for upward pass
   void upwardPass(Cell * Ci) {
-    for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) {
-#pragma omp task untied if(Cj->NBODY > 100)
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
+#pragma omp task untied if(Cj->numBodies > 100)
       upwardPass(Cj);
     }
 #pragma omp taskwait
     Ci->M.resize(NTERM, 0.0);
     Ci->L.resize(NTERM, 0.0);
-    if(Ci->NCHILD==0) P2M(Ci);
+    if(Ci->numChilds==0) P2M(Ci);
     M2M(Ci);
   }
 
@@ -44,15 +44,15 @@ namespace exafmm {
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       Ci->listM2L.push_back(Cj);
       Ci->periodicM2L.push_back(periodic1D(IX));
-    } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {
+    } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
       Ci->listP2P.push_back(Cj);
       Ci->periodicP2P.push_back(periodic1D(IX));
-    } else if (Cj->NCHILD == 0 || (Ci->R >= Cj->R && Ci->NCHILD != 0)) {
-      for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {
+    } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
+      for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
         getList(ci, Cj);
       }
     } else {
-      for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {
+      for (Cell * cj=Cj->child; cj!=Cj->child+Cj->numChilds; cj++) {
         getList(Ci, cj);
       }
     }
@@ -82,8 +82,8 @@ namespace exafmm {
     }
     Cell * Ci = &pcells.back();
     *Ci = *Cj0;
-    Ci->CHILD = &pcells[0];
-    Ci->NCHILD = 26;
+    Ci->child = &pcells[0];
+    Ci->numChilds = 26;
     for (int level=0; level<IMAGES-1; level++) {
       for (int ix=-1; ix<=1; ix++) {
         for (int iy=-1; iy<=1; iy++) {
@@ -145,9 +145,9 @@ namespace exafmm {
   //! Recursive call to pre-order tree traversal for downward pass
   void downwardPass(Cell * Cj) {
     L2L(Cj);
-    if (Cj->NCHILD==0) L2P(Cj);
-    for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; Ci++) {
-#pragma omp task untied if(Ci->NBODY > 100)
+    if (Cj->numChilds==0) L2P(Cj);
+    for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
+#pragma omp task untied if(Ci->numBodies > 100)
       downwardPass(Ci);
     }
 #pragma omp taskwait
@@ -165,10 +165,10 @@ namespace exafmm {
     Cells cells(2);
     Cell * Ci = &cells[0];
     Cell * Cj = &cells[1];
-    Ci->BODY = &bodies[0];
-    Ci->NBODY = bodies.size();
-    Cj->BODY = &jbodies[0];
-    Cj->NBODY = jbodies.size();
+    Ci->body = &bodies[0];
+    Ci->numBodies = bodies.size();
+    Cj->body = &jbodies[0];
+    Cj->numBodies = jbodies.size();
     int prange = 0;
     for (int i=0; i<IMAGES; i++) {
       prange += int(powf(3.,i));

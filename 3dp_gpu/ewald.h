@@ -81,8 +81,8 @@ namespace exafmm {
 
   //! Ewald real part P2P kernel
   void realP2P(Cell * Ci, Cell * Cj) {
-    for (Body * Bi=Ci->BODY; Bi!=Ci->BODY+Ci->NBODY; Bi++) {
-      for (Body * Bj=Cj->BODY; Bj!=Cj->BODY+Cj->NBODY; Bj++) {
+    for (Body * Bi=Ci->body; Bi!=Ci->body+Ci->numBodies; Bi++) {
+      for (Body * Bj=Cj->body; Bj!=Cj->body+Cj->numBodies; Bj++) {
         vec3 dX;
         for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - IX[d] * CYCLE;
         real_t R2 = norm(dX);
@@ -103,8 +103,8 @@ namespace exafmm {
 
   //! Get leaf cells
   void getLeaf(Cells & ileafs, Cell * Ci) {
-    if (Ci->NCHILD == 0) ileafs.push_back(*Ci);
-    for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {
+    if (Ci->numChilds == 0) ileafs.push_back(*Ci);
+    for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
       getLeaf(ileafs, ci);
     }
   }
@@ -120,8 +120,8 @@ namespace exafmm {
     }
     real_t R = std::sqrt(norm(dX));
     if (R - Ci->R - Cj->R < sqrtf(3) * CUTOFF) {
-      if(Cj->NCHILD == 0) realP2P(Ci, Cj);
-      for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {
+      if(Cj->numChilds == 0) realP2P(Ci, Cj);
+      for (Cell * cj=Cj->child; cj!=Cj->child+Cj->numChilds; cj++) {
         neighbor(Ci, cj);
       }
     }
