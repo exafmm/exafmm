@@ -5,29 +5,28 @@
 namespace exafmm {
   //! Wave structure for Ewald summation
   struct Wave {
-    real_t K[3];                                                //!< 3-D wave number vector
-    real_t REAL;                                                //!< real part of wave
-    real_t IMAG;                                                //!< imaginary part of wave
+    vec3 K;                                     //!< 3-D wave number vector
+    real_t real;                                //!< real part of wave
+    real_t imag;                                //!< imaginary part of wave
   };
-  typedef std::vector<Wave> Waves;                              //!< Vector of Wave types
+  typedef std::vector<Wave> Waves;              //!< Vector of Wave types
 
-  static int KSIZE;                                             //!< Number of waves in Ewald summation
-  static real_t ALPHA;                                          //!< Scaling parameter for Ewald summation
-  static real_t SIGMA;                                          //!< Scaling parameter for Ewald summation
-  static real_t CUTOFF;                                         //!< Cutoff distance
-  static real_t K[3];                                           //!< Wave number vector
-  static real_t SCALE[3];                                       //!< Scale vector
+  static int KSIZE;                             //!< Number of waves in Ewald summation
+  static real_t ALPHA;                          //!< Scaling parameter for Ewald summation
+  static real_t SIGMA;                          //!< Scaling parameter for Ewald summation
+  static real_t CUTOFF;                         //!< Cutoff distance
+  static vec3 K;                                //!< Wave number vector
+  static vec3 SCALE;                            //!< Scale vector
 
   //! Forward DFT
   void dft(Waves & waves, Bodies & bodies) {
 #pragma omp parallel for
     for (size_t w=0; w<waves.size(); w++) {
-      waves[w].REAL = waves[w].IMAG = 0;
+      waves[w].real = waves[w].imag = 0;
       for (size_t b=0; b<bodies.size(); b++) {
-        real_t th = 0;
-        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * SCALE[d];
-        waves[w].REAL += bodies[b].q * std::cos(th);
-        waves[w].IMAG += bodies[b].q * std::sin(th);
+        real_t th = sum(waves[w].K * bodies[b].X * SCALE);
+        waves[w].real += bodies[b].q * std::cos(th);
+        waves[w].imag += bodies[b].q * std::sin(th);
       }
     }
   }
@@ -39,13 +38,12 @@ namespace exafmm {
       real_t p = 0;
       vec3 F = 0;
       for (size_t w=0; w<waves.size(); w++) {
-        real_t th = 0;
-        for (int d=0; d<3; d++) th += waves[w].K[d] * bodies[b].X[d] * SCALE[d];
-        real_t dtmp = waves[w].REAL * std::sin(th) - waves[w].IMAG * std::cos(th);
-        p += waves[w].REAL * std::cos(th) + waves[w].IMAG * std::sin(th);
-        for (int d=0; d<3; d++) F[d] -= dtmp * waves[w].K[d];
+        real_t th = sum(waves[w].K * bodies[b].X * SCALE);
+        real_t dtmp = waves[w].real * std::sin(th) - waves[w].imag * std::cos(th);
+        p += waves[w].real * std::cos(th) + waves[w].imag * std::sin(th);
+        F -= waves[w].K * dtmp;
       }
-      for (int d=0; d<3; d++) F[d] *= SCALE[d];
+      F *= SCALE;
       bodies[b].p += p;
       bodies[b].F += F;
     }
@@ -53,7 +51,7 @@ namespace exafmm {
 
   //! Initialize wave vector
   Waves initWaves() {
-    for (int d=0; d<3; d++) SCALE[d]= 2 * M_PI / CYCLE;
+    for (int d=0; d<3; d++) SCALE[d] = 2 * M_PI / CYCLE;
     Waves waves;
     int kmaxsq = KSIZE * KSIZE;
     int kmax = KSIZE;
@@ -70,7 +68,7 @@ namespace exafmm {
             wave.K[0] = l;
             wave.K[1] = m;
             wave.K[2] = n;
-            wave.REAL = wave.IMAG = 0;
+            wave.real = wave.imag = 0;
             waves.push_back(wave);
           }
         }
@@ -132,7 +130,7 @@ namespace exafmm {
     Cells ileafs;
     getLeaf(ileafs, &icells[0]);
 #pragma omp parallel for
-    for (int i=0; i<ileafs.size(); i++) {
+    for (size_t i=0; i<ileafs.size(); i++) {
       neighbor(&ileafs[i], &jcells[0]);
     }
   }
@@ -144,11 +142,11 @@ namespace exafmm {
     real_t coef = 2 / SIGMA / CYCLE / CYCLE / CYCLE;
     real_t coef2 = 1 / (4 * ALPHA * ALPHA);
     for (size_t w=0; w<waves.size(); w++) {
-      for (int d=0; d<3; d++) K[d] = waves[w].K[d] * SCALE[d];
+      K = waves[w].K * SCALE;
       real_t K2 = K[0] * K[0] + K[1] * K[1] + K[2] * K[2];
       real_t factor = coef * std::exp(-K2 * coef2) / K2;
-      waves[w].REAL *= factor;
-      waves[w].IMAG *= factor;
+      waves[w].real *= factor;
+      waves[w].imag *= factor;
     }
     idft(waves,bodies);
   }
