@@ -3,8 +3,11 @@
 /* Enable assertion. */
 #undef EXAFMM_ASSERT
 
-/* Define to enable extra debugging options. */
+/* Enable debugging options. */
 #undef EXAFMM_DEBUG
+
+/* Use CUDA */
+#undef EXAFMM_HAVE_CUDA
 
 /* Define if you have the MPI library. */
 #undef EXAFMM_HAVE_MPI
@@ -50,6 +53,18 @@
 
 /* Define to 1 to support AVX-512 Vector Length Extensions */
 #undef HAVE_AVX512_VL
+
+/* Define if we have CUDA */
+#undef HAVE_CUDA
+
+/* Define to 1 if you have the `cublas' library (-lcublas). */
+#undef HAVE_LIBCUBLAS
+
+/* Define to 1 if you have the `cuda' library (-lcuda). */
+#undef HAVE_LIBCUDA
+
+/* Define to 1 if you have the `cudart' library (-lcudart). */
+#undef HAVE_LIBCUDART
 
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP

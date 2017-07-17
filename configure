@@ -195,8 +195,7 @@ test -x / || exit 1"
   as_suggested="  as_lineno_1=";as_suggested=$as_suggested$LINENO;as_suggested=$as_suggested" as_lineno_1a=\$LINENO
   as_lineno_2=";as_suggested=$as_suggested$LINENO;as_suggested=$as_suggested" as_lineno_2a=\$LINENO
   eval 'test \"x\$as_lineno_1'\$as_run'\" != \"x\$as_lineno_2'\$as_run'\" &&
-  test \"x\`expr \$as_lineno_1'\$as_run' + 1\`\" = \"x\$as_lineno_2'\$as_run'\"' || exit 1
-test \$(( 1 + 1 )) = 2 || exit 1"
+  test \"x\`expr \$as_lineno_1'\$as_run' + 1\`\" = \"x\$as_lineno_2'\$as_run'\"' || exit 1"
   if (eval "$as_required") 2>/dev/null; then :
   as_have_required=yes
 else
@@ -594,9 +593,6 @@ EXAFMM_HAVE_INTEL_FALSE
 EXAFMM_HAVE_INTEL_TRUE
 EXAFMM_HAVE_CRAY_FALSE
 EXAFMM_HAVE_CRAY_TRUE
-ax_compiler_cxxflags
-COMPILER_CXXFLAGS
-SED
 EXAFMM_DEBUG_FALSE
 EXAFMM_DEBUG_TRUE
 EXAFMM_ASSERT_FALSE
@@ -613,6 +609,12 @@ build
 PRECISION
 EXAFMM_SINGLE_FALSE
 EXAFMM_SINGLE_TRUE
+EXAFMM_HAVE_CUDA_FALSE
+EXAFMM_HAVE_CUDA_TRUE
+CUDA_LDLIBS
+CUDA_CFLAGS
+NVCCFLAGS
+NVCC
 EXAFMM_HAVE_MPI_FALSE
 EXAFMM_HAVE_MPI_TRUE
 MPIRUN
@@ -728,9 +730,12 @@ enable_maintainer_mode
 enable_dependency_tracking
 enable_openmp
 enable_mpi
+enable_cuda
+with_cuda
+enable_emu
 enable_single
 enable_float
-enable_simd_ext
+enable_simd
 enable_assert
 enable_debug
 '
@@ -748,7 +753,8 @@ FCFLAGS
 CC
 CFLAGS
 MPICXX
-MPIFC'
+MPIFC
+NVCCFLAGS'
 
 
 # Initialize some variables set by options.
@@ -1378,11 +1384,18 @@ Optional Features:
                           speeds up one-time build
   --disable-openmp        disable OpenMP
   --disable-mpi           do not compile with MPI
+  --disable-cuda          do not compile with CUDA
+  --enable-emu            turn on device emulation for CUDA
   --enable-single         compile in single precision
   --enable-float          synonym for --enable-single
-  --disable-simd-ext      disable SIMD
-  --enable-assert         enable assertion
-  --enable-debug          compile in debugging mode
+  --disable-simd          disable SIMD
+  --disable-assert        disable assertion
+  --enable-debug          enable debugging
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-cuda=PATH        prefix where CUDA is installed [default=no]
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -1398,6 +1411,8 @@ Some influential environment variables:
   CFLAGS      C compiler flags
   MPICXX      MPI C++ compiler command
   MPIFC       MPI Fortran compiler command
+  NVCCFLAGS   Additional nvcc flags (example: NVCCFLAGS="-arch=compute_30
+              -code=sm_30")
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -1705,6 +1720,37 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_cxx_check_func
+
+# ac_fn_cxx_check_header_compile LINENO HEADER VAR INCLUDES
+# ---------------------------------------------------------
+# Tests whether HEADER exists and can be compiled using the include files in
+# INCLUDES, setting the cache variable VAR accordingly.
+ac_fn_cxx_check_header_compile ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#include <$2>
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_cxx_check_header_compile
 
 # ac_fn_c_try_run LINENO
 # ----------------------
@@ -4747,7 +4793,7 @@ if test "$enable_mpi" = "yes"; then
 
 
 
-	for ac_prog in mpxlC_r mpxlC mpiFCCpx mpiFCC sxmpic++ mpiicpc mpicxx CC
+	for ac_prog in mpiicpc mpicxx CC
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4795,7 +4841,7 @@ test -n "$MPICXX" || MPICXX="$CXX"
 
 
 
-	for ac_prog in mpxlf90_r mpxlf90 mpifrtpx mpifrt sxmpif03 ftn mpiifort mpif90
+	for ac_prog in mpxlf90_rftn mpiifort mpif90
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -5152,20 +5198,468 @@ else
 fi
 
 
+# CUDA
+# Check whether --enable-cuda was given.
+if test "${enable_cuda+set}" = set; then :
+  enableval=$enable_cuda;
+else
+  enable_cuda=yes
+fi
+
+if test "$enable_cuda" = "yes"; then
+
+$as_echo "#define EXAFMM_HAVE_CUDA 1" >>confdefs.h
+
+
+
+# Provide your CUDA path with this
+
+# Check whether --with-cuda was given.
+if test "${with_cuda+set}" = set; then :
+  withval=$with_cuda;
+else
+  with_cuda=no
+fi
+
+
+NVCC=no
+CUDA_CFLAGS=
+CUDA_LDLIBS=
+
+if test "x$with_cuda" != "xno"
+then
+
+   # -----------------------------------------
+   # Setup CUDA paths
+   # -----------------------------------------
+   if test "x$with_cuda" != "xyes"
+   then
+      case ":$with_cuda:" in
+# change empty paths to '.'
+  ::) with_cuda='.' ;;
+# strip trailing slashes
+  :*[\\/]:) with_cuda=`echo "$with_cuda" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+# squeze repeated slashes
+case "/" in
+# if the path contains any backslashes, turn slashes into backslashes
+ *\\*) with_cuda=`echo "$with_cuda" | sed 's,\(.\)[\\/][\\/]*,\1\\\\,g'` ;;
+# if the path contains slashes, also turn backslashes into slashes
+ *) with_cuda=`echo "$with_cuda" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+      CUDAPATH="$with_cuda"
+      CUDA_CFLAGS+=" -I$with_cuda/include"
+      CUDA_LDLIBS+=" -L$with_cuda/lib64"
+   else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/cuda/" >&5
+$as_echo_n "checking for /usr/local/cuda/... " >&6; }
+if ${ac_cv_file__usr_local_cuda_+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/cuda/"; then
+  ac_cv_file__usr_local_cuda_=yes
+else
+  ac_cv_file__usr_local_cuda_=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_cuda_" >&5
+$as_echo "$ac_cv_file__usr_local_cuda_" >&6; }
+if test "x$ac_cv_file__usr_local_cuda_" = xyes; then :
+  CUDAPATH="/usr/local/cuda"
+fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/cuda/include" >&5
+$as_echo_n "checking for /usr/local/cuda/include... " >&6; }
+if ${ac_cv_file__usr_local_cuda_include+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/cuda/include"; then
+  ac_cv_file__usr_local_cuda_include=yes
+else
+  ac_cv_file__usr_local_cuda_include=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_cuda_include" >&5
+$as_echo "$ac_cv_file__usr_local_cuda_include" >&6; }
+if test "x$ac_cv_file__usr_local_cuda_include" = xyes; then :
+  CUDA_CFLAGS+=" -I/usr/local/cuda/include"
+else
+  CUDA_CFLAGS=""
+fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/cuda/lib64" >&5
+$as_echo_n "checking for /usr/local/cuda/lib64... " >&6; }
+if ${ac_cv_file__usr_local_cuda_lib64+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/cuda/lib64"; then
+  ac_cv_file__usr_local_cuda_lib64=yes
+else
+  ac_cv_file__usr_local_cuda_lib64=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_cuda_lib64" >&5
+$as_echo "$ac_cv_file__usr_local_cuda_lib64" >&6; }
+if test "x$ac_cv_file__usr_local_cuda_lib64" = xyes; then :
+  CUDA_LDLIBS+=" -L/usr/local/cuda/lib64"
+fi
+
+   fi
+   CUDA_LDLIBS+=" -lcuda -lcudart -lcublas"
+
+
+   # -----------------------------------------
+   # Checking for nvcc
+   # -----------------------------------------
+   # Extract the first word of "nvcc", so it can be a program name with args.
+set dummy nvcc; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_NVCC+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $NVCC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_NVCC="$NVCC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$PATH:$CUDAPATH/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_NVCC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_NVCC" && ac_cv_path_NVCC="no"
+  ;;
+esac
+fi
+NVCC=$ac_cv_path_NVCC
+if test -n "$NVCC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NVCC" >&5
+$as_echo "$NVCC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+   if test "x$NVCC" = "xno"
+   then
+      as_fn_error $? "Cannot find nvcc compiler. To enable CUDA, please add path to
+                    nvcc in the PATH environment variable and/or specify the path
+                    where CUDA is installed using: --with-cuda=PATH" "$LINENO" 5
+   fi
+
+
+   # -----------------------------------------
+   # Setup nvcc flags
+   # -----------------------------------------
+
+   if test x$DEBUG = xtrue
+   then
+      NVCCFLAGS+=" -g"
+   else
+      NVCCFLAGS+=" -O3"
+   fi
+   # Check whether --enable-emu was given.
+if test "${enable_emu+set}" = set; then :
+  enableval=$enable_emu; case "${enableval}" in
+         yes) EMULATION=true;;
+         no)  EMULATION=false;;
+         *) as_fn_error $? "bad value ${enableval} for --enable-emu" "$LINENO" 5;;
+         esac
+else
+  EMULATION=false
+fi
+
+   if test x$EMULATION = xtrue
+   then
+      NVCCFLAGS+=" -deviceemu"
+   fi
+
+
+   # -----------------------------------------
+   # Check if nvcc works
+   # -----------------------------------------
+   ac_compile_nvcc=no
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether nvcc works" >&5
+$as_echo_n "checking whether nvcc works... " >&6; }
+   cat>conftest.cu<<EOF
+   __global__ static void test_cuda() {
+      const int tid = threadIdx.x;
+      const int bid = blockIdx.x;
+      __syncthreads();
+   }
+EOF
+
+   if $NVCC -c $NVCCFLAGS conftest.cu &> /dev/null
+   then
+      ac_compile_nvcc=yes
+   fi
+   rm -f conftest.cu conftest.o
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_compile_nvcc" >&5
+$as_echo "$ac_compile_nvcc" >&6; }
+
+   if test "x$ac_compile_nvcc" = "xno"
+   then
+      as_fn_error $? "CUDA compiler has problems." "$LINENO" 5
+   fi
+
+
+   # -----------------------------------------
+   # Check for headers and libraries
+   # -----------------------------------------
+   ax_save_CXXFLAGS="${CXXFLAGS}"
+   ax_save_LIBS="${LIBS}"
+
+   CXXFLAGS="$CUDA_CFLAGS $CXXFLAGS"
+   LIBS="$CUDA_LDLIBS $LIBS"
+
+   # And the header and the lib
+   ac_fn_cxx_check_header_compile "$LINENO" "cuda.h" "ac_cv_header_cuda_h" "#include <cuda.h>
+"
+if test "x$ac_cv_header_cuda_h" = xyes; then :
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Couldn't find cuda.h
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+   ac_fn_cxx_check_header_compile "$LINENO" "cuda_runtime_api.h" "ac_cv_header_cuda_runtime_api_h" "#include <cuda_runtime_api.h>
+"
+if test "x$ac_cv_header_cuda_runtime_api_h" = xyes; then :
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Couldn't find cuda_runtime_api.h
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+   ac_fn_cxx_check_header_compile "$LINENO" "cublas.h" "ac_cv_header_cublas_h" "#include <cublas.h>
+"
+if test "x$ac_cv_header_cublas_h" = xyes; then :
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Couldn't find cublas.h
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cuInit in -lcuda" >&5
+$as_echo_n "checking for cuInit in -lcuda... " >&6; }
+if ${ac_cv_lib_cuda_cuInit+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcuda  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cuInit ();
+int
+main ()
+{
+return cuInit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_cuda_cuInit=yes
+else
+  ac_cv_lib_cuda_cuInit=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cuda_cuInit" >&5
+$as_echo "$ac_cv_lib_cuda_cuInit" >&6; }
+if test "x$ac_cv_lib_cuda_cuInit" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBCUDA 1
+_ACEOF
+
+  LIBS="-lcuda $LIBS"
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Couldn't find libcuda
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cudaMalloc in -lcudart" >&5
+$as_echo_n "checking for cudaMalloc in -lcudart... " >&6; }
+if ${ac_cv_lib_cudart_cudaMalloc+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcudart  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cudaMalloc ();
+int
+main ()
+{
+return cudaMalloc ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_cudart_cudaMalloc=yes
+else
+  ac_cv_lib_cudart_cudaMalloc=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cudart_cudaMalloc" >&5
+$as_echo "$ac_cv_lib_cudart_cudaMalloc" >&6; }
+if test "x$ac_cv_lib_cudart_cudaMalloc" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBCUDART 1
+_ACEOF
+
+  LIBS="-lcudart $LIBS"
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Couldn't find libcudart
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cublasInit in -lcublas" >&5
+$as_echo_n "checking for cublasInit in -lcublas... " >&6; }
+if ${ac_cv_lib_cublas_cublasInit+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcublas  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cublasInit ();
+int
+main ()
+{
+return cublasInit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_cublas_cublasInit=yes
+else
+  ac_cv_lib_cublas_cublasInit=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cublas_cublasInit" >&5
+$as_echo "$ac_cv_lib_cublas_cublasInit" >&6; }
+if test "x$ac_cv_lib_cublas_cublasInit" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBCUBLAS 1
+_ACEOF
+
+  LIBS="-lcublas $LIBS"
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Couldn't find libcublas
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+   # Returning to the original flags
+   CXXFLAGS=${ax_save_CXXFLAGS}
+   LIBS=${ax_save_LIBS}
+
+
+$as_echo "#define HAVE_CUDA 1" >>confdefs.h
+
+fi
+
+
+# Announcing the new variables
+
+
+
+
+
+fi
+ if test "$enable_cuda" = "yes"; then
+  EXAFMM_HAVE_CUDA_TRUE=
+  EXAFMM_HAVE_CUDA_FALSE='#'
+else
+  EXAFMM_HAVE_CUDA_TRUE='#'
+  EXAFMM_HAVE_CUDA_FALSE=
+fi
+
+
 # Single precision
 # Check whether --enable-single was given.
 if test "${enable_single+set}" = set; then :
-  enableval=$enable_single; ok=$enableval
+  enableval=$enable_single; enable_single=$enableval
 else
-  ok=no
+  enable_single=no
 fi
 
 # Check whether --enable-float was given.
 if test "${enable_float+set}" = set; then :
-  enableval=$enable_float; ok=$enableval
+  enableval=$enable_float; enable_single=$enableval
 fi
 
-if test "$ok" = "yes"; then
+if test "$enable_single" = "yes"; then
 
 $as_echo "#define EXAFMM_SINGLE 1" >>confdefs.h
 
@@ -5173,7 +5667,7 @@ $as_echo "#define EXAFMM_SINGLE 1" >>confdefs.h
 else
    PRECISION=d
 fi
- if test "$ok" = "yes"; then
+ if test "$enable_single" = "yes"; then
   EXAFMM_SINGLE_TRUE=
   EXAFMM_SINGLE_FALSE='#'
 else
@@ -5184,14 +5678,14 @@ fi
 
 
 # SIMD extensions supported by compiler
-# Check whether --enable-simd-ext was given.
-if test "${enable_simd_ext+set}" = set; then :
-  enableval=$enable_simd_ext; use_simd_ext=$enableval
+# Check whether --enable-simd was given.
+if test "${enable_simd+set}" = set; then :
+  enableval=$enable_simd; enable_simd=$enableval
 else
-  use_simd_ext=yes
+  enable_simd=yes
 fi
 
-if test "$use_simd_ext" = "yes"; then
+if test "$enable_simd" = "yes"; then
    # Make sure we can run config.sub.
 $SHELL "$ac_aux_dir/config.sub" sun4 >/dev/null 2>&1 ||
   as_fn_error $? "cannot run $SHELL $ac_aux_dir/config.sub" "$LINENO" 5
@@ -6253,12 +6747,12 @@ fi
 # Assertion
 # Check whether --enable-assert was given.
 if test "${enable_assert+set}" = set; then :
-  enableval=$enable_assert; use_assert=$enableval
+  enableval=$enable_assert;
 else
-  use_assert=no
+  enable_assert=yes
 fi
 
-if test "$use_assert" = "yes"; then
+if test "$enable_assert" = "yes"; then
 
 $as_echo "#define EXAFMM_ASSERT 1" >>confdefs.h
 
@@ -6294,469 +6788,23 @@ else
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++ compiler vendor" >&5
-$as_echo_n "checking for C++ compiler vendor... " >&6; }
-if ${ax_cv_cxx_compiler_vendor+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-    # note: don't check for gcc first since some other compilers define __GNUC__
-  vendors="intel:     __ICC,__ECC,__INTEL_COMPILER
-           ibm:       __xlc__,__xlC__,__IBMC__,__IBMCPP__
-           pathscale: __PATHCC__,__PATHSCALE__
-           clang:     __clang__
-           cray:      _CRAYC
-           fujitsu:   __FUJITSU
-           gnu:       __GNUC__
-           sun:       __SUNPRO_C,__SUNPRO_CC
-           hp:        __HP_cc,__HP_aCC
-           dec:       __DECC,__DECCXX,__DECC_VER,__DECCXX_VER
-           borland:   __BORLANDC__,__CODEGEARC__,__TURBOC__
-           comeau:    __COMO__
-           kai:       __KCC
-           lcc:       __LCC__
-           sgi:       __sgi,sgi
-           microsoft: _MSC_VER
-           metrowerks: __MWERKS__
-           watcom:    __WATCOMC__
-           portland:  __PGI
-	   nec:       _SX
-	   tcc:       __TINYC__
-           unknown:   UNKNOWN"
-  for ventest in $vendors; do
-    case $ventest in
-      *:) vendor=$ventest; continue ;;
-      *)  vencpp="defined("`echo $ventest | sed 's/,/) || defined(/g'`")" ;;
-    esac
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-      #if !($vencpp)
-        thisisanerror;
-      #endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  break
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  done
-  ax_cv_cxx_compiler_vendor=`echo $vendor | cut -d: -f1`
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_compiler_vendor" >&5
-$as_echo "$ax_cv_cxx_compiler_vendor" >&6; }
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for a sed that does not truncate output" >&5
-$as_echo_n "checking for a sed that does not truncate output... " >&6; }
-if ${ac_cv_path_SED+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-            ac_script=s/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/
-     for ac_i in 1 2 3 4 5 6 7; do
-       ac_script="$ac_script$as_nl$ac_script"
-     done
-     echo "$ac_script" 2>/dev/null | sed 99q >conftest.sed
-     { ac_script=; unset ac_script;}
-     if test -z "$SED"; then
-  ac_path_SED_found=false
-  # Loop through the user's path and test for each of PROGNAME-LIST
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_prog in sed gsed; do
-    for ac_exec_ext in '' $ac_executable_extensions; do
-      ac_path_SED="$as_dir/$ac_prog$ac_exec_ext"
-      as_fn_executable_p "$ac_path_SED" || continue
-# Check for GNU ac_path_SED and select it if it is found.
-  # Check for GNU $ac_path_SED
-case `"$ac_path_SED" --version 2>&1` in
-*GNU*)
-  ac_cv_path_SED="$ac_path_SED" ac_path_SED_found=:;;
-*)
-  ac_count=0
-  $as_echo_n 0123456789 >"conftest.in"
-  while :
-  do
-    cat "conftest.in" "conftest.in" >"conftest.tmp"
-    mv "conftest.tmp" "conftest.in"
-    cp "conftest.in" "conftest.nl"
-    $as_echo '' >> "conftest.nl"
-    "$ac_path_SED" -f conftest.sed < "conftest.nl" >"conftest.out" 2>/dev/null || break
-    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
-    as_fn_arith $ac_count + 1 && ac_count=$as_val
-    if test $ac_count -gt ${ac_path_SED_max-0}; then
-      # Best one so far, save it but keep looking for a better one
-      ac_cv_path_SED="$ac_path_SED"
-      ac_path_SED_max=$ac_count
-    fi
-    # 10*(2^10) chars as input seems more than enough
-    test $ac_count -gt 10 && break
-  done
-  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
-esac
-
-      $ac_path_SED_found && break 3
-    done
-  done
-  done
-IFS=$as_save_IFS
-  if test -z "$ac_cv_path_SED"; then
-    as_fn_error $? "no acceptable sed could be found in \$PATH" "$LINENO" 5
-  fi
-else
-  ac_cv_path_SED=$SED
-fi
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_SED" >&5
-$as_echo "$ac_cv_path_SED" >&6; }
- SED="$ac_cv_path_SED"
-  rm -f conftest.sed
-
-if ${CXXFLAGS+:} false; then :
-  case " $CXXFLAGS " in
-    *"  "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : CXXFLAGS already contains "; } >&5
-  (: CXXFLAGS already contains ) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : CXXFLAGS=\"\$CXXFLAGS \""; } >&5
-  (: CXXFLAGS="$CXXFLAGS ") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      CXXFLAGS="$CXXFLAGS "
-      ;;
-   esac
-else
-  CXXFLAGS=""
-fi
-
-
-
-
-    # We need to turn warnings to errors for AX_APPEND_COMPILE_FLAGS to be able to work.
-    # Different compilers require different flags for this:
-    # GNU: -Werror
-    # Intel: -diag-error warn
-    # Clang: -Werror=unknown-warning-option
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts -Werror=unknown-warning-option" >&5
-$as_echo_n "checking whether C++ compiler accepts -Werror=unknown-warning-option... " >&6; }
-if ${ax_cv_check_cxxflags___Werror_unknown_warning_option+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CXXFLAGS
-  CXXFLAGS="$CXXFLAGS  -Werror=unknown-warning-option"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ax_cv_check_cxxflags___Werror_unknown_warning_option=yes
-else
-  ax_cv_check_cxxflags___Werror_unknown_warning_option=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CXXFLAGS=$ax_check_save_flags
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___Werror_unknown_warning_option" >&5
-$as_echo "$ax_cv_check_cxxflags___Werror_unknown_warning_option" >&6; }
-if test "x$ax_cv_check_cxxflags___Werror_unknown_warning_option" = xyes; then :
-
-        ax_compiler_flags_test="-Werror=unknown-warning-option"
-
-else
-
-        ax_compiler_flags_test="-Werror"
-
-fi
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts -diag-error warn" >&5
-$as_echo_n "checking whether C++ compiler accepts -diag-error warn... " >&6; }
-if ${ax_cv_check_cxxflags___diag_error_warn+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CXXFLAGS
-  CXXFLAGS="$CXXFLAGS  -diag-error warn"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ax_cv_check_cxxflags___diag_error_warn=yes
-else
-  ax_cv_check_cxxflags___diag_error_warn=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CXXFLAGS=$ax_check_save_flags
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___diag_error_warn" >&5
-$as_echo "$ax_cv_check_cxxflags___diag_error_warn" >&6; }
-if test "x$ax_cv_check_cxxflags___diag_error_warn" = xyes; then :
-
-        ax_compiler_flags_test="-diag-error warn"
-
-else
-  :
-fi
-
-
-    # Base flags
-
-
-for flag in         -O0         -g     ; do
-  as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags_$ax_compiler_flags_test_$flag" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $flag" >&5
-$as_echo_n "checking whether C++ compiler accepts $flag... " >&6; }
-if eval \${$as_CACHEVAR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CXXFLAGS
-  CXXFLAGS="$CXXFLAGS $ax_compiler_flags_test $flag"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  eval "$as_CACHEVAR=yes"
-else
-  eval "$as_CACHEVAR=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CXXFLAGS=$ax_check_save_flags
-fi
-eval ac_res=\$$as_CACHEVAR
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-  if ${ax_compiler_cxxflags+:} false; then :
-  case " $ax_compiler_cxxflags " in
-    *" $flag "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
-  (: ax_compiler_cxxflags already contains $flag) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
-      ;;
-   esac
-else
-  ax_compiler_cxxflags="$flag"
-fi
-
-else
-  :
-fi
-
-done
-
-
-    # http://stackoverflow.com/questions/3375697/useful-gcc-flags-for-c
-    # http://stackoverflow.com/questions/5088460/flags-to-enable-thorough-and-verbose-g-warnings
-
-
-for flag in          $ax_compiler_flags_test         "-check all"         "-debug all" 	"-diag-disable remark" 	-fmudflap 	-fno-strict-aliasing 	-fsanitize=address 	-fsanitize=leak 	-fstack-protector 	-ftrapuv 	-ftrapv 	-traceback 		-Wall 	-Warray-bounds         -Wbad-function-cast 		-Wcast-align 	-Wcast-qual 	-Wextra 	-Wfatal-errors 		-Wformat=2 	-Wformat-nonliteral 	-Wformat-security 	-Winit-self 	-Winline 	-Wmissing-format-attribute 	-Wmissing-include-dirs 	-Wmissing-noreturn         -Wnested-externs 	-Wno-missing-field-initializers 	-Wno-overloaded-virtual         -Wno-unused-local-typedefs 	-Wno-unused-parameter         -Wno-unused-variable 		-Wpointer-arith 	-Wredundant-decls 	-Wreturn-type 	-Wshadow 	-Wsign-compare 	-Wstrict-aliasing 	-Wstrict-overflow=5 	-Wstrict-prototype 		-Wswitch-enum 		-Wuninitialized 	-Wunreachable-code 	-Wunused-but-set-variable 	-Wwrite-strings     ; do
-  as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags_$ax_compiler_flags_test_$flag" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $flag" >&5
-$as_echo_n "checking whether C++ compiler accepts $flag... " >&6; }
-if eval \${$as_CACHEVAR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CXXFLAGS
-  CXXFLAGS="$CXXFLAGS $ax_compiler_flags_test $flag"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  eval "$as_CACHEVAR=yes"
-else
-  eval "$as_CACHEVAR=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CXXFLAGS=$ax_check_save_flags
-fi
-eval ac_res=\$$as_CACHEVAR
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-  if ${ax_compiler_cxxflags+:} false; then :
-  case " $ax_compiler_cxxflags " in
-    *" $flag "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
-  (: ax_compiler_cxxflags already contains $flag) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
-      ;;
-   esac
-else
-  ax_compiler_cxxflags="$flag"
-fi
-
-else
-  :
-fi
-
-done
-
-
-    # In the flags below, when disabling specific flags, always add *both*
-    # -Wno-foo and -Wno-error=foo. This fixes the situation where (for example)
-    # we enable -Werror, disable a flag, and a build bot passes C/CXX/FCFLAGS=-Wall,
-    # which effectively turns that flag back on again as an error.
-    for flag in $ax_compiler_cxxflags; do
-        case $flag in #(
-  -Wno-*=*) :
-     ;; #(
-  -Wno-*) :
-
-
-
-for flag in -Wno-error=$($as_echo $flag | $SED 's/^-Wno-//'); do
-  as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags_$ax_compiler_flags_test_$flag" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $flag" >&5
-$as_echo_n "checking whether C++ compiler accepts $flag... " >&6; }
-if eval \${$as_CACHEVAR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CXXFLAGS
-  CXXFLAGS="$CXXFLAGS $ax_compiler_flags_test $flag"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  eval "$as_CACHEVAR=yes"
-else
-  eval "$as_CACHEVAR=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CXXFLAGS=$ax_check_save_flags
-fi
-eval ac_res=\$$as_CACHEVAR
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-  if ${ax_compiler_cxxflags+:} false; then :
-  case " $ax_compiler_cxxflags " in
-    *" $flag "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
-  (: ax_compiler_cxxflags already contains $flag) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
-      ;;
-   esac
-else
-  ax_compiler_cxxflags="$flag"
-fi
-
-else
-  :
-fi
-
-done
-
-                 ;; #(
-  *) :
-     ;;
-esac
-    done
-
-    COMPILER_CXXFLAGS=$ax_compiler_cxxflags
-    # Substitute the variables
-
-
-
-ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
+#AX_COMPILER_VENDOR()
 #AX_COMPILER_FLAGS()
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-
+{ $as_echo "$as_me:${as_lineno-$LINENO}: OpenMP   : $enable_openmp" >&5
+$as_echo "$as_me: OpenMP   : $enable_openmp" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: MPI      : $enable_mpi" >&5
+$as_echo "$as_me: MPI      : $enable_mpi" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: CUDA     : $enable_cuda" >&5
+$as_echo "$as_me: CUDA     : $enable_cuda" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: FP32     : $enable_single" >&5
+$as_echo "$as_me: FP32     : $enable_single" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: SIMD     : $SIMD_FLAGS" >&5
+$as_echo "$as_me: SIMD     : $SIMD_FLAGS" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Assert   : $enable_assert" >&5
+$as_echo "$as_me: Assert   : $enable_assert" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Debug    : $enable_debug" >&5
+$as_echo "$as_me: Debug    : $enable_debug" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: Vendor   : $ax_cv_cxx_compiler_vendor" >&5
 $as_echo "$as_me: Vendor   : $ax_cv_cxx_compiler_vendor" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: CXX      : $CXX" >&5
@@ -6944,6 +6992,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXAFMM_HAVE_MPI_TRUE}" && test -z "${EXAFMM_HAVE_MPI_FALSE}"; then
   as_fn_error $? "conditional \"EXAFMM_HAVE_MPI\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${EXAFMM_HAVE_CUDA_TRUE}" && test -z "${EXAFMM_HAVE_CUDA_FALSE}"; then
+  as_fn_error $? "conditional \"EXAFMM_HAVE_CUDA\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXAFMM_SINGLE_TRUE}" && test -z "${EXAFMM_SINGLE_FALSE}"; then
