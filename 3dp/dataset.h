@@ -27,9 +27,9 @@ namespace exafmm {
     splitRange(begin, end, mpirank, mpisize);
     int numLattice = nx * ny * (end - begin);
     Bodies bodies(numLattice);
-    for (int ix=0; ix<nx; ix++) {
+    for (int ix=0, b=0; ix<nx; ix++) {
       for (int iy=0; iy<ny; iy++) {
-        for (int iz=begin, b=0; iz<end; ++iz, ++b) {
+        for (int iz=begin; iz<end; ++iz, ++b) {
           bodies[b].X[0] = (ix / real_t(nx-1)) * 2 - 1;
           bodies[b].X[1] = (iy / real_t(ny-1)) * 2 - 1;
           bodies[b].X[2] = (iz / real_t(nz-1)) * 2 - 1;
