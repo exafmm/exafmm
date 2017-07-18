@@ -68,7 +68,7 @@ AC_DEFUN([AX_EXT],
 
           if test "$ax_cv_have_altivec_old_ext" = yes; then
             AC_DEFINE(HAVE_ALTIVEC,,[Support Altivec instructions])
-            AX_CHECK_COMPILE_FLAG(-faltivec, SIMD_FLAGS="-faltivec", [])
+            AX_CHECK_COMPILE_FLAG(-faltivec, SIMD_FLAGS="$SIMD_FLAGS -faltivec", [])
           fi
 
       AC_CACHE_CHECK([whether altivec is supported], [ax_cv_have_altivec_ext],
@@ -80,7 +80,7 @@ AC_DEFUN([AX_EXT],
 
           if test "$ax_cv_have_altivec_ext" = yes; then
             AC_DEFINE(HAVE_ALTIVEC,,[Support Altivec instructions])
-            AX_CHECK_COMPILE_FLAG(-maltivec, SIMD_FLAGS="-maltivec", [])
+            AX_CHECK_COMPILE_FLAG(-maltivec, SIMD_FLAGS="$SIMD_FLAGS -maltivec", [])
           fi
 
       AC_CACHE_CHECK([whether vsx is supported], [ax_cv_have_vsx_ext],
@@ -92,7 +92,7 @@ AC_DEFUN([AX_EXT],
 
           if test "$ax_cv_have_vsx_ext" = yes; then
             AC_DEFINE(HAVE_VSX,,[Support VSX instructions])
-            AX_CHECK_COMPILE_FLAG(-mvsx, SIMD_FLAGS="-mvsx", [])
+            AX_CHECK_COMPILE_FLAG(-mvsx, SIMD_FLAGS="$SIMD_FLAGS -mvsx", [])
           fi
     ;;
 

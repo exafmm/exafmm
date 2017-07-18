@@ -7,8 +7,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
 AM_MAINTAINER_MODE
 AC_LANG([C++])
-: ${CXXFLAGS=""}
-: ${FCFLAGS=""}
+#: ${CXXFLAGS=""}
+#: ${FCFLAGS=""}
 AC_PROG_CXX([CC icpc g++])
 AC_PROG_FC([ftn ifort gfortran])
 AC_PROG_RANLIB

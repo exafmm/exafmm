@@ -2791,8 +2791,8 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-: ${CXXFLAGS=""}
-: ${FCFLAGS=""}
+#: ${CXXFLAGS=""}
+#: ${FCFLAGS=""}
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5457,7 +5457,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___faltivec" >&5
 $as_echo "$ax_cv_check_cxxflags___faltivec" >&6; }
 if test "x$ax_cv_check_cxxflags___faltivec" = xyes; then :
-  SIMD_FLAGS="-faltivec"
+  SIMD_FLAGS="$SIMD_FLAGS -faltivec"
 else
   :
 fi
@@ -5512,7 +5512,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___maltivec" >&5
 $as_echo "$ax_cv_check_cxxflags___maltivec" >&6; }
 if test "x$ax_cv_check_cxxflags___maltivec" = xyes; then :
-  SIMD_FLAGS="-maltivec"
+  SIMD_FLAGS="$SIMD_FLAGS -maltivec"
 else
   :
 fi
@@ -5567,7 +5567,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___mvsx" >&5
 $as_echo "$ax_cv_check_cxxflags___mvsx" >&6; }
 if test "x$ax_cv_check_cxxflags___mvsx" = xyes; then :
-  SIMD_FLAGS="-mvsx"
+  SIMD_FLAGS="$SIMD_FLAGS -mvsx"
 else
   :
 fi
