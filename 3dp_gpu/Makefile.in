@@ -108,9 +108,7 @@ bin_PROGRAMS = build_tree$(EXEEXT) traverse$(EXEEXT) kernel$(EXEEXT) \
 subdir = 3dp_gpu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
-	$(top_srcdir)/m4/ax_check_cuda.m4 \
-	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
-	$(top_srcdir)/m4/ax_ext.m4 \
+	$(top_srcdir)/m4/ax_check_cuda.m4 $(top_srcdir)/m4/ax_ext.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_mpi.m4 $(top_srcdir)/m4/ax_openmp.m4 \
 	$(top_srcdir)/configure.ac
@@ -412,6 +410,7 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
+CPUEXT_FLAGS = @CPUEXT_FLAGS@
 CUDA_CFLAGS = @CUDA_CFLAGS@
 CUDA_LDLIBS = @CUDA_LDLIBS@
 CXX = @CXX@

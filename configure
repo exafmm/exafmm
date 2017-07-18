@@ -597,6 +597,7 @@ EXAFMM_DEBUG_FALSE
 EXAFMM_DEBUG_TRUE
 EXAFMM_ASSERT_FALSE
 EXAFMM_ASSERT_TRUE
+CPUEXT_FLAGS
 SIMD_FLAGS
 host_os
 host_vendor
@@ -5876,6 +5877,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
+  CPUEXT_FLAGS=""
   SIMD_FLAGS=""
 
   case $host_cpu in
@@ -5930,7 +5932,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___faltivec" >&5
 $as_echo "$ax_cv_check_cxxflags___faltivec" >&6; }
 if test "x$ax_cv_check_cxxflags___faltivec" = xyes; then :
-  SIMD_FLAGS="$SIMD_FLAGS -faltivec"
+  SIMD_FLAGS="-faltivec"
 else
   :
 fi
@@ -5985,7 +5987,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___maltivec" >&5
 $as_echo "$ax_cv_check_cxxflags___maltivec" >&6; }
 if test "x$ax_cv_check_cxxflags___maltivec" = xyes; then :
-  SIMD_FLAGS="$SIMD_FLAGS -maltivec"
+  SIMD_FLAGS="-maltivec"
 else
   :
 fi
@@ -6040,7 +6042,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cxxflags___mvsx" >&5
 $as_echo "$ax_cv_check_cxxflags___mvsx" >&6; }
 if test "x$ax_cv_check_cxxflags___mvsx" = xyes; then :
-  SIMD_FLAGS="$SIMD_FLAGS -mvsx"
+  SIMD_FLAGS="-mvsx"
 else
   :
 fi
@@ -6390,6 +6392,15 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
         fi
       fi
 
+      if ${ax_cv_have_mmx_os_support_ext+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+        ax_cv_have_mmx_os_support_ext=yes
+
+fi
+
+
       ax_cv_have_none_os_support_ext=yes
 
       if ${ax_cv_have_sse_os_support_ext+:} false; then :
@@ -6535,7 +6546,7 @@ else
 fi
 
 
-      for ac_instr_info       in "sse;sse3;SSE3;ecx_cpuid1,1;-msse3;HAVE_SSE3;SIMD_FLAGS"          "avx;avx;AVX;ecx_cpuid1,28;-mavx;HAVE_AVX;SIMD_FLAGS"          "avx;avx2;AVX2;ebx_cpuid7,5;-mavx2;HAVE_AVX2;SIMD_FLAGS"          "avx512;avx512f;AVX512-F;ebx_cpuid7,16;-mavx512f;HAVE_AVX512_F;SIMD_FLAGS"          "avx512;avx512cd;AVX512-CD;ebx_cpuid7,28;-mavx512cd;HAVE_AVX512_CD;SIMD_FLAGS"          "avx512;avx512pf;AVX512-PF;ebx_cpuid7,26;-mavx512pf;HAVE_AVX512_PF;SIMD_FLAGS"          "avx512;avx512er;AVX512-ER;ebx_cpuid7,27;-mavx512er;HAVE_AVX512_ER;SIMD_FLAGS"          "avx512;avx512vl;AVX512-VL;ebx_cpuid7,31;-mavx512vl;HAVE_AVX512_VL;SIMD_FLAGS"          "avx512;avx512bw;AVX512-BW;ebx_cpuid7,30;-mavx512bw;HAVE_AVX512_BW;SIMD_FLAGS"          "avx512;avx512dq;AVX512-DQ;ebx_cpuid7,17;-mavx512dq;HAVE_AVX512_DQ;SIMD_FLAGS"          "avx512;avx512ifma;AVX512-IFMA;ebx_cpuid7,21;-mavx512ifma;HAVE_AVX512_IFMA;SIMD_FLAGS"          "avx512;avx512vbmi;AVX512-VBMI;ecx_cpuid7,1;-mavx512vbmi;HAVE_AVX512_VBMI;SIMD_FLAGS"          #
+      for ac_instr_info       in "none;rdrnd;RDRND;ecx_cpuid1,30;-mrdrnd;HAVE_RDRND;CPUEXT_FLAGS"          "none;bmi1;BMI1;ebx_cpuid7,3;-mbmi;HAVE_BMI1;CPUEXT_FLAGS"          "none;bmi2;BMI2;ebx_cpuid7,8;-mbmi2;HAVE_BMI2;CPUEXT_FLAGS"          "none;adx;ADX;ebx_cpuid7,19;-madx;HAVE_ADX;CPUEXT_FLAGS"          "none;mpx;MPX;ebx_cpuid7,14;-mmpx;HAVE_MPX;CPUEXT_FLAGS"          "none;prefetchwt1;PREFETCHWT1;ecx_cpuid7,0;-mprefetchwt1;HAVE_PREFETCHWT1;CPUEXT_FLAGS"          "none;abm;ABM;ecx_cpuid80000001,5;-mabm;HAVE_ABM;CPUEXT_FLAGS"          "mmx;mmx;MMX;edx_cpuid1,23;-mmmx;HAVE_MMX;SIMD_FLAGS"          "sse;sse;SSE;edx_cpuid1,25;-msse;HAVE_SSE;SIMD_FLAGS"          "sse;sse2;SSE2;edx_cpuid1,26;-msse2;HAVE_SSE2;SIMD_FLAGS"          "sse;sse3;SSE3;ecx_cpuid1,1;-msse3;HAVE_SSE3;SIMD_FLAGS"          "sse;ssse3;SSSE3;ecx_cpuid1,9;-mssse3;HAVE_SSSE3;SIMD_FLAGS"          "sse;sse41;SSE4.1;ecx_cpuid1,19;-msse4.1;HAVE_SSE4_1;SIMD_FLAGS"          "sse;sse42;SSE4.2;ecx_cpuid1,20;-msse4.2;HAVE_SSE4_2;SIMD_FLAGS"          "sse;sse4a;SSE4a;ecx_cpuid80000001,6;-msse4a;HAVE_SSE4a;SIMD_FLAGS"          "sse;sha;SHA;ebx_cpuid7,29;-msha;HAVE_SHA;SIMD_FLAGS"          "sse;aes;AES;ecx_cpuid1,25;-maes;HAVE_AES;SIMD_FLAGS"          "avx;avx;AVX;ecx_cpuid1,28;-mavx;HAVE_AVX;SIMD_FLAGS"          "avx;fma3;FMA3;ecx_cpuid1,12;-mfma;HAVE_FMA3;SIMD_FLAGS"          "avx;fma4;FMA4;ecx_cpuid80000001,16;-mfma4;HAVE_FMA4;SIMD_FLAGS"          "avx;xop;XOP;ecx_cpuid80000001,11;-mxop;HAVE_XOP;SIMD_FLAGS"          "avx;avx2;AVX2;ebx_cpuid7,5;-mavx2;HAVE_AVX2;SIMD_FLAGS"          "avx512;avx512f;AVX512-F;ebx_cpuid7,16;-mavx512f;HAVE_AVX512_F;SIMD_FLAGS"          "avx512;avx512cd;AVX512-CD;ebx_cpuid7,28;-mavx512cd;HAVE_AVX512_CD;SIMD_FLAGS"          "avx512;avx512pf;AVX512-PF;ebx_cpuid7,26;-mavx512pf;HAVE_AVX512_PF;SIMD_FLAGS"          "avx512;avx512er;AVX512-ER;ebx_cpuid7,27;-mavx512er;HAVE_AVX512_ER;SIMD_FLAGS"          "avx512;avx512vl;AVX512-VL;ebx_cpuid7,31;-mavx512vl;HAVE_AVX512_VL;SIMD_FLAGS"          "avx512;avx512bw;AVX512-BW;ebx_cpuid7,30;-mavx512bw;HAVE_AVX512_BW;SIMD_FLAGS"          "avx512;avx512dq;AVX512-DQ;ebx_cpuid7,17;-mavx512dq;HAVE_AVX512_DQ;SIMD_FLAGS"          "avx512;avx512ifma;AVX512-IFMA;ebx_cpuid7,21;-mavx512ifma;HAVE_AVX512_IFMA;SIMD_FLAGS"          "avx512;avx512vbmi;AVX512-VBMI;ecx_cpuid7,1;-mavx512vbmi;HAVE_AVX512_VBMI;SIMD_FLAGS"          #
       do ac_instr_os_support=$(eval echo \$ax_cv_have_$(echo $ac_instr_info | cut -d ";" -f 1)_os_support_ext)
          ac_instr_acvar=$(echo $ac_instr_info | cut -d ";" -f 2)
          ac_instr_shortname=$(echo $ac_instr_info | cut -d ";" -f 3)
@@ -6657,76 +6668,25 @@ fi
   ;;
   esac
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++ compiler vendor" >&5
-$as_echo_n "checking for C++ compiler vendor... " >&6; }
-if ${ax_cv_cxx_compiler_vendor+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-    # note: don't check for gcc first since some other compilers define __GNUC__
-  vendors="intel:     __ICC,__ECC,__INTEL_COMPILER
-           ibm:       __xlc__,__xlC__,__IBMC__,__IBMCPP__
-           pathscale: __PATHCC__,__PATHSCALE__
-           clang:     __clang__
-           cray:      _CRAYC
-           fujitsu:   __FUJITSU
-           gnu:       __GNUC__
-           sun:       __SUNPRO_C,__SUNPRO_CC
-           hp:        __HP_cc,__HP_aCC
-           dec:       __DECC,__DECCXX,__DECC_VER,__DECCXX_VER
-           borland:   __BORLANDC__,__CODEGEARC__,__TURBOC__
-           comeau:    __COMO__
-           kai:       __KCC
-           lcc:       __LCC__
-           sgi:       __sgi,sgi
-           microsoft: _MSC_VER
-           metrowerks: __MWERKS__
-           watcom:    __WATCOMC__
-           portland:  __PGI
-	   nec:       _SX
-	   tcc:       __TINYC__
-           unknown:   UNKNOWN"
-  for ventest in $vendors; do
-    case $ventest in
-      *:) vendor=$ventest; continue ;;
-      *)  vencpp="defined("`echo $ventest | sed 's/,/) || defined(/g'`")" ;;
-    esac
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
 
-int
-main ()
-{
 
-      #if !($vencpp)
-        thisisanerror;
-      #endif
 
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  break
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  done
-  ax_cv_cxx_compiler_vendor=`echo $vendor | cut -d: -f1`
 
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_compiler_vendor" >&5
-$as_echo "$ax_cv_cxx_compiler_vendor" >&6; }
 
-  if test x"${ax_cv_cxx_compiler_vendor}" = x"intel"; then
-    if test x"${ax_cv_support_avx_ext}" = x"yes"; then
-      SIMD_FLAGS="-mavx"
-    fi
-    if test x"${ax_cv_support_avx2_ext}" = x"yes"; then
-            SIMD_FLAGS="-march=core-avx2"
-    fi
-    if test x"${ax_cv_support_avx512er_ext}" = x"yes"; then
-            SIMD_FLAGS="-xMIC-AVX512"
-    fi
-  fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
