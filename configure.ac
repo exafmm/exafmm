@@ -7,8 +7,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
 AM_MAINTAINER_MODE
 AC_LANG([C++])
-${CXXFLAGS=""}
-${FCFLAGS=""}
+CXXFLAGS=""
+FCFLAGS=""
 AC_PROG_CXX([CC icpc g++])
 AC_PROG_FC([ftn ifort gfortran])
 AC_PROG_RANLIB
@@ -38,6 +38,15 @@ if test "$enable_mpi" = "yes"; then
 fi
 AM_CONDITIONAL(EXAFMM_HAVE_MPI, test "$enable_mpi" = "yes")
 
+# SIMD extensions
+AC_ARG_ENABLE([simd],
+              [AS_HELP_STRING([--disable-simd],[disable SIMD])],
+              [enable_simd=$enableval],
+              [enable_simd=yes])
+if test "$enable_simd" = "yes"; then
+   AX_EXT
+fi
+
 # CUDA
 AC_ARG_ENABLE([cuda],
               [AS_HELP_STRING([--disable-cuda],[do not compile with CUDA])],
@@ -66,15 +75,6 @@ fi
 AM_CONDITIONAL(EXAFMM_SINGLE, test "$enable_single" = "yes")
 AC_SUBST(PRECISION)
 
-# SIMD extensions supported by compiler
-AC_ARG_ENABLE([simd],
-              [AS_HELP_STRING([--disable-simd],[disable SIMD])],
-              [enable_simd=$enableval],
-              [enable_simd=yes])
-if test "$enable_simd" = "yes"; then
-   AX_EXT
-fi
-
 # Assertion
 AC_ARG_ENABLE([assert],
               [AS_HELP_STRING([--disable-assert],[disable assertion])],
@@ -95,8 +95,8 @@ if test "$enable_debug" = "yes"; then
 fi
 AM_CONDITIONAL(EXAFMM_DEBUG, test "$enable_debug" = "yes")
 
-#AX_COMPILER_VENDOR()
-#AX_COMPILER_FLAGS()
+AX_COMPILER_VENDOR()
+AX_COMPILER_FLAGS()
 
 AC_MSG_NOTICE([OpenMP   : $enable_openmp])
 AC_MSG_NOTICE([MPI      : $enable_mpi])
@@ -108,6 +108,8 @@ AC_MSG_NOTICE([Debug    : $enable_debug])
 AC_MSG_NOTICE([Vendor   : $ax_cv_cxx_compiler_vendor])
 AC_MSG_NOTICE([CXX      : $CXX])
 AC_MSG_NOTICE([FC       : $FC])
+AC_MSG_NOTICE([CXXFLAGS : $CXXFLAGS])
+AC_MSG_NOTICE([FCFLAGS  : $FCFLAGS])
 
 AM_CONDITIONAL(EXAFMM_HAVE_CRAY, test "$CXX" = "CC")
 AM_CONDITIONAL(EXAFMM_HAVE_INTEL, test "$ax_cv_cxx_compiler_vendor" = "intel")

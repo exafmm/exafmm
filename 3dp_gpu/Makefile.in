@@ -108,7 +108,11 @@ bin_PROGRAMS = build_tree$(EXEEXT) traverse$(EXEEXT) kernel$(EXEEXT) \
 subdir = 3dp_gpu
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
-	$(top_srcdir)/m4/ax_check_cuda.m4 $(top_srcdir)/m4/ax_ext.m4 \
+	$(top_srcdir)/m4/ax_check_cuda.m4 \
+	$(top_srcdir)/m4/ax_compiler_flags.m4 \
+	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
+	$(top_srcdir)/m4/ax_ext.m4 \
+	$(top_srcdir)/m4/ax_gcc_x86_avx_xgetbv.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_mpi.m4 $(top_srcdir)/m4/ax_openmp.m4 \
 	$(top_srcdir)/configure.ac
@@ -409,6 +413,7 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+COMPILER_CXXFLAGS = @COMPILER_CXXFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CPUEXT_FLAGS = @CPUEXT_FLAGS@
 CUDA_CFLAGS = @CUDA_CFLAGS@
@@ -456,6 +461,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PRECISION = @PRECISION@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SIMD_FLAGS = @SIMD_FLAGS@
@@ -474,6 +480,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+ax_compiler_cxxflags = @ax_compiler_cxxflags@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@

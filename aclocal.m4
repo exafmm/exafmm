@@ -21,34 +21,34 @@ If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically 'autoreconf'.])])
 
 # ===========================================================================
-#   http://www.gnu.org/software/autoconf-archive/ax_gcc_x86_avx_xgetbv.html
+#  http://www.gnu.org/software/autoconf-archive/ax_append_compile_flags.html
 # ===========================================================================
 #
 # SYNOPSIS
 #
-#   AX_GCC_X86_AVX_XGETBV
+#   AX_APPEND_COMPILE_FLAGS([FLAG1 FLAG2 ...], [FLAGS-VARIABLE], [EXTRA-FLAGS])
 #
 # DESCRIPTION
 #
-#   On later x86 processors with AVX SIMD support, with gcc or a compiler
-#   that has a compatible syntax for inline assembly instructions, run a
-#   small program that executes the xgetbv instruction with input OP. This
-#   can be used to detect if the OS supports AVX instruction usage.
+#   For every FLAG1, FLAG2 it is checked whether the compiler works with the
+#   flag.  If it does, the flag is added FLAGS-VARIABLE
 #
-#   On output, the values of the eax and edx registers are stored as
-#   hexadecimal strings as "eax:edx" in the cache variable
-#   ax_cv_gcc_x86_avx_xgetbv.
+#   If FLAGS-VARIABLE is not specified, the current language's flags (e.g.
+#   CFLAGS) is used.  During the check the flag is always added to the
+#   current language's flags.
 #
-#   If the xgetbv instruction fails (because you are running a
-#   cross-compiler, or because you are not using gcc, or because you are on
-#   a processor that doesn't have this instruction),
-#   ax_cv_gcc_x86_avx_xgetbv_OP is set to the string "unknown".
+#   If EXTRA-FLAGS is defined, it is added to the current language's default
+#   flags (e.g. CFLAGS) when the check is done.  The check is thus made with
+#   the flags: "CFLAGS EXTRA-FLAGS FLAG".  This can for example be used to
+#   force the compiler to issue an error when a bad flag is given.
 #
-#   This macro mainly exists to be used in AX_EXT.
+#   NOTE: This macro depends on the AX_APPEND_FLAG and
+#   AX_CHECK_COMPILE_FLAG. Please keep this macro in sync with
+#   AX_APPEND_LINK_FLAGS.
 #
 # LICENSE
 #
-#   Copyright (c) 2013 Michael Petch <mpetch@capp-sysware.com>
+#   Copyright (c) 2011 Maarten Bosmans <mkbosmans@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -76,29 +76,85 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 1
+#serial 3
 
-AC_DEFUN([AX_GCC_X86_AVX_XGETBV],
-[AC_REQUIRE([AC_PROG_CC])
-AC_LANG_PUSH([C])
-AC_CACHE_CHECK(for x86-AVX xgetbv $1 output, ax_cv_gcc_x86_avx_xgetbv_$1,
- [AC_RUN_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>], [
-     int op = $1, eax, edx;
-     FILE *f;
-      /* Opcodes for xgetbv */
-      __asm__(".byte 0x0f, 0x01, 0xd0"
-        : "=a" (eax), "=d" (edx)
-        : "c" (op));
-     f = fopen("conftest_xgetbv", "w"); if (!f) return 1;
-     fprintf(f, "%x:%x\n", eax, edx);
-     fclose(f);
-     return 0;
-])],
-     [ax_cv_gcc_x86_avx_xgetbv_$1=`cat conftest_xgetbv`; rm -f conftest_xgetbv],
-     [ax_cv_gcc_x86_avx_xgetbv_$1=unknown; rm -f conftest_xgetbv],
-     [ax_cv_gcc_x86_avx_xgetbv_$1=unknown])])
-AC_LANG_POP([C])
-])
+AC_DEFUN([AX_APPEND_COMPILE_FLAGS],
+[AC_REQUIRE([AX_CHECK_COMPILE_FLAG])
+AC_REQUIRE([AX_APPEND_FLAG])
+for flag in $1; do
+  AX_CHECK_COMPILE_FLAG([$flag], [AX_APPEND_FLAG([$flag], [$2])], [], [$3])
+done
+])dnl AX_APPEND_COMPILE_FLAGS
+
+# ===========================================================================
+#      http://www.gnu.org/software/autoconf-archive/ax_append_flag.html
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_APPEND_FLAG(FLAG, [FLAGS-VARIABLE])
+#
+# DESCRIPTION
+#
+#   FLAG is appended to the FLAGS-VARIABLE shell variable, with a space
+#   added in between.
+#
+#   If FLAGS-VARIABLE is not specified, the current language's flags (e.g.
+#   CFLAGS) is used.  FLAGS-VARIABLE is not changed if it already contains
+#   FLAG.  If FLAGS-VARIABLE is unset in the shell, it is set to exactly
+#   FLAG.
+#
+#   NOTE: Implementation based on AX_CFLAGS_GCC_OPTION.
+#
+# LICENSE
+#
+#   Copyright (c) 2008 Guido U. Draheim <guidod@gmx.de>
+#   Copyright (c) 2011 Maarten Bosmans <mkbosmans@gmail.com>
+#
+#   This program is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#   As a special exception, the respective Autoconf Macro's copyright owner
+#   gives unlimited permission to copy, distribute and modify the configure
+#   scripts that are the output of Autoconf when processing the Macro. You
+#   need not follow the terms of the GNU General Public License when using
+#   or distributing such scripts, even though portions of the text of the
+#   Macro appear in them. The GNU General Public License (GPL) does govern
+#   all other use of the material that constitutes the Autoconf Macro.
+#
+#   This special exception to the GPL applies to versions of the Autoconf
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 2
+
+AC_DEFUN([AX_APPEND_FLAG],
+[AC_PREREQ(2.59)dnl for _AC_LANG_PREFIX
+AS_VAR_PUSHDEF([FLAGS], [m4_default($2,_AC_LANG_PREFIX[FLAGS])])dnl
+AS_VAR_SET_IF(FLAGS,
+  [case " AS_VAR_GET(FLAGS) " in
+    *" $1 "*)
+      AC_RUN_LOG([: FLAGS already contains $1])
+      ;;
+    *)
+      AC_RUN_LOG([: FLAGS="$FLAGS $1"])
+      AS_VAR_SET(FLAGS, ["AS_VAR_GET(FLAGS) $1"])
+      ;;
+   esac],
+  [AS_VAR_SET(FLAGS,["$1"])])
+AS_VAR_POPDEF([FLAGS])dnl
+])dnl AX_APPEND_FLAG
 
 # ===========================================================================
 #     http://www.gnu.org/software/autoconf-archive/ax_normalize_path.html
@@ -1441,7 +1497,10 @@ AC_SUBST([am__untar])
 
 m4_include([m4/ax_check_compile_flag.m4])
 m4_include([m4/ax_check_cuda.m4])
+m4_include([m4/ax_compiler_flags.m4])
+m4_include([m4/ax_compiler_vendor.m4])
 m4_include([m4/ax_ext.m4])
+m4_include([m4/ax_gcc_x86_avx_xgetbv.m4])
 m4_include([m4/ax_gcc_x86_cpuid.m4])
 m4_include([m4/ax_mpi.m4])
 m4_include([m4/ax_openmp.m4])
