@@ -14,6 +14,7 @@ namespace exafmm {
     {"ncrit",        required_argument, 0, 'c'},
     {"distribution", required_argument, 0, 'd'},
     {"help",         no_argument,       0, 'h'},
+    {"images",       required_argument, 0, 'i'},
     {"numBodies",    required_argument, 0, 'n'},
     {"path",         required_argument, 0, 'p'},
     {"P",            required_argument, 0, 'P'},
@@ -27,6 +28,7 @@ namespace exafmm {
   public:
     int ncrit;                                  //!< Number of bodies per leaf cell
     const char * distribution;                  //!< Body Distribution
+    int images;                                 //!< Number of periodic images (3^images in each direction)
     int numBodies;                              //!< Number of bodies
     const char * path;                          //!< Path to save files
     int P;                                      //!< Order of expansions
@@ -42,6 +44,7 @@ namespace exafmm {
               " --ncrit (-c)                    : Number of bodies per leaf cell (%d)\n"
               " --distribution (-d) [l/c/s/o/p] : lattice, cube, sphere, octant, plummer (%s)\n"
               " --help (-h)                     : Show this help document\n"
+              " --images (-i)                   : Number of images (3^images in each direction) (%d)\n"
               " --numBodies (-n)                : Number of bodies (%d)\n"
               " --path (-p)                     : Path to save files (%s)\n"
               " --P (-P)                        : Order of expansion (%d)\n"
@@ -50,6 +53,7 @@ namespace exafmm {
               name,
               ncrit,
               distribution,
+              images,
               numBodies,
               path,
               P,
@@ -92,6 +96,7 @@ namespace exafmm {
     Args(int argc=0, char ** argv=NULL)
       : ncrit(64),
         distribution("cube"),
+        images(4),
         numBodies(10000),
         path("./"),
         P(10),
@@ -99,7 +104,7 @@ namespace exafmm {
         verbose(1) {
       while (1) {
         int option_index;
-        int c = getopt_long(argc, argv, "c:d:hn:p:P:t:v:",
+        int c = getopt_long(argc, argv, "c:d:hi:n:p:P:t:v:",
                             long_options, &option_index);
         if (c == -1) break;
         switch (c) {
@@ -112,6 +117,9 @@ namespace exafmm {
           case 'h':
             usage(argv[0]);
             abort();
+          case 'i':
+            images = atoi(optarg);
+            break;
           case 'n':
             numBodies = atoi(optarg);
             break;
@@ -134,22 +142,12 @@ namespace exafmm {
       }
     }
 
-    //! Use bit masking to store arguments information in key, used in regression test to identify different runs
-    uint64_t getKey() {
-      uint64_t key = 0;
-      key |= uint64_t(round(log(ncrit)/log(2)));                // [1-4] bit
-      key |= getDistNum(distribution) << 4;                     // [5-15] bit
-      key |= uint64_t(round(log(numBodies)/log(10))) << 15;     // [16-19] bit
-      key |= P << 19;                                           // [20-28] bit
-      key |= uint64_t(theta*14) << 28;                          // [29-64] bit
-      return key;
-    }
-
     //! Print formatted output for arguments
     void show() {
       if (verbose) {
         print("ncrit", ncrit);
         print("distribution", distribution);
+        print("images", images);
         print("numBodies", numBodies);
         print("path", path);
         print("P", P);
