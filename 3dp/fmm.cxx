@@ -50,7 +50,7 @@ int main(int argc, char ** argv) {
   downwardPass(cells);
   stop("L2L & L2P");
   totalFMM += stop("Total FMM");
-#if 1
+#if 0
   start("Direct N-Body");
   const int numTargets = 10;
   Bodies jbodies = bodies;
