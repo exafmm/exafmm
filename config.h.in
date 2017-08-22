@@ -18,16 +18,6 @@
 /* Define to compile in single precision. */
 #undef EXAFMM_SINGLE
 
-/* Define to 1 to support Advanced Bit Manipulation */
-#undef HAVE_ABM
-
-/* Define to 1 to support Multi-Precision Add-Carry Instruction Extensions */
-#undef HAVE_ADX
-
-/* Define to 1 to support Advanced Encryption Standard New Instruction Set
-   (AES-NI) */
-#undef HAVE_AES
-
 /* Support Altivec instructions */
 #undef HAVE_ALTIVEC
 
@@ -64,20 +54,8 @@
 /* Define to 1 to support AVX-512 Vector Length Extensions */
 #undef HAVE_AVX512_VL
 
-/* Define to 1 to support Bit Manipulation Instruction Set 1 */
-#undef HAVE_BMI1
-
-/* Define to 1 to support Bit Manipulation Instruction Set 2 */
-#undef HAVE_BMI2
-
 /* Define if we have CUDA */
 #undef HAVE_CUDA
-
-/* Define to 1 to support Fused Multiply-Add Extensions 3 */
-#undef HAVE_FMA3
-
-/* Define to 1 to support Fused Multiply-Add Extensions 4 */
-#undef HAVE_FMA4
 
 /* Define to 1 if you have the `cublas' library (-lcublas). */
 #undef HAVE_LIBCUBLAS
@@ -88,50 +66,14 @@
 /* Define to 1 if you have the `cudart' library (-lcudart). */
 #undef HAVE_LIBCUDART
 
-/* Define to 1 to support Multimedia Extensions */
-#undef HAVE_MMX
-
-/* Define to 1 to support Memory Protection Extensions */
-#undef HAVE_MPX
-
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
-
-/* Define to 1 to support Prefetch Vector Data Into Caches WT1 */
-#undef HAVE_PREFETCHWT1
-
-/* Define to 1 to support Digital Random Number Generator */
-#undef HAVE_RDRND
-
-/* Define to 1 to support Secure Hash Algorithm Extension */
-#undef HAVE_SHA
-
-/* Define to 1 to support Streaming SIMD Extensions */
-#undef HAVE_SSE
-
-/* Define to 1 to support Streaming SIMD Extensions */
-#undef HAVE_SSE2
 
 /* Define to 1 to support Streaming SIMD Extensions 3 */
 #undef HAVE_SSE3
 
-/* Define to 1 to support Streaming SIMD Extensions 4.1 */
-#undef HAVE_SSE4_1
-
-/* Define to 1 to support Streaming SIMD Extensions 4.2 */
-#undef HAVE_SSE4_2
-
-/* Define to 1 to support AMD Streaming SIMD Extensions 4a */
-#undef HAVE_SSE4a
-
-/* Define to 1 to support Supplemental Streaming SIMD Extensions 3 */
-#undef HAVE_SSSE3
-
 /* Support VSX instructions */
 #undef HAVE_VSX
-
-/* Define to 1 to support eXtended Operations Extensions */
-#undef HAVE_XOP
 
 /* Name of package */
 #undef PACKAGE
