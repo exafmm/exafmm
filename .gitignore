@@ -5,11 +5,13 @@
 *.o
 *.so
 *.out*
+*.p
+*.pyc
 *.th_o
 *.reg
 .deps
 .dirstamp
-nightly.log
+check_all.log
 
 autom4te.cache
 config.h
