@@ -20,14 +20,14 @@ namespace exafmm {
   void buildCells(Body * bodies, Body * buffer, int begin, int end, Cell * cell, Cells & cells,
                   const vec2 & X, real_t R, int level=0, bool direction=false) {
     //! Create a tree cell
-    cell->BODY = bodies + begin;
-    if(direction) cell->BODY = buffer + begin;
-    cell->NBODY = end - begin;
-    cell->NCHILD = 0;
+    cell->body = bodies + begin;
+    if(direction) cell->body = buffer + begin;
+    cell->numBodies = end - begin;
+    cell->numChilds = 0;
     cell->X = X;
     cell->R = R / (1 << level);
     //! If cell is a leaf
-    if (end - begin <= ncrit) {
+    if (end - begin <= NCRIT) {
       if (direction) {
         for (int i=begin; i<end; i++) {
           buffer[i].X = bodies[i].X;
@@ -50,7 +50,7 @@ namespace exafmm {
     for (int i=0; i<4; i++) {
       offsets[i] = offset;
       offset += size[i];
-      if (size[i]) cell->NCHILD++;
+      if (size[i]) cell->numChilds++;
     }
     //! Sort bodies by quadrant
     for (int i=0; i<4; i++) counter[i] = offsets[i];
@@ -63,9 +63,9 @@ namespace exafmm {
     }
     //! Loop over children and recurse
     vec2 Xchild;
-    cells.resize(cells.size()+cell->NCHILD);
-    Cell * child = &cells.back() - cell->NCHILD + 1;
-    cell->CHILD = child;
+    cells.resize(cells.size()+cell->numChilds);
+    Cell * child = &cells.back() - cell->numChilds + 1;
+    cell->child = child;
     int c = 0;
     for (int i=0; i<4; i++) {
       Xchild = X;

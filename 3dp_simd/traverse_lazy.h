@@ -6,14 +6,14 @@
 namespace exafmm {
   //! Recursive call to post-order tree traversal for upward pass
   void upwardPass(Cell * Ci) {
-    for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) {
-#pragma omp task untied if(Cj->NBODY > 100)
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
+#pragma omp task untied if(Cj->numBodies > 100)
       upwardPass(Cj);
     }
 #pragma omp taskwait
     Ci->M.resize(NTERM, 0.0);
     Ci->L.resize(NTERM, 0.0);
-    if(Ci->NCHILD==0) P2M(Ci);
+    if(Ci->numChilds==0) P2M(Ci);
     M2M(Ci);
   }
 
@@ -25,34 +25,34 @@ namespace exafmm {
   }
 
   //! 3-D to 1-D periodic index
-  int periodic1D(int * iX) {
-    return iX[0] + 1 + 3 * (iX[1] + 1) + 9 * (iX[2] + 1);
+  int periodic1D(int * IX) {
+    return IX[0] + 1 + 3 * (IX[1] + 1) + 9 * (IX[2] + 1);
   }
 
   //! 1-D to 3-D periodic index
-  void periodic3D(int i, int * iX) {
-    iX[0] = (i % 3) - 1;
-    iX[1] = ((i / 3) % 3) - 1;
-    iX[2] = (i / 9) - 1;
+  void periodic3D(int i, int * IX) {
+    IX[0] = (i % 3) - 1;
+    IX[1] = ((i / 3) % 3) - 1;
+    IX[2] = (i / 9) - 1;
   }
 
   //! Recursive call to dual tree traversal for list construction
   void getList(Cell * Ci, Cell * Cj) {
     vec3 dX;
-    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - iX[d] * cycle;
-    real_t R2 = norm(dX) * theta * theta;
+    for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
+    real_t R2 = norm(dX) * THETA * THETA;
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       Ci->listM2L.push_back(Cj);
-      Ci->periodicM2L.push_back(periodic1D(iX));
-    } else if (Ci->NCHILD == 0 && Cj->NCHILD == 0) {
+      Ci->periodicM2L.push_back(periodic1D(IX));
+    } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
       Ci->listP2P.push_back(Cj);
-      Ci->periodicP2P.push_back(periodic1D(iX));
-    } else if (Cj->NCHILD == 0 || (Ci->R >= Cj->R && Ci->NCHILD != 0)) {
-      for (Cell * ci=Ci->CHILD; ci!=Ci->CHILD+Ci->NCHILD; ci++) {
+      Ci->periodicP2P.push_back(periodic1D(IX));
+    } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
+      for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
         getList(ci, Cj);
       }
     } else {
-      for (Cell * cj=Cj->CHILD; cj!=Cj->CHILD+Cj->NCHILD; cj++) {
+      for (Cell * cj=Cj->child; cj!=Cj->child+Cj->numChilds; cj++) {
         getList(Ci, cj);
       }
     }
@@ -63,11 +63,11 @@ namespace exafmm {
 #pragma omp parallel for
     for (size_t i=0; i<cells.size(); i++) {
       for (size_t j=0; j<cells[i].listM2L.size(); j++) {
-        periodic3D(cells[i].periodicM2L[j],iX);
+        periodic3D(cells[i].periodicM2L[j],IX);
 	M2L(&cells[i],cells[i].listM2L[j]);
       }
       for (size_t j=0; j<cells[i].listP2P.size(); j++) {
-        periodic3D(cells[i].periodicP2P[j],iX);
+        periodic3D(cells[i].periodicP2P[j],IX);
         P2P(&cells[i],cells[i].listP2P[j]);
       }
     }
@@ -82,9 +82,9 @@ namespace exafmm {
     }
     Cell * Ci = &pcells.back();
     *Ci = *Cj0;
-    Ci->CHILD = &pcells[0];
-    Ci->NCHILD = 26;
-    for (int level=0; level<images-1; level++) {
+    Ci->child = &pcells[0];
+    Ci->numChilds = 26;
+    for (int level=0; level<IMAGES-1; level++) {
       for (int ix=-1; ix<=1; ix++) {
         for (int iy=-1; iy<=1; iy++) {
           for (int iz=-1; iz<=1; iz++) {
@@ -92,9 +92,9 @@ namespace exafmm {
               for (int cx=-1; cx<=1; cx++) {
                 for (int cy=-1; cy<=1; cy++) {
                   for (int cz=-1; cz<=1; cz++) {
-                    iX[0] = ix * 3 + cx;
-                    iX[1] = iy * 3 + cy;
-                    iX[2] = iz * 3 + cz;
+                    IX[0] = ix * 3 + cx;
+                    IX[1] = iy * 3 + cy;
+                    IX[2] = iz * 3 + cz;
                     M2L(Ci0, Ci);
                   }
                 }
@@ -108,9 +108,9 @@ namespace exafmm {
         for (int iy=-1; iy<=1; iy++) {
           for (int iz=-1; iz<=1; iz++) {
             if (ix != 0 || iy != 0 || iz != 0) {
-              Cj->X[0] = Ci->X[0] + ix * cycle;
-              Cj->X[1] = Ci->X[1] + iy * cycle;
-              Cj->X[2] = Ci->X[2] + iz * cycle;
+              Cj->X[0] = Ci->X[0] + ix * CYCLE;
+              Cj->X[1] = Ci->X[1] + iy * CYCLE;
+              Cj->X[2] = Ci->X[2] + iz * CYCLE;
               Cj->M = Ci->M;
               Cj++;
             }
@@ -118,36 +118,36 @@ namespace exafmm {
         }
       }
       M2M(Ci);
-      cycle *= 3;
+      CYCLE *= 3;
     }
   }
 
   //! Horizontal pass interface
   void horizontalPass(Cells & icells, Cells & jcells) {
-    if (images == 0) {
+    if (IMAGES == 0) {
       getList(&icells[0], &jcells[0]);
       evaluate(icells);
     } else {
-      for (iX[0]=-1; iX[0]<=1; iX[0]++) {
-        for (iX[1]=-1; iX[1]<=1; iX[1]++) {
-          for (iX[2]=-1; iX[2]<=1; iX[2]++) {
+      for (IX[0]=-1; IX[0]<=1; IX[0]++) {
+        for (IX[1]=-1; IX[1]<=1; IX[1]++) {
+          for (IX[2]=-1; IX[2]<=1; IX[2]++) {
             getList(&icells[0], &jcells[0]);
           }
         }
       }
       evaluate(icells);
-      real_t saveCycle = cycle;
+      real_t saveCycle = CYCLE;
       periodic(&icells[0], &jcells[0]);
-      cycle = saveCycle;
+      CYCLE = saveCycle;
     }
   }
 
   //! Recursive call to pre-order tree traversal for downward pass
   void downwardPass(Cell * Cj) {
     L2L(Cj);
-    if (Cj->NCHILD==0) L2P(Cj);
-    for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; Ci++) {
-#pragma omp task untied if(Ci->NBODY > 100)
+    if (Cj->numChilds==0) L2P(Cj);
+    for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
+#pragma omp task untied if(Ci->numBodies > 100)
       downwardPass(Ci);
     }
 #pragma omp taskwait
@@ -165,21 +165,21 @@ namespace exafmm {
     Cells cells(2);
     Cell * Ci = &cells[0];
     Cell * Cj = &cells[1];
-    Ci->BODY = &bodies[0];
-    Ci->NBODY = bodies.size();
-    Cj->BODY = &jbodies[0];
-    Cj->NBODY = jbodies.size();
+    Ci->body = &bodies[0];
+    Ci->numBodies = bodies.size();
+    Cj->body = &jbodies[0];
+    Cj->numBodies = jbodies.size();
     int prange = 0;
-    for (int i=0; i<images; i++) {
+    for (int i=0; i<IMAGES; i++) {
       prange += int(powf(3.,i));
     }
 #pragma omp parallel for collapse(3)
     for (int ix=-prange; ix<=prange; ix++) {
       for (int iy=-prange; iy<=prange; iy++) {
         for (int iz=-prange; iz<=prange; iz++) {
-          iX[0] = ix;
-          iX[1] = iy;
-          iX[2] = iz;
+          IX[0] = ix;
+          IX[1] = iy;
+          IX[2] = iz;
           P2P(Ci, Cj);
         }
       }

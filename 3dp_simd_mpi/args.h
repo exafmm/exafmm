@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include "print.h"
 #include <getopt.h>
 #include <iostream>
 #include <iomanip>
@@ -10,7 +11,6 @@
 
 namespace exafmm {
   static struct option long_options[] = {
-    {"accuracy",     no_argument,       0, 'a'},
     {"ncrit",        required_argument, 0, 'c'},
     {"distribution", required_argument, 0, 'd'},
     {"help",         no_argument,       0, 'h'},
@@ -18,14 +18,13 @@ namespace exafmm {
     {"path",         required_argument, 0, 'p'},
     {"P",            required_argument, 0, 'P'},
     {"theta",        required_argument, 0, 't'},
-    {"verbose",      no_argument,       0, 'v'},
+    {"verbose",      required_argument, 0, 'v'},
     {0, 0, 0, 0}
   };
 
   //! Parse and set the parameters of FMM and bodies from argv
   class Args {
   public:
-    int accuracy;                               //!< Regression for accuracy only
     int ncrit;                                  //!< Number of bodies per leaf cell
     const char * distribution;                  //!< Body Distribution
     int numBodies;                              //!< Number of bodies
@@ -40,17 +39,15 @@ namespace exafmm {
       fprintf(stderr,
               "Usage: %s [options]\n"
               "Long option (short option)       : Description (Default value)\n"
-              " --accuracy (-a)                 : Regression for accuracy only (%d)\n"
               " --ncrit (-c)                    : Number of bodies per leaf cell (%d)\n"
-              " --distribution (-d) [c/l/o/p/s] : lattice, cube, sphere, octant, plummer (%s)\n"
+              " --distribution (-d) [l/c/s/o/p] : lattice, cube, sphere, octant, plummer (%s)\n"
               " --help (-h)                     : Show this help document\n"
               " --numBodies (-n)                : Number of bodies (%d)\n"
               " --path (-p)                     : Path to save files (%s)\n"
-              " --P (-P) not working            : Order of expansion (%d)\n"
+              " --P (-P)                        : Order of expansion (%d)\n"
               " --theta (-t)                    : Multipole acceptance criterion (%f)\n"
               " --verbose (-v)                  : Print information to screen (%d)\n",
               name,
-              accuracy,
               ncrit,
               distribution,
               numBodies,
@@ -93,24 +90,19 @@ namespace exafmm {
   public:
     //! Set default values to FMM parameters and parse argv for user-defined options
     Args(int argc=0, char ** argv=NULL)
-      : accuracy(1),
-        ncrit(64),
+      : ncrit(64),
         distribution("cube"),
         numBodies(10000),
         path("./"),
         P(10),
         theta(.4),
-        verbose(0)
-    {
+        verbose(1) {
       while (1) {
         int option_index;
-        int c = getopt_long(argc, argv, "ac:d:hn:p:P:t:v",
+        int c = getopt_long(argc, argv, "c:d:hn:p:P:t:v:",
                             long_options, &option_index);
         if (c == -1) break;
         switch (c) {
-          case 'a':
-            accuracy = 1;
-            break;
           case 'c':
             ncrit = atoi(optarg);
             break;
@@ -133,7 +125,7 @@ namespace exafmm {
             theta = atof(optarg);
             break;
           case 'v':
-            verbose = 1;
+            verbose = atoi(optarg);
             break;
           default:
             usage(argv[0]);
@@ -154,25 +146,15 @@ namespace exafmm {
     }
 
     //! Print formatted output for arguments
-    void print(int stringLength) {
+    void show() {
       if (verbose) {
-        std::cout << std::setw(stringLength) << std::fixed << std::left
-                  << "accuracy" << " : " << accuracy << std::endl
-                  << std::setw(stringLength)
-                  << "ncrit" << " : " << ncrit << std::endl
-                  << std::setw(stringLength)
-                  << "distribution" << " : " << distribution << std::endl
-                  << std::setw(stringLength)
-                  << "numBodies" << " : " << numBodies << std::endl
-                  << std::setw(stringLength)
-                  << "path" << " : " << path << std::endl
-                  << std::setw(stringLength)
-                  << "P" << " : " << P << std::endl
-                  << std::setw(stringLength)
-                  << "theta" << " : " << theta << std::endl
-                  << std::setw(stringLength)
-                  << "verbose" << " : " << verbose << std::endl
-                  << std::setw(stringLength);
+        print("ncrit", ncrit);
+        print("distribution", distribution);
+        print("numBodies", numBodies);
+        print("path", path);
+        print("P", P);
+        print("theta", theta);
+        print("verbose", verbose);
       }
     }
   };

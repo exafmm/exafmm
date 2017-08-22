@@ -1,3 +1,5 @@
+All folders are self-contained and do not require files from other folders.
+
 2d: 2-D FMM
 
 3d: 3-D FMM

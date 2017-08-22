@@ -7,8 +7,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
 AM_MAINTAINER_MODE
 AC_LANG([C++])
-${CXXFLAGS=""}
-${FCFLAGS=""}
+#: ${CXXFLAGS=""}
+#: ${FCFLAGS=""}
 AC_PROG_CXX([CC icpc g++])
 AC_PROG_FC([ftn ifort gfortran])
 AC_PROG_RANLIB
@@ -38,61 +38,78 @@ if test "$enable_mpi" = "yes"; then
 fi
 AM_CONDITIONAL(EXAFMM_HAVE_MPI, test "$enable_mpi" = "yes")
 
+# SIMD extensions
+AC_ARG_ENABLE([simd],
+              [AS_HELP_STRING([--disable-simd],[disable SIMD])],
+              [enable_simd=$enableval],
+              [enable_simd=yes])
+if test "$enable_simd" = "yes"; then
+   AX_EXT
+fi
+
+# CUDA
+AC_ARG_ENABLE([cuda],
+              [AS_HELP_STRING([--disable-cuda],[do not compile with CUDA])],
+              [],
+              [enable_cuda=yes])
+if test "$enable_cuda" = "yes"; then
+   AC_DEFINE(EXAFMM_HAVE_CUDA,1,[Use CUDA])
+   AX_CHECK_CUDA([],[AC_MSG_ERROR([could not find CUDA runtime])])
+fi
+AM_CONDITIONAL(EXAFMM_HAVE_CUDA, test "$enable_cuda" = "yes")
+
 # Single precision
 AC_ARG_ENABLE([single],
               [AS_HELP_STRING([--enable-single],[compile in single precision])],
-              [ok=$enableval],
-              [ok=no])
+              [enable_single=$enableval],
+              [enable_single=no])
 AC_ARG_ENABLE([float],
               [AS_HELP_STRING([--enable-float],[synonym for --enable-single])],
-              [ok=$enableval])
-if test "$ok" = "yes"; then
+              [enable_single=$enableval])
+if test "$enable_single" = "yes"; then
    AC_DEFINE(EXAFMM_SINGLE,1,[Define to compile in single precision.])
    PRECISION=s
 else
    PRECISION=d
 fi
-AM_CONDITIONAL(EXAFMM_SINGLE, test "$ok" = "yes")
+AM_CONDITIONAL(EXAFMM_SINGLE, test "$enable_single" = "yes")
 AC_SUBST(PRECISION)
-
-# SIMD extensions supported by compiler
-AC_ARG_ENABLE([simd-ext],
-              [AS_HELP_STRING([--disable-simd-ext],[disable SIMD])],
-              [use_simd_ext=$enableval],
-              [use_simd_ext=yes])
-if test "$use_simd_ext" = "yes"; then
-   AX_EXT
-fi
 
 # Assertion
 AC_ARG_ENABLE([assert],
-              [AS_HELP_STRING([--enable-assert],[enable assertion])],
-              [use_assert=$enableval],
-              [use_assert=no])
-if test "$use_assert" = "yes"; then
+              [AS_HELP_STRING([--disable-assert],[disable assertion])],
+              [],
+              [enable_assert=yes])
+if test "$enable_assert" = "yes"; then
    AC_DEFINE(EXAFMM_ASSERT,1,[Enable assertion.])
 fi
 AM_CONDITIONAL(EXAFMM_ASSERT, test "$use_assert" = "yes")
 
 # Debug
 AC_ARG_ENABLE([debug],
-              [AS_HELP_STRING([--enable-debug],[compile in debugging mode])],
+              [AS_HELP_STRING([--enable-debug],[enable debugging])],
               [enable_debug=$enableval],
               [enable_debug=no])
 if test "$enable_debug" = "yes"; then
-   AC_DEFINE(EXAFMM_DEBUG,1,[Define to enable extra debugging options.])
+   AC_DEFINE(EXAFMM_DEBUG,1,[Enable debugging options.])
 fi
 AM_CONDITIONAL(EXAFMM_DEBUG, test "$enable_debug" = "yes")
 
 AX_COMPILER_VENDOR()
 AX_COMPILER_FLAGS()
-AC_LANG_PUSH([Fortran])
-#AX_COMPILER_FLAGS()
-AC_LANG_POP([Fortran])
 
+AC_MSG_NOTICE([OpenMP   : $enable_openmp])
+AC_MSG_NOTICE([MPI      : $enable_mpi])
+AC_MSG_NOTICE([CUDA     : $enable_cuda])
+AC_MSG_NOTICE([FP32     : $enable_single])
+AC_MSG_NOTICE([SIMD     : $SIMD_FLAGS])
+AC_MSG_NOTICE([Assert   : $enable_assert])
+AC_MSG_NOTICE([Debug    : $enable_debug])
 AC_MSG_NOTICE([Vendor   : $ax_cv_cxx_compiler_vendor])
 AC_MSG_NOTICE([CXX      : $CXX])
 AC_MSG_NOTICE([FC       : $FC])
+AC_MSG_NOTICE([CXXFLAGS : $CXXFLAGS])
+AC_MSG_NOTICE([FCFLAGS  : $FCFLAGS])
 
 AM_CONDITIONAL(EXAFMM_HAVE_CRAY, test "$CXX" = "CC")
 AM_CONDITIONAL(EXAFMM_HAVE_INTEL, test "$ax_cv_cxx_compiler_vendor" = "intel")

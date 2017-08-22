@@ -81,13 +81,13 @@ AC_DEFUN([AX_MPI], [
 AC_PREREQ(2.50) dnl for AC_LANG_CASE
 AC_REQUIRE([AC_PROG_CXX])
 	AC_ARG_VAR(MPICXX,[MPI C++ compiler command])
-	AC_CHECK_PROGS(MPICXX, mpxlC_r mpxlC mpiFCCpx mpiFCC sxmpic++ mpiicpc mpicxx CC, $CXX)
+	AC_CHECK_PROGS(MPICXX, mpiicpc mpicxx CC, $CXX)
 	ax_mpi_save_CXX="$CXX"
 	CXX="$MPICXX"
 	AC_SUBST(MPICXX)
 AC_REQUIRE([AC_PROG_FC])
 	AC_ARG_VAR(MPIFC,[MPI Fortran compiler command])
-	AC_CHECK_PROGS(MPIFC, mpxlf90_r mpxlf90 mpifrtpx mpifrt sxmpif03 ftn mpiifort mpif90, $FC)
+	AC_CHECK_PROGS(MPIFC, mpxlf90_rftn mpiifort mpif90, $FC)
 	ax_mpi_save_FC="$FC"
 	FC="$MPIFC"
 	AC_SUBST(MPIFC)

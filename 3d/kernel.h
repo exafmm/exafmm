@@ -109,12 +109,12 @@ namespace exafmm {
   }
 
   void P2P(Cell * Ci, Cell * Cj) {
-    Body * Bi = Ci->BODY;
-    Body * Bj = Cj->BODY;
-    for (int i=0; i<Ci->NBODY; i++) {
+    Body * Bi = Ci->body;
+    Body * Bj = Cj->body;
+    for (int i=0; i<Ci->numBodies; i++) {
       real_t p = 0;
       vec3 F = 0;
-      for (int j=0; j<Cj->NBODY; j++) {
+      for (int j=0; j<Cj->numBodies; j++) {
         vec3 dX = Bi[i].X - Bj[j].X;
         real_t R2 = norm(dX);
         if (R2 != 0) {
@@ -131,7 +131,7 @@ namespace exafmm {
 
   void P2M(Cell * C) {
     complex_t Ynm[P*P], YnmTheta[P*P];
-    for (Body * B=C->BODY; B!=C->BODY+C->NBODY; B++) {
+    for (Body * B=C->body; B!=C->body+C->numBodies; B++) {
       vec3 dX = B->X - C->X;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
@@ -148,7 +148,7 @@ namespace exafmm {
 
   void M2M(Cell * Ci) {
     complex_t Ynm[P*P], YnmTheta[P*P];
-    for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) {
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
       vec3 dX = Ci->X - Cj->X;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
@@ -206,7 +206,7 @@ namespace exafmm {
 
   void L2L(Cell * Cj) {
     complex_t Ynm[P*P], YnmTheta[P*P];
-    for (Cell * Ci=Cj->CHILD; Ci!=Cj->CHILD+Cj->NCHILD; Ci++) {
+    for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
       vec3 dX = Ci->X - Cj->X;
       real_t rho, alpha, beta;
       cart2sph(dX, rho, alpha, beta);
@@ -237,7 +237,7 @@ namespace exafmm {
 
   void L2P(Cell * Ci) {
     complex_t Ynm[P*P], YnmTheta[P*P];
-    for (Body * B=Ci->BODY; B!=Ci->BODY+Ci->NBODY; B++) {
+    for (Body * B=Ci->body; B!=Ci->body+Ci->numBodies; B++) {
       vec3 dX = B->X - Ci->X;
       vec3 spherical = 0;
       vec3 cartesian = 0;

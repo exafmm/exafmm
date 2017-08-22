@@ -5,12 +5,12 @@
 namespace exafmm {
   //! P2P kernel between cells Ci and Cj
   void P2P(Cell * Ci, Cell * Cj) {
-    Body * Bi = Ci->BODY;
-    Body * Bj = Cj->BODY;
-    for (int i=0; i<Ci->NBODY; i++) {
+    Body * Bi = Ci->body;
+    Body * Bj = Cj->body;
+    for (int i=0; i<Ci->numBodies; i++) {
       real_t p = 0;
       vec2 F = 0;
-      for (int j=0; j<Cj->NBODY; j++) {
+      for (int j=0; j<Cj->numBodies; j++) {
         vec2 dX = Bi[i].X - Bj[j].X;
         real_t R2 = norm(dX);
         if (R2 != 0) {
@@ -27,7 +27,7 @@ namespace exafmm {
 
   //! P2M kernel for cell C
   void P2M(Cell * C) {
-    for (Body * B=C->BODY; B!=C->BODY+C->NBODY; B++) {
+    for (Body * B=C->body; B!=C->body+C->numBodies; B++) {
       vec2 dX = B->X - C->X;
       complex_t Z(dX[0],dX[1]), powZ(1.0, 0.0);
       C->M[0] += B->q;
@@ -40,7 +40,7 @@ namespace exafmm {
 
   //! M2M kernel for one parent cell Ci
   void M2M(Cell * Ci) {
-    for (Cell * Cj=Ci->CHILD; Cj!=Ci->CHILD+Ci->NCHILD; Cj++) {
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
       vec2 dX = Cj->X - Ci->X;
       for (int k=0; k<P; k++) {
         complex_t Z(dX[0],dX[1]), powZ(1.0, 0.0);
@@ -85,7 +85,7 @@ namespace exafmm {
 
   //! L2L kernel for one parent cell Cj
   void L2L(Cell * Cj) {
-    for (Cell * Ci=Cj->CHILD; Ci<Cj->CHILD+Cj->NCHILD; Ci++) {
+    for (Cell * Ci=Cj->child; Ci<Cj->child+Cj->numChilds; Ci++) {
       vec2 dX = Ci->X - Cj->X;
       complex_t Z(dX[0],dX[1]);
       for (int l=0; l<P; l++) {
@@ -101,7 +101,7 @@ namespace exafmm {
 
   //! L2P kernel for cell C
   void L2P(Cell * C) {
-    for (Body * B=C->BODY; B!=C->BODY+C->NBODY; B++) {
+    for (Body * B=C->body; B!=C->body+C->numBodies; B++) {
       vec2 dX = B->X - C->X;
       complex_t Z(dX[0],dX[1]), powZ(1.0, 0.0);
       B->p += std::real(C->L[0]);

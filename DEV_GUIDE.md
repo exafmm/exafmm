@@ -1,10 +1,19 @@
 ## Development Guide
 
-**Rules for development:**
-1. Write incremental tests and leave breadcrumbs
-2. Document each new code
-3. Unit test for each component
-4. Integration/regression test for each commit
+**Flow of development:**
+
+1. Experiment with design decisions in 2d/
+
+2. Propagate to other directories when decision is reached
+
+3. Write incremental tests and leave breadcrumbs
+
+4. Document each new code
+
+5. Unit test for each component
+
+6. Integration/regression test for each commit
+
 
 **Variable name convention:**
 
@@ -12,7 +21,7 @@ Use all capital for
  - Macro variables
  - Environtment values
  - Makefile variables
- - Struct elements
+ - Global variables
 
 Start with capital for
  - Class & Struct names

@@ -157,38 +157,79 @@ AS_VAR_POPDEF([FLAGS])dnl
 ])dnl AX_APPEND_FLAG
 
 # ===========================================================================
-#   http://www.gnu.org/software/autoconf-archive/ax_gcc_x86_avx_xgetbv.html
+#     http://www.gnu.org/software/autoconf-archive/ax_normalize_path.html
 # ===========================================================================
 #
 # SYNOPSIS
 #
-#   AX_GCC_X86_AVX_XGETBV
+#   AX_NORMALIZE_PATH(VARNAME, [REFERENCE_STRING])
 #
 # DESCRIPTION
 #
-#   On later x86 processors with AVX SIMD support, with gcc or a compiler
-#   that has a compatible syntax for inline assembly instructions, run a
-#   small program that executes the xgetbv instruction with input OP. This
-#   can be used to detect if the OS supports AVX instruction usage.
+#   Perform some cleanups on the value of $VARNAME (interpreted as a path):
 #
-#   On output, the values of the eax and edx registers are stored as
-#   hexadecimal strings as "eax:edx" in the cache variable
-#   ax_cv_gcc_x86_avx_xgetbv.
+#     - empty paths are changed to '.'
+#     - trailing slashes are removed
+#     - repeated slashes are squeezed except a leading doubled slash '//'
+#       (which might indicate a networked disk on some OS).
 #
-#   If the xgetbv instruction fails (because you are running a
-#   cross-compiler, or because you are not using gcc, or because you are on
-#   a processor that doesn't have this instruction),
-#   ax_cv_gcc_x86_avx_xgetbv_OP is set to the string "unknown".
+#   REFERENCE_STRING is used to turn '/' into '\' and vice-versa: if
+#   REFERENCE_STRING contains some backslashes, all slashes and backslashes
+#   are turned into backslashes, otherwise they are all turned into slashes.
 #
-#   This macro mainly exists to be used in AX_EXT.
+#   This makes processing of DOS filenames quite easier, because you can
+#   turn a filename to the Unix notation, make your processing, and turn it
+#   back to original notation.
+#
+#     filename='A:\FOO\\BAR\'
+#     old_filename="$filename"
+#     # Switch to the unix notation
+#     AX_NORMALIZE_PATH([filename], ["/"])
+#     # now we have $filename = 'A:/FOO/BAR' and we can process it as if
+#     # it was a Unix path.  For instance let's say that you want
+#     # to append '/subpath':
+#     filename="$filename/subpath"
+#     # finally switch back to the original notation
+#     AX_NORMALIZE_PATH([filename], ["$old_filename"])
+#     # now $filename equals to 'A:\FOO\BAR\subpath'
+#
+#   One good reason to make all path processing with the unix convention is
+#   that backslashes have a special meaning in many cases. For instance
+#
+#     expr 'A:\FOO' : 'A:\Foo'
+#
+#   will return 0 because the second argument is a regex in which
+#   backslashes have to be backslashed. In other words, to have the two
+#   strings to match you should write this instead:
+#
+#     expr 'A:\Foo' : 'A:\\Foo'
+#
+#   Such behavior makes DOS filenames extremely unpleasant to work with. So
+#   temporary turn your paths to the Unix notation, and revert them to the
+#   original notation after the processing. See the macro
+#   AX_COMPUTE_RELATIVE_PATHS for a concrete example of this.
+#
+#   REFERENCE_STRING defaults to $VARIABLE, this means that slashes will be
+#   converted to backslashes if $VARIABLE already contains some backslashes
+#   (see $thirddir below).
+#
+#     firstdir='/usr/local//share'
+#     seconddir='C:\Program Files\\'
+#     thirddir='C:\home/usr/'
+#     AX_NORMALIZE_PATH([firstdir])
+#     AX_NORMALIZE_PATH([seconddir])
+#     AX_NORMALIZE_PATH([thirddir])
+#     # $firstdir = '/usr/local/share'
+#     # $seconddir = 'C:\Program Files'
+#     # $thirddir = 'C:\home\usr'
 #
 # LICENSE
 #
-#   Copyright (c) 2013 Michael Petch <mpetch@capp-sysware.com>
+#   Copyright (c) 2008 Alexandre Duret-Lutz <adl@gnu.org>
 #
-#   This program is free software: you can redistribute it and/or modify it
+#   This program is free software; you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
-#   Free Software Foundation, either version 3 of the License, or (at your
+#   Free Software Foundation; either version 2 of the License, or (at your
 #   option) any later version.
 #
 #   This program is distributed in the hope that it will be useful, but
@@ -212,29 +253,24 @@ AS_VAR_POPDEF([FLAGS])dnl
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 1
+#serial 5
 
-AC_DEFUN([AX_GCC_X86_AVX_XGETBV],
-[AC_REQUIRE([AC_PROG_CC])
-AC_LANG_PUSH([C])
-AC_CACHE_CHECK(for x86-AVX xgetbv $1 output, ax_cv_gcc_x86_avx_xgetbv_$1,
- [AC_RUN_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>], [
-     int op = $1, eax, edx;
-     FILE *f;
-      /* Opcodes for xgetbv */
-      __asm__(".byte 0x0f, 0x01, 0xd0"
-        : "=a" (eax), "=d" (edx)
-        : "c" (op));
-     f = fopen("conftest_xgetbv", "w"); if (!f) return 1;
-     fprintf(f, "%x:%x\n", eax, edx);
-     fclose(f);
-     return 0;
-])],
-     [ax_cv_gcc_x86_avx_xgetbv_$1=`cat conftest_xgetbv`; rm -f conftest_xgetbv],
-     [ax_cv_gcc_x86_avx_xgetbv_$1=unknown; rm -f conftest_xgetbv],
-     [ax_cv_gcc_x86_avx_xgetbv_$1=unknown])])
-AC_LANG_POP([C])
-])
+AU_ALIAS([ADL_NORMALIZE_PATH], [AX_NORMALIZE_PATH])
+AC_DEFUN([AX_NORMALIZE_PATH],
+[case ":[$]$1:" in
+# change empty paths to '.'
+  ::) $1='.' ;;
+# strip trailing slashes
+  :*[[\\/]]:) $1=`echo "[$]$1" | sed 's,[[\\/]]*[$],,'` ;;
+  :*:) ;;
+esac
+# squeze repeated slashes
+case ifelse($2,,"[$]$1",$2) in
+# if the path contains any backslashes, turn slashes into backslashes
+ *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
+# if the path contains slashes, also turn backslashes into slashes
+ *) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1/,g'` ;;
+esac])
 
 # Copyright (C) 2002-2013 Free Software Foundation, Inc.
 #
@@ -1460,9 +1496,11 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([m4/ax_check_compile_flag.m4])
+m4_include([m4/ax_check_cuda.m4])
 m4_include([m4/ax_compiler_flags.m4])
 m4_include([m4/ax_compiler_vendor.m4])
 m4_include([m4/ax_ext.m4])
+m4_include([m4/ax_gcc_x86_avx_xgetbv.m4])
 m4_include([m4/ax_gcc_x86_cpuid.m4])
 m4_include([m4/ax_mpi.m4])
 m4_include([m4/ax_openmp.m4])
