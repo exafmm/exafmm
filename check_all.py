@@ -1,25 +1,22 @@
 import itertools
 import os
 import subprocess
+from collections import OrderedDict
 
 # the range of each parameter
-#param_range = { 'n': ['2', '10', '100', '1000', '10000', '100000', '1000000'],
-#                'P': ['5', '10', '20', '30', '40'],
-#                't': ['0.5', '0.4', '0.3', '0.2'],
-#                'd': ['c', 's', 'o', 'p'] }
 param_range = { 'n': ['2', '10', '100', '1000'],
-                'P': ['5', '10'],
+                'P': ['20'],
                 't': ['0.5', '0.4'],
-                'd': ['p'] }
+                'd': ['c', 's', 'p'] }
 
 # the parameters of each test
-test_params = { 'kernel': 'P',
-                'build_tree': 'nd',
-                'traverse': 'ntd',
-                'fmm': 'nPtd' }
+test_params = OrderedDict([('kernel', 'P'),
+                           ('build_tree', 'nd'),
+                           ('traverse', 'ntd'),
+                           ('fmm', 'nPtd')])
 
-exedir_list = ['2d', '3d', '3dp', '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
-logfile = open('nightly.log', 'w')
+exedir_list = ['2d', '3d', '3dp']#, '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
+logfile = open('check_all.log', 'w')
 
 # loop over each directory
 for exedir in exedir_list:
@@ -35,6 +32,10 @@ for exedir in exedir_list:
             args_list = list(itertools.chain(*zip(dash_params, values)))
             # insert executable at the beginning of args list
             args_list.insert(0, os.path.join(exedir, test))
+            # make regression test for fmm executable
+            if test is "fmm":
+                args_list.insert(0, "regression.py")
+                args_list.insert(0, "python")
             # print args string and write to log file
             args_str = ' '.join(args_list)
             print(args_str)
@@ -46,5 +47,7 @@ for exedir in exedir_list:
                 logfile.write(33*'-' + '\n')
             except subprocess.CalledProcessError:
                 print("Regression Failed @", args_str)
+                print("...trying again...")
+                subprocess.call(args_list)
                 raise SystemExit
 logfile.close()

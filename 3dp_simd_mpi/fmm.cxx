@@ -21,7 +21,7 @@ int main(int argc, char ** argv) {
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
   CYCLE = 2 * M_PI;
-  IMAGES = 4;
+  IMAGES = args.images;
   KSIZE = 11;
   ALPHA = KSIZE / CYCLE;
   SIGMA = .25 / M_PI;
@@ -49,41 +49,63 @@ int main(int argc, char ** argv) {
   start("L2L & L2P");
   downwardPass(cells);
   stop("L2L & L2P");
-  start("Dipole correction");
-  vec3 dipole = 0;
-  for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q;
-  real_t coef = 4 * M_PI / (3 * CYCLE * CYCLE * CYCLE);
-  for (size_t b=0; b<bodies.size(); b++) {
-    real_t dnorm = norm(dipole);
-    bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;
-    bodies[b].F -= dipole * coef;
-  }
-  stop("Dipole correction");
   totalFMM += stop("Total FMM");
+  Bodies bodies2;
+  if (IMAGES == 0 | bodies.size() < 1000) {
+    start("Direct N-Body");
+    const int numTargets = 10;
+    Bodies jbodies = bodies;
+    sampleBodies(bodies, numTargets);
+    bodies2 = bodies;
+    initTarget(bodies);
+    for (size_t b=0; b<bodies.size(); b++) {
+      bodies[b].p = 0;
+      bodies[b].F = 0;
+    }
+    direct(bodies, jbodies);
+    stop("Direct N-Body");
+  } else {
+    start("Dipole correction");
+    vec3 dipole = 0;
+    for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q;
+    real_t coef = 4 * M_PI / (3 * CYCLE * CYCLE * CYCLE);
+    for (size_t b=0; b<bodies.size(); b++) {
+      real_t dnorm = norm(dipole);
+      bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;
+      bodies[b].F -= dipole * coef;
+    }
+    stop("Dipole correction");
 
-  print("Ewald Profiling");
-  start("Build tree");
-  Bodies bodies2 = bodies;
-  for (size_t b=0; b<bodies.size(); b++) {
-    bodies[b].p = 0;
-    bodies[b].F = 0;
+    print("Ewald Profiling");
+    start("Build tree");
+    bodies2 = bodies;
+    for (size_t b=0; b<bodies.size(); b++) {
+      bodies[b].p = 0;
+      bodies[b].F = 0;
+    }
+    Bodies jbodies = bodies;
+    Cells  jcells = buildTree(jbodies);
+    stop("Build tree");
+    start("Wave part");
+    wavePart(bodies, jbodies);
+    stop("Wave part");
+    start("Real part");
+    realPart(cells, jcells);
+    selfTerm(bodies);
+    stop("Real part");
   }
-  Bodies jbodies = bodies;
-  Cells  jcells = buildTree(jbodies);
-  stop("Build tree");
-  start("Wave part");
-  wavePart(bodies, jbodies);
-  stop("Wave part");
-  start("Real part");
-  realPart(cells, jcells);
-  selfTerm(bodies);
-  stop("Real part");
 
   Verify verify(args.path);
-  double pSum = verify.getSumScalar(bodies);
-  double pSum2 = verify.getSumScalar(bodies2);
-  double pDif = (pSum - pSum2) * (pSum - pSum2);
-  double pNrm = pSum * pSum;
+  double pDif, pNrm;
+  if (IMAGES == 0) {
+    pDif = verify.getDifScalar(bodies, bodies2);
+    pNrm = verify.getNrmScalar(bodies2);
+  } else {
+    double pSum = verify.getSumScalar(bodies);
+    double pSum2 = verify.getSumScalar(bodies2);
+    pDif = (pSum - pSum2) * (pSum - pSum2);
+    pNrm = pSum * pSum;
+  }
   double pRel = std::sqrt(pDif/pNrm);
   double FDif = verify.getDifVector(bodies, bodies2);
   double FNrm = verify.getNrmVector(bodies2);

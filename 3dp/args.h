@@ -140,6 +140,10 @@ namespace exafmm {
             abort();
         }
       }
+      if (distribution != "cube") {
+        images = 0;
+        printf("Setting images to 0 for distribution != cube\n");
+      }
     }
 
     //! Print formatted output for arguments
