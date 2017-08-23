@@ -125,8 +125,12 @@ namespace exafmm {
           F += dX * invR2 * invR;
         }
       }
+#pragma omp atomic
       Bi[i].p += p;
-      Bi[i].F -= F;
+      for (int d=0; d<3; d++) {
+#pragma omp atomic
+        Bi[i].F[d] -= F[d];
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 *.a
 *.dat
 *genmod*
+*.log
 *.mod
 *.o
 *.so
@@ -11,7 +12,6 @@
 *.reg
 .deps
 .dirstamp
-check_all.log
 
 autom4te.cache
 config.h
@@ -19,7 +19,6 @@ config.h.in~
 config.log
 config.status
 Makefile
-!docs/**/Makefile
 stamp-h1
 
 build

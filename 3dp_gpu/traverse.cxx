@@ -13,7 +13,7 @@ int main(int argc, char ** argv) {
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
   CYCLE = 2 * M_PI;
-  IMAGES = 4;
+  IMAGES = args.images;
 
   Bodies bodies = initBodies(numBodies, distribution);
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;

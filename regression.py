@@ -6,8 +6,7 @@ import pickle
 import subprocess
 import itertools
 
-threshold = 1 + 1e-8 + 0.01
-max_error = numpy.array([5e-4, 5e-3])
+max_error = numpy.array([1e-2, 1e-2])
 
 def parse(lines):
     return [ [ elem.strip() for elem in line.strip().split(':') ] for line in lines ]
@@ -21,7 +20,7 @@ def accuracy_regression(args, values):
     else:
         record = {}
     if (args not in record and numpy.all(values <= max_error)) or \
-       (args in record and numpy.all(values <= threshold*record[args])):
+       (args in record and numpy.all(values <= 1.000001*record[args])):
         record[args] = values
         print("Accuracy regression passed")
     elif args not in record:
@@ -47,7 +46,7 @@ def time_regression(args, time):
     if args not in record:
         record[args] = numpy.array([time, 1])
         print("Time regression passed")
-    elif time <= threshold*record[args][0]:
+    elif time <= 1.5*record[args][0]:
         record[args][0] = (record[args][0]*record[args][1] + time) / (record[args][1] + 1)
         record[args][1] += 1
         print("Time regression passed")
@@ -85,4 +84,4 @@ if __name__ == "__main__":
                 break
         if i == 0:
             accuracy_regression(args, values)
-    time_regression(args, time/repeat)
+    #time_regression(args, time/repeat)
