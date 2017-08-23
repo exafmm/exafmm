@@ -179,6 +179,7 @@ namespace exafmm {
     initTarget(bodies);
     return bodies;
   }
+
   //! Sample a subset of target bodies
   void sampleBodies(Bodies & bodies, int numTargets) {
     if (int(bodies.size()) > numTargets) {
