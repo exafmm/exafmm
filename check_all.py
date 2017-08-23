@@ -4,14 +4,10 @@ import subprocess
 from collections import OrderedDict
 
 # the range of each parameter
-#param_range = { 'n': ['2', '10', '100', '1000', '10000', '100000', '1000000'],
-#                'P': ['5', '10', '20', '30', '40'],
-#                't': ['0.5', '0.4', '0.3', '0.2'],
-#                'd': ['c', 's', 'o', 'p'] }
 param_range = { 'n': ['2', '10', '100', '1000'],
                 'P': ['20'],
                 't': ['0.5', '0.4'],
-                'd': ['c', 's', 'o', 'p'] }
+                'd': ['c', 's', 'p'] }
 
 # the parameters of each test
 test_params = OrderedDict([('kernel', 'P'),
