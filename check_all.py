@@ -1,6 +1,7 @@
 import itertools
 import os
 import subprocess
+from collections import OrderedDict
 
 # the range of each parameter
 #param_range = { 'n': ['2', '10', '100', '1000', '10000', '100000', '1000000'],
@@ -8,17 +9,17 @@ import subprocess
 #                't': ['0.5', '0.4', '0.3', '0.2'],
 #                'd': ['c', 's', 'o', 'p'] }
 param_range = { 'n': ['2', '10', '100', '1000'],
-                'P': ['5', '10'],
+                'P': ['20'],
                 't': ['0.5', '0.4'],
-                'd': ['p'] }
+                'd': ['c', 's', 'o', 'p'] }
 
 # the parameters of each test
-test_params = { 'kernel': 'P',
-                'build_tree': 'nd',
-                'traverse': 'ntd',
-                'fmm': 'nPtd' }
+test_params = OrderedDict([('kernel', 'P'),
+                           ('build_tree', 'nd'),
+                           ('traverse', 'ntd'),
+                           ('fmm', 'nPtd')])
 
-exedir_list = ['2d', '3d', '3dp', '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
+exedir_list = ['2d', '3d', '3dp']#, '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
 logfile = open('check_all.log', 'w')
 
 # loop over each directory
