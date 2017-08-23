@@ -51,7 +51,7 @@ int main(int argc, char ** argv) {
   stop("L2L & L2P");
   totalFMM += stop("Total FMM");
   Bodies bodies2;
-  if (bodies.size() < 200) {
+  if (IMAGES == 0 | bodies.size() < 1000) {
     start("Direct N-Body");
     const int numTargets = 10;
     Bodies jbodies = bodies;
@@ -96,10 +96,16 @@ int main(int argc, char ** argv) {
   }
 
   Verify verify(args.path);
-  double pSum = verify.getSumScalar(bodies);
-  double pSum2 = verify.getSumScalar(bodies2);
-  double pDif = (pSum - pSum2) * (pSum - pSum2);
-  double pNrm = pSum * pSum;
+  double pDif, pNrm;
+  if (IMAGES == 0) {
+    pDif = verify.getDifScalar(bodies, bodies2);
+    pNrm = verify.getNrmScalar(bodies2);
+  } else {
+    double pSum = verify.getSumScalar(bodies);
+    double pSum2 = verify.getSumScalar(bodies2);
+    pDif = (pSum - pSum2) * (pSum - pSum2);
+    pNrm = pSum * pSum;
+  }
   double pRel = std::sqrt(pDif/pNrm);
   double FDif = verify.getDifVector(bodies, bodies2);
   double FNrm = verify.getNrmVector(bodies2);
