@@ -1,3 +1,4 @@
+#include "mpi_utils.h"
 #include "args.h"
 #include "build_tree.h"
 #include "dataset.h"
@@ -14,6 +15,7 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
+  startMPI();
   P = args.P;
   THETA = args.theta;
   NCRIT = args.ncrit;
@@ -29,6 +31,13 @@ int main(int argc, char ** argv) {
 
   print("FMM Parameter");
   args.show();
+
+  int * a = new int [100];
+  for (int i=0; i< 100; i++) {
+    a[i] = i + MPIRANK;
+  }
+  printMPI(a, 0, 4, 2);
+  delete[] a;
 
   double totalFMM = 0;
   print("FMM Profiling");
@@ -113,5 +122,6 @@ int main(int argc, char ** argv) {
   print("FMM vs. direct");
   print("Rel. L2 Error (p)", pRel, false);
   print("Rel. L2 Error (F)", FRel, false);
+  stopMPI();
   return 0;
 }
