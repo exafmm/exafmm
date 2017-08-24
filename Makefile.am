@@ -9,7 +9,7 @@ cleandat:
 cleanlib:
 	@find . -name "*.a" -o -name "*.so" | xargs rm -f
 cleanreg:
-	@find . -name "*.reg" | xargs rm -f
+	@find . -name "*.p" | xargs rm -f
 cleanall:
 	make cleanbin
 	make cleandat
