@@ -54,6 +54,8 @@ namespace exafmm {
   int IX[3];                                    //!< 3-D periodic index
   real_t CYCLE;                                 //!< Cycle of periodic boundary condition
   real_t THETA;                                 //!< Multipole acceptance criterion
+  real_t R0;                                    //!< Radius of the bounding box
+  vec3 X0;                                      //!< Center of the bounding box
 #pragma omp threadprivate(IX)                   //!< Make global variables private
 }
 #endif

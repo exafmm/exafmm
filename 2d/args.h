@@ -3,10 +3,10 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include "print.h"
 #include <getopt.h>
 #include <iostream>
 #include <iomanip>
+#include "print.h"
 #include <stdint.h>
 
 namespace exafmm {

@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <iostream>
 #include <unistd.h>
+#include <vector>
 
 namespace exafmm {
   bool VERBOSE = true;                          //!< Print to screen
@@ -34,15 +35,14 @@ namespace exafmm {
   void printMPI(T data) {
     if (!VERBOSE) return;
     int size = sizeof(data);
-    T * recv = new T [MPISIZE];
-    MPI_Gather(&data, size, MPI_BYTE, recv, size, MPI_BYTE, 0, MPI_COMM_WORLD);
+    std::vector<T> recv(MPISIZE);
+    MPI_Gather(&data, size, MPI_BYTE, &recv[0], size, MPI_BYTE, 0, MPI_COMM_WORLD);
     if (MPIRANK == 0) {
       for (int irank=0; irank<MPISIZE; irank++ ) {
         std::cout << recv[irank] << " ";
       }
       std::cout << std::endl;
     }
-    delete[] recv;
   }
 
   template<typename T>
@@ -61,8 +61,8 @@ namespace exafmm {
     if (!VERBOSE) return;
     int range = end - begin;
     int size = sizeof(*data) * range;
-    T * recv = new T [MPISIZE * range];
-    MPI_Gather(&data[begin], size, MPI_BYTE, recv, size, MPI_BYTE, 0, MPI_COMM_WORLD);
+    std::vector<T> recv(MPISIZE * range);
+    MPI_Gather(&data[begin], size, MPI_BYTE, &recv[0], size, MPI_BYTE, 0, MPI_COMM_WORLD);
     if (MPIRANK == 0) {
       int ic = 0;
       for (int irank=0; irank<MPISIZE; irank++ ) {
@@ -73,7 +73,6 @@ namespace exafmm {
         std::cout << std::endl;
       }
     }
-    delete[] recv;
   }
 
   template<typename T>
@@ -81,16 +80,15 @@ namespace exafmm {
     if (!VERBOSE) return;
     int range = end - begin;
     int size = sizeof(*data) * range;
-    T * recv = new T [range];
+    std::vector<T> recv(range);
     if (MPIRANK == irank) MPI_Send(&data[begin], size, MPI_BYTE, 0, 0, MPI_COMM_WORLD);
     if (MPIRANK == 0) {
-      MPI_Recv(recv, size, MPI_BYTE, irank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(&recv[0], size, MPI_BYTE, irank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       for (int i=0; i<range; i++) {
         std::cout << recv[i] << " ";
       }
       std::cout << std::endl;
     }
-    delete[] recv;
   }
 }
 #endif

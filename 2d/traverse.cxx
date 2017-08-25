@@ -1,6 +1,6 @@
-#include <cassert>
 #include "args.h"
 #include "build_tree.h"
+#include <cassert>
 #include "dataset.h"
 #include "test.h"
 using namespace exafmm;

@@ -1,6 +1,7 @@
-#include <cassert>
+#include "mpi_utils.h"
 #include "args.h"
 #include "build_tree.h"
+#include <cassert>
 #include "dataset.h"
 #include "test.h"
 using namespace exafmm;
@@ -18,6 +19,7 @@ int main(int argc, char ** argv) {
   Bodies bodies = initBodies(numBodies, distribution);
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
+  partition(bodies);
   Cells cells = buildTree(bodies);
   upwardPass(&cells[0]);
   if (IMAGES == 0) {

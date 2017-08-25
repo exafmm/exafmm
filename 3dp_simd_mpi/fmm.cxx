@@ -2,8 +2,9 @@
 #include "args.h"
 #include "build_tree.h"
 #include "dataset.h"
-#include "kernel.h"
 #include "ewald.h"
+#include "kernel.h"
+#include "partition.h"
 #include "timer.h"
 #if EXAFMM_EAGER
 #include "traverse_eager.h"
@@ -19,6 +20,7 @@ int main(int argc, char ** argv) {
   P = args.P;
   THETA = args.theta;
   NCRIT = args.ncrit;
+  LEVEL = args.level;
   VERBOSE = args.verbose;
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
@@ -32,19 +34,15 @@ int main(int argc, char ** argv) {
   print("FMM Parameter");
   args.show();
 
-  int * a = new int [100];
-  for (int i=0; i< 100; i++) {
-    a[i] = i + MPIRANK;
-  }
-  printMPI(a, 0, 4, 2);
-  delete[] a;
-
   double totalFMM = 0;
   print("FMM Profiling");
   start("Initialize bodies");
-  Bodies bodies = initBodies(numBodies, distribution);
+  Bodies bodies = initBodies(numBodies, distribution, MPIRANK, MPISIZE);
   stop("Initialize bodies");
   start("Total FMM");
+  start("Partition");
+  partition(bodies);
+  stop("Partition");
   start("Build tree");
   Cells cells = buildTree(bodies);
   stop("Build tree");

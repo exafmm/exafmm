@@ -3,19 +3,6 @@
 #include "exafmm.h"
 
 namespace exafmm {
-  //! Get bounding box of bodies
-  void getBounds(Bodies & bodies, real_t & R0, vec3 & X0) {
-    vec3 Xmin = bodies[0].X;
-    vec3 Xmax = bodies[0].X;
-    for (size_t b=0; b<bodies.size(); b++) {
-      Xmin = min(bodies[b].X, Xmin);
-      Xmax = max(bodies[b].X, Xmax);
-    }
-    X0 = (Xmax + Xmin) / 2;
-    R0 = fmax(max(X0-Xmin), max(Xmax-X0));
-    R0 *= 1.00001;
-  }
-
   //! Build cells of tree adaptively using a top-down approach based on recursion
   void buildCells(Body * bodies, Body * buffer, int begin, int end, Cell * cell, Cells & cells,
                   const vec3 & X, real_t R, int level=0, bool direction=false) {
@@ -82,9 +69,6 @@ namespace exafmm {
   }
 
   Cells buildTree(Bodies & bodies) {
-    real_t R0;
-    vec3 X0;
-    getBounds(bodies, R0, X0);
     Bodies buffer = bodies;
     Cells cells(1);
     cells.reserve(bodies.size());

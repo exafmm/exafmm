@@ -105,7 +105,7 @@ DIST_COMMON = $(top_srcdir)/Makefile.am.include $(srcdir)/Makefile.in \
 @EXAFMM_DEBUG_TRUE@am__append_12 = $(COMPILER_FCFLAGS) -DEXAFMM_DEBUG
 bin_PROGRAMS = build_tree$(EXEEXT) traverse$(EXEEXT) kernel$(EXEEXT) \
 	fmm$(EXEEXT)
-subdir = 3dp_gpu_mpi
+subdir = 3dp_simd_mpi
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_check_cuda.m4 \
@@ -588,9 +588,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign 3dp_gpu_mpi/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign 3dp_simd_mpi/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign 3dp_gpu_mpi/Makefile
+	  $(AUTOMAKE) --foreign 3dp_simd_mpi/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

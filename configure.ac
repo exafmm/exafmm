@@ -83,7 +83,7 @@ AC_ARG_ENABLE([assert],
 if test "$enable_assert" = "yes"; then
    AC_DEFINE(EXAFMM_ASSERT,1,[Enable assertion.])
 fi
-AM_CONDITIONAL(EXAFMM_ASSERT, test "$use_assert" = "yes")
+AM_CONDITIONAL(EXAFMM_ASSERT, test "$enable_assert" = "yes")
 
 # Debug
 AC_ARG_ENABLE([debug],

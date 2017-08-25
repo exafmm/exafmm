@@ -6761,7 +6761,7 @@ if test "$enable_assert" = "yes"; then
 $as_echo "#define EXAFMM_ASSERT 1" >>confdefs.h
 
 fi
- if test "$use_assert" = "yes"; then
+ if test "$enable_assert" = "yes"; then
   EXAFMM_ASSERT_TRUE=
   EXAFMM_ASSERT_FALSE='#'
 else

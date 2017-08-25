@@ -87,7 +87,7 @@ int main(int argc, char ** argv) {
   double FDif = verify.getDifVector(bodies, bodies2);
   double FNrm = verify.getNrmVector(bodies2);
   double FRel = std::sqrt(FDif/FNrm);
-  printf("%-20s : %8.5e \n","Rel. L2 Error (p)", pRel);
-  printf("%-20s : %8.5e \n","Rel. L2 Error (F)", FRel);
+  print("Rel. L2 Error (p)", pRel, false);
+  print("Rel. L2 Error (F)", FRel, false);
   return 0;
 }

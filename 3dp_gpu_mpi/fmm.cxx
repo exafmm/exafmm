@@ -1,8 +1,10 @@
+#include "mpi_utils.h"
 #include "args.h"
 #include "build_tree.h"
 #include "dataset.h"
-#include "kernel.h"
 #include "ewald.h"
+#include "kernel.h"
+#include "partition.h"
 #include "timer.h"
 #if EXAFMM_EAGER
 #include "traverse_eager.h"
@@ -14,9 +16,11 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
+  startMPI();
   P = args.P;
   THETA = args.theta;
   NCRIT = args.ncrit;
+  LEVEL = args.level;
   VERBOSE = args.verbose;
   const int numBodies = args.numBodies;
   const char * distribution = args.distribution;
@@ -33,9 +37,12 @@ int main(int argc, char ** argv) {
   double totalFMM = 0;
   print("FMM Profiling");
   start("Initialize bodies");
-  Bodies bodies = initBodies(numBodies, distribution);
+  Bodies bodies = initBodies(numBodies, distribution, MPIRANK, MPISIZE);
   stop("Initialize bodies");
   start("Total FMM");
+  start("Partition");
+  partition(bodies);
+  stop("Partition");
   start("Build tree");
   Cells cells = buildTree(bodies);
   stop("Build tree");
@@ -113,5 +120,6 @@ int main(int argc, char ** argv) {
   print("FMM vs. direct");
   print("Rel. L2 Error (p)", pRel, false);
   print("Rel. L2 Error (F)", FRel, false);
+  stopMPI();
   return 0;
 }

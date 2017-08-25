@@ -15,7 +15,8 @@ test_params = OrderedDict([('kernel', 'P'),
                            ('traverse', 'ntd'),
                            ('fmm', 'nPtd')])
 
-exedir_list = ['2d', '3d', '3dp']#, '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
+#exedir_list = ['2d', '3d', '3dp', '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
+exedir_list = ['2d', '3d', '3dp', '3dp_simd_mpi']
 logfile = open('check_all.log', 'w')
 
 # loop over each directory

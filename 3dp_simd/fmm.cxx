@@ -1,8 +1,8 @@
 #include "args.h"
 #include "build_tree.h"
 #include "dataset.h"
-#include "kernel.h"
 #include "ewald.h"
+#include "kernel.h"
 #include "timer.h"
 #if EXAFMM_EAGER
 #include "traverse_eager.h"
