@@ -127,6 +127,7 @@ namespace exafmm {
     buffer.resize(recvBodyDispl[MPISIZE-1]+recvBodyCount[MPISIZE-1]);
     MPI_Alltoallv(&bodies[0], &sendBodyCount[0], &sendBodyDispl[0], MPI_BODY,
                   &buffer[0], &recvBodyCount[0], &recvBodyDispl[0], MPI_BODY, MPI_COMM_WORLD);
+    bodies = buffer;
   }
 
   void partition(Bodies & bodies) {

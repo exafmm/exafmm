@@ -1,8 +1,8 @@
 #ifndef print_h
 #define print_h
-#include <string>
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 namespace exafmm {
   bool VERBOSE = true;                          //!< Print to screen

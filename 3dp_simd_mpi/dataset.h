@@ -4,6 +4,8 @@
 #include <cmath>
 #include <cstdlib>
 #include "exafmm.h"
+#include <fstream>
+#include <sstream>
 
 namespace exafmm {
   //! Split range and return partial range
@@ -189,6 +191,17 @@ namespace exafmm {
       }
       bodies.resize(numTargets);
     }
+  }
+
+  //! Write bodies to file
+  void writeBodies(Bodies & bodies) {
+    std::stringstream name;
+    name << "bodies" << std::setfill('0') << std::setw(4) << MPIRANK << ".dat";
+    std::ofstream file(name.str().c_str());
+    for (int b=0; b<bodies.size(); b++) {
+      file << bodies[b].X << std::endl;
+    }
+    file.close();
   }
 }
 #endif
