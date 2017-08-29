@@ -108,7 +108,7 @@ namespace exafmm {
   void alltoallBodies(Bodies & bodies, Bodies & buffer, std::vector<int> & key) {
     std::vector<int> sendBodyCount(MPISIZE, 0);
     for (int irank=0, b=0; irank<MPISIZE; irank++) {
-      while (key[b] < OFFSET[irank+1]) {
+      while (b < int(bodies.size()) && key[b] < OFFSET[irank+1]) {
         sendBodyCount[irank]++;
         b++;
       }
