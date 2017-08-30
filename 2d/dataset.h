@@ -28,8 +28,8 @@ namespace exafmm {
     int numLattice = nx * (end - begin);
     fprintf(stderr, "Changing numBodies from %d to %d for lattice disribution\n", numBodies, numLattice);
     Bodies bodies(numLattice);
-    for (int ix=0, b=0; ix<nx; ++ix) {
-      for (int iy=begin; iy<end; ++iy, ++b) {
+    for (int ix=0, b=0; ix<nx; ix++) {
+      for (int iy=begin; iy<end; iy++, b++) {
         bodies[b].X[0] = (ix / real_t(nx-1)) * 2 - 1;
         bodies[b].X[1] = (iy / real_t(ny-1)) * 2 - 1;
       }
@@ -45,7 +45,7 @@ namespace exafmm {
       int end = bodies.size();
       splitRange(begin, end, i, numSplit);
       srand48(seed);
-      for (size_t b=begin; b!=end; ++b) {
+      for (int b=begin; b<end; b++) {
         for (int d=0; d<2; d++) {
           bodies[b].X[d] = drand48() * 2 * M_PI - M_PI;
         }
@@ -62,7 +62,7 @@ namespace exafmm {
       int end = bodies.size();
       splitRange(begin, end, i, numSplit);
       srand48(seed);
-      for (size_t b=begin; b!=end; ++b) {
+      for (int b=begin; b<end; b++) {
         for (int d=0; d<2; d++) {
           bodies[b].X[d] = drand48() * 2 - 1;
         }
@@ -81,7 +81,7 @@ namespace exafmm {
       int end = bodies.size();
       splitRange(begin, end, i, numSplit);
       srand48(seed);
-      for (size_t b=begin; b!=end; ++b) {
+      for (int b=begin; b<end; b++) {
         real_t phi = drand48() * M_PI * 0.5;
         bodies[b].X[0] = 2 * M_PI * std::cos(phi) - M_PI;
         bodies[b].X[1] = 2 * M_PI * std::sin(phi) - M_PI;
@@ -98,8 +98,8 @@ namespace exafmm {
       int end = bodies.size();
       splitRange(begin, end, i, numSplit);
       srand48(seed);
-      size_t b = begin;
-      while (b != end) {
+      int b = begin;
+      while (b < end) {
         real_t X1 = drand48();
         real_t X2 = drand48();
         real_t R = 1.0 / sqrt( (pow(X1, -2.0 / 3.0) - 1.0) );
@@ -110,7 +110,7 @@ namespace exafmm {
           X *= scale; Y *= scale;
           bodies[b].X[0] = X;
           bodies[b].X[1] = Y;
-          ++b;
+          b++;
         }
       }
     }
@@ -126,12 +126,12 @@ namespace exafmm {
       srand48(seed);
 
       real_t average = 0;
-      for (size_t b=begin; b!=end; ++b) {
+      for (int b=begin; b<end; b++) {
         bodies[b].q = drand48() - .5;
         average += bodies[b].q;
       }
       average /= (end - begin);
-      for (size_t b=begin; b!=end; ++b) {
+      for (int b=begin; b<end; b++) {
         bodies[b].q -= average;
       }
     }
@@ -139,7 +139,7 @@ namespace exafmm {
 
   //! Initialize target values
   void initTarget(Bodies & bodies) {
-    for (size_t b=0; b!=bodies.size(); ++b) {
+    for (size_t b=0; b<bodies.size(); b++) {
       bodies[b].p = 0;
       bodies[b].F = 0;
     }
@@ -187,7 +187,7 @@ namespace exafmm {
   //! Write bodies to file
   void writeBodies(Bodies & bodies) {
     std::ofstream file("bodies0000.dat");
-    for (int b=0; b<bodies.size(); b++) {
+    for (size_t b=0; b<bodies.size(); b++) {
       file << bodies[b].X << std::endl;
     }
     file.close();
