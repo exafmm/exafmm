@@ -23,9 +23,9 @@ int main(int argc, char ** argv) {
   Cells cells = buildTree(bodies);
   upwardPass(&cells[0]);
 
-  print("numBodies", numBodies);
+  print("numBodies", bodies.size());
   print("cells[0].M[0]", cells[0].M[0]);
-  assert(numBodies == std::real(cells[0].M[0]));
+  assert(bodies.size() == std::real(cells[0].M[0]));
   print("Assertion passed");
   stopMPI();
   return 0;

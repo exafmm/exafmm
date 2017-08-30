@@ -21,9 +21,9 @@ int main(int argc, char ** argv) {
   horizontalPass(&cells[0], &cells[0]);
   downwardPass(&cells[0]);
 
-  print("numBodies", numBodies);
+  print("numBodies", bodies.size());
   print("bodies[0].p", bodies[0].p);
-  for (size_t b=0; b<bodies.size(); b++) assert(numBodies == bodies[b].p);
+  for (size_t b=0; b<bodies.size(); b++) assert(bodies.size() == bodies[b].p);
   print("Assertion passed");
   return 0;
 }

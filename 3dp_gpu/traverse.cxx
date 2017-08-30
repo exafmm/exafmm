@@ -36,7 +36,7 @@ int main(int argc, char ** argv) {
   }
   downwardPass(&cells[0]);
 
-  uint64_t imageBodies = std::pow(3,3*IMAGES) * numBodies;
+  uint64_t imageBodies = std::pow(3,3*IMAGES) * bodies.size();
   print("numBodies", imageBodies);
   print("bodies[0].p", bodies[0].p);
   for (size_t b=0; b<bodies.size(); b++) assert(imageBodies == bodies[b].p);

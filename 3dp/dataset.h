@@ -20,14 +20,15 @@ namespace exafmm {
 
   //! Uniform distribution on [-1,1]^3 lattice
   Bodies lattice(int numBodies, int mpirank, int mpisize) {
-    int nx = int(std::pow(numBodies*mpisize, 1./3));
+    int nx = ceil(std::pow(numBodies*mpisize, 1./3));
     int ny = nx;
     int nz = nx;
     int begin = 0;
     int end = nz;
     splitRange(begin, end, mpirank, mpisize);
     int numLattice = nx * ny * (end - begin);
-    fprintf(stderr, "Changing numBodies from %d to %d for lattice disribution\n", numBodies, numLattice);
+    if (numBodies != numLattice)
+      fprintf(stderr, "Changing numBodies from %d to %d for lattice disribution\n", numBodies, numLattice);
     Bodies bodies(numLattice);
     for (int ix=0, b=0; ix<nx; ix++) {
       for (int iy=0; iy<ny; iy++) {

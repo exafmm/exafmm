@@ -20,14 +20,16 @@ namespace exafmm {
   }
 
   void sph2cart(real_t r, real_t theta, real_t phi, const vec3 & spherical, vec3 & cartesian) {
+    real_t invSinTheta = theta == 0 ? 0 : 1 / std::sin(theta);
+    real_t invR = r == 0 ? 0 : 1 / r;
     cartesian[0] = std::sin(theta) * std::cos(phi) * spherical[0]
-      + std::cos(theta) * std::cos(phi) / r * spherical[1]
-      - std::sin(phi) / r / std::sin(theta) * spherical[2];
+      + std::cos(theta) * std::cos(phi) * invR * spherical[1]
+      - std::sin(phi) * invR * invSinTheta * spherical[2];
     cartesian[1] = std::sin(theta) * std::sin(phi) * spherical[0]
-      + std::cos(theta) * std::sin(phi) / r * spherical[1]
-      + std::cos(phi) / r / std::sin(theta) * spherical[2];
+      + std::cos(theta) * std::sin(phi) * invR * spherical[1]
+      + std::cos(phi) * invR * invSinTheta * spherical[2];
     cartesian[2] = std::cos(theta) * spherical[0]
-      - std::sin(theta) / r * spherical[1];
+      - std::sin(theta) * invR * spherical[1];
   }
 
   void evalMultipole(real_t rho, real_t alpha, real_t beta, complex_t * Ynm, complex_t * YnmTheta) {
