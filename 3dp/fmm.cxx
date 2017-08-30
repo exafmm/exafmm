@@ -18,10 +18,8 @@ int main(int argc, char ** argv) {
   THETA = args.theta;
   NCRIT = args.ncrit;
   VERBOSE = args.verbose;
-  const int numBodies = args.numBodies;
-  const char * distribution = args.distribution;
-  CYCLE = 2 * M_PI;
   IMAGES = args.images;
+  CYCLE = 2 * M_PI;
   KSIZE = 11;
   ALPHA = KSIZE / CYCLE;
   SIGMA = .25 / M_PI;
@@ -33,7 +31,7 @@ int main(int argc, char ** argv) {
   double totalFMM = 0;
   print("FMM Profiling");
   start("Initialize bodies");
-  Bodies bodies = initBodies(numBodies, distribution);
+  Bodies bodies = initBodies(args.numBodies, args.distribution);
   stop("Initialize bodies");
   start("Total FMM");
   start("Build tree");
@@ -95,20 +93,19 @@ int main(int argc, char ** argv) {
     stop("Real part");
   }
 
-  Verify verify(args.path);
   double pDif, pNrm;
   if (IMAGES == 0) {
-    pDif = verify.getDifScalar(bodies, bodies2);
-    pNrm = verify.getNrmScalar(bodies2);
+    pDif = getDifScalar(bodies, bodies2);
+    pNrm = getNrmScalar(bodies2);
   } else {
-    double pSum = verify.getSumScalar(bodies);
-    double pSum2 = verify.getSumScalar(bodies2);
+    double pSum = getSumScalar(bodies);
+    double pSum2 = getSumScalar(bodies2);
     pDif = (pSum - pSum2) * (pSum - pSum2);
     pNrm = pSum * pSum;
   }
   double pRel = std::sqrt(pDif/pNrm);
-  double FDif = verify.getDifVector(bodies, bodies2);
-  double FNrm = verify.getNrmVector(bodies2);
+  double FDif = getDifVector(bodies, bodies2);
+  double FNrm = getNrmVector(bodies2);
   double FRel = std::sqrt(FDif/FNrm);
   print("FMM vs. direct");
   print("Rel. L2 Error (p)", pRel, false);

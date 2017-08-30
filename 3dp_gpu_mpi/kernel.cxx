@@ -81,12 +81,11 @@ int main(int argc, char ** argv) {
   P2P(Ci, Cj);
 
   //! Verify results
-  Verify verify;
-  double pDif = verify.getDifScalar(bodies, bodies2);
-  double pNrm = verify.getNrmScalar(bodies2);
+  double pDif = getDifScalar(bodies, bodies2);
+  double pNrm = getNrmScalar(bodies2);
   double pRel = std::sqrt(pDif/pNrm);
-  double FDif = verify.getDifVector(bodies, bodies2);
-  double FNrm = verify.getNrmVector(bodies2);
+  double FDif = getDifVector(bodies, bodies2);
+  double FNrm = getNrmVector(bodies2);
   double FRel = std::sqrt(FDif/FNrm);
   print("Rel. L2 Error (p)", pRel, false);
   print("Rel. L2 Error (F)", FRel, false);
