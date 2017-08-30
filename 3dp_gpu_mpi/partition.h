@@ -108,7 +108,7 @@ namespace exafmm {
   void alltoallBodies(Bodies & bodies, Bodies & buffer, std::vector<int> & key) {
     std::vector<int> sendBodyCount(MPISIZE, 0);
     for (int irank=0, b=0; irank<MPISIZE; irank++) {
-      while (key[b] < OFFSET[irank+1]) {
+      while (b < int(bodies.size()) && key[b] < OFFSET[irank+1]) {
         sendBodyCount[irank]++;
         b++;
       }
@@ -127,6 +127,7 @@ namespace exafmm {
     buffer.resize(recvBodyDispl[MPISIZE-1]+recvBodyCount[MPISIZE-1]);
     MPI_Alltoallv(&bodies[0], &sendBodyCount[0], &sendBodyDispl[0], MPI_BODY,
                   &buffer[0], &recvBodyCount[0], &recvBodyDispl[0], MPI_BODY, MPI_COMM_WORLD);
+    bodies = buffer;
   }
 
   void partition(Bodies & bodies) {
@@ -153,7 +154,7 @@ namespace exafmm {
     MPI_Allreduce(&localHist[0], &globalHist[0], numBins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     OFFSET.resize(MPISIZE+1);
     OFFSET[0] = 0;
-    for (uint64_t i=0, irank=0, count=0; i<numBins; i++) {
+    for (int i=0, irank=0, count=0; i<numBins; i++) {
       count += globalHist[i];
       if (irank * numBodies < count) {
         OFFSET[irank] = i;

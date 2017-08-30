@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <getopt.h>
 #include <iostream>
 #include <iomanip>
@@ -140,7 +141,7 @@ namespace exafmm {
             abort();
         }
       }
-      if (distribution != "cube") {
+      if (strcmp(distribution, "cube") != 0) {
         images = 0;
         printf("Setting images to 0 for distribution != cube\n");
       }

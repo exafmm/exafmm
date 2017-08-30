@@ -154,7 +154,7 @@ namespace exafmm {
     MPI_Allreduce(&localHist[0], &globalHist[0], numBins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     OFFSET.resize(MPISIZE+1);
     OFFSET[0] = 0;
-    for (uint64_t i=0, irank=0, count=0; i<numBins; i++) {
+    for (int i=0, irank=0, count=0; i<numBins; i++) {
       count += globalHist[i];
       if (irank * numBodies < count) {
         OFFSET[irank] = i;

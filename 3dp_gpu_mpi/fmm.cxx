@@ -58,7 +58,7 @@ int main(int argc, char ** argv) {
   stop("L2L & L2P");
   totalFMM += stop("Total FMM");
   Bodies bodies2;
-  if (IMAGES == 0 | bodies.size() < 1000) {
+  if ((IMAGES == 0) | (bodies.size() < 1000)) {
     start("Direct N-Body");
     const int numTargets = 10;
     Bodies jbodies = bodies;

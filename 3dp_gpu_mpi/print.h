@@ -13,7 +13,7 @@ namespace exafmm {
   static const int wait = 100;                  //!< Waiting time between output of different ranks
 
   void print(std::string s) {
-    if (!VERBOSE | MPIRANK != 0) return;
+    if (!VERBOSE | (MPIRANK != 0)) return;
     s += " ";
     std::cout << "--- " << std::setw(stringLength) << std::left
               << std::setfill('-') << s << std::setw(decimal+1) << "-"
@@ -22,7 +22,7 @@ namespace exafmm {
 
   template<typename T>
   void print(std::string s, T v, bool fixed=true) {
-    if (!VERBOSE | MPIRANK != 0) return;
+    if (!VERBOSE | (MPIRANK != 0)) return;
     std::cout << std::setw(stringLength) << std::left << s << " : ";
     if(fixed)
       std::cout << std::setprecision(decimal) << std::fixed;

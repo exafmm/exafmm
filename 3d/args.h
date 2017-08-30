@@ -134,17 +134,6 @@ namespace exafmm {
       }
     }
 
-    //! Use bit masking to store arguments information in key, used in regression test to identify different runs
-    uint64_t getKey() {
-      uint64_t key = 0;
-      key |= uint64_t(round(log(ncrit)/log(2)));                // [1-4] bit
-      key |= getDistNum(distribution) << 4;                     // [5-15] bit
-      key |= uint64_t(round(log(numBodies)/log(10))) << 15;     // [16-19] bit
-      key |= P << 19;                                           // [20-28] bit
-      key |= uint64_t(theta*14) << 28;                          // [29-64] bit
-      return key;
-    }
-
     //! Print formatted output for arguments
     void show() {
       if (verbose) {
