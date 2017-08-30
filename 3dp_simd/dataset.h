@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include "exafmm.h"
+#include <fstream>
 
 namespace exafmm {
   //! Split range and return partial range
@@ -26,6 +27,7 @@ namespace exafmm {
     int end = nz;
     splitRange(begin, end, mpirank, mpisize);
     int numLattice = nx * ny * (end - begin);
+    fprintf(stderr, "Changing numBodies from %d to %d for lattice disribution\n", numBodies, numLattice);
     Bodies bodies(numLattice);
     for (int ix=0, b=0; ix<nx; ix++) {
       for (int iy=0; iy<ny; iy++) {
@@ -189,6 +191,15 @@ namespace exafmm {
       }
       bodies.resize(numTargets);
     }
+  }
+
+  //! Write bodies to file
+  void writeBodies(Bodies & bodies) {
+    std::ofstream file("bodies0000.dat");
+    for (int b=0; b<bodies.size(); b++) {
+      file << bodies[b].X << std::endl;
+    }
+    file.close();
   }
 }
 #endif
