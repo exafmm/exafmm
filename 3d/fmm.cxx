@@ -47,10 +47,6 @@ int main(int argc, char ** argv) {
   sampleBodies(bodies, numTargets);
   Bodies bodies2 = bodies;
   initTarget(bodies);
-  for (size_t b=0; b<bodies.size(); b++) {
-    bodies[b].p = 0;
-    bodies[b].F = 0;
-  }
   direct(bodies, jbodies);
   stop("Direct N-Body");
 

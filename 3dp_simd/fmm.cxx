@@ -56,10 +56,6 @@ int main(int argc, char ** argv) {
     sampleBodies(bodies, numTargets);
     bodies2 = bodies;
     initTarget(bodies);
-    for (size_t b=0; b<bodies.size(); b++) {
-      bodies[b].p = 0;
-      bodies[b].F = 0;
-    }
     direct(bodies, jbodies);
     stop("Direct N-Body");
   } else {
@@ -77,10 +73,7 @@ int main(int argc, char ** argv) {
     print("Ewald Profiling");
     start("Build tree");
     bodies2 = bodies;
-    for (size_t b=0; b<bodies.size(); b++) {
-      bodies[b].p = 0;
-      bodies[b].F = 0;
-    }
+    initTarget(bodies);
     Bodies jbodies = bodies;
     Cells  jcells = buildTree(jbodies);
     stop("Build tree");
