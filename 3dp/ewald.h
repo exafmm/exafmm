@@ -129,7 +129,9 @@ namespace exafmm {
   void realPart(Cells & icells, Cells & jcells) {
     Cells ileafs;
     getLeaf(ileafs, &icells[0]);
+#if EXAFMM_LAZY
 #pragma omp parallel for
+#endif
     for (size_t i=0; i<ileafs.size(); i++) {
       neighbor(&ileafs[i], &jcells[0]);
     }

@@ -2,6 +2,8 @@
 #define traverse_eager_h
 #include "exafmm.h"
 #include "kernel.h"
+#include "stdio.h"
+#include "omp.h"
 
 namespace exafmm {
   //! Recursive call to post-order tree traversal for upward pass
@@ -35,6 +37,7 @@ namespace exafmm {
       P2P(Ci, Cj);
     } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
       for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
+#pragma omp task untied if(ci->numBodies > 100) firstprivate(IX)
         horizontalPass(ci, Cj);
       }
     } else {
@@ -42,6 +45,7 @@ namespace exafmm {
         horizontalPass(Ci, cj);
       }
     }
+#pragma omp taskwait
   }
 
   //! Horizontal pass for periodic images
@@ -95,6 +99,8 @@ namespace exafmm {
 
   //! Horizontal pass interface
   void horizontalPass(Cells & icells, Cells & jcells) {
+#pragma omp parallel
+#pragma omp single
     if (IMAGES == 0) {
       horizontalPass(&icells[0], &jcells[0]);
     } else {
