@@ -145,7 +145,6 @@ namespace exafmm {
     Cj->body = &jbodies[0];
     Cj->numBodies = jbodies.size();
     int prange = (std::pow(3,IMAGES) - 1) / 2;
-#pragma omp parallel for collapse(3)
     for (int ix=-prange; ix<=prange; ix++) {
       for (int iy=-prange; iy<=prange; iy++) {
         for (int iz=-prange; iz<=prange; iz++) {
