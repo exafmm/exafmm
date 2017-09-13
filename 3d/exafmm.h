@@ -17,13 +17,23 @@ namespace exafmm {
 #endif
   typedef std::complex<real_t> complex_t;       //!< Complex type
   typedef vec<3,real_t> vec3;                   //!< Vector of 3 real_t types
+#if EXAFMM_HELMHOLTZ
+  typedef vec<3,complex_t> cvec3;               //!< Vector of 3 complex_t types
+  const complex_t I(0.,1.);                     //!< Imaginary unit
+#endif
 
   //! Structure of bodies
   struct Body {
     vec3 X;                                     //!< Position
+#if EXAFMM_LAPLACE
     real_t q;                                   //!< Charge
     real_t p;                                   //!< Potential
     vec3 F;                                     //!< Force
+#elif EXAFMM_HELMHOLTZ
+    complex_t q;                                //!< Charge
+    complex_t p;                                //!< Potential
+    cvec3 F;                                    //!< Force
+#endif
   };
   typedef std::vector<Body> Bodies;             //!< Vector of bodies
 
@@ -49,5 +59,6 @@ namespace exafmm {
   int NTERM;                                    //!< Number of coefficients
   int NCRIT;                                    //!< Number of bodies per leaf cell
   real_t THETA;                                 //!< Multipole acceptance criterion
+  complex_t WAVEK;                              //!< Wave number
 }
 #endif

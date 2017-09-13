@@ -134,7 +134,7 @@ namespace exafmm {
       int end = bodies.size();
       splitRange(begin, end, i, numSplit);
       srand48(seed);
-
+#if EXAFMM_LAPLACE
       real_t average = 0;
       for (int b=begin; b<end; b++) {
         bodies[b].q = drand48() - .5;
@@ -144,6 +144,11 @@ namespace exafmm {
       for (int b=begin; b<end; b++) {
         bodies[b].q -= average;
       }
+#elif EXAFMM_HELMHOLTZ
+      for (int b=begin; b<end; b++) {
+        bodies[b].q = bodies[b].X[0] + I * bodies[b].X[1];
+      }
+#endif
     }
   }
 
@@ -151,7 +156,11 @@ namespace exafmm {
   void initTarget(Bodies & bodies) {
     for (size_t b=0; b<bodies.size(); b++) {
       bodies[b].p = 0;
+#if EXAFMM_LAPLACE
       bodies[b].F = 0;
+#elif EXAFMM_HELMHOLTZ
+      bodies[b].F = complex_t(0.,0.);
+#endif
     }
   }
 
