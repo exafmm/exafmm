@@ -78,11 +78,11 @@ namespace exafmm {
   }
 
   //! Ewald real part P2P kernel
-  void realP2P(Cell * Ci, Cell * Cj) {
+  void realP2P(Cell * Ci, Cell * Cj, vec3 iX) {
     for (Body * Bi=Ci->body; Bi!=Ci->body+Ci->numBodies; Bi++) {
       for (Body * Bj=Cj->body; Bj!=Cj->body+Cj->numBodies; Bj++) {
         vec3 dX;
-        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - IX[d] * CYCLE;
+        for (int d=0; d<3; d++) dX[d] = Bi->X[d] - Bj->X[d] - iX[d] * CYCLE;
         real_t R2 = norm(dX);
         if (0 < R2 && R2 < CUTOFF * CUTOFF) {
           real_t R2s = R2 * ALPHA * ALPHA;
@@ -110,15 +110,15 @@ namespace exafmm {
   //! Find neighbor cell
   void neighbor(Cell * Ci, Cell * Cj) {
     vec3 dX = Ci->X - Cj->X;
+    vec3 iX = 0;
     for (int d=0; d<3; d++) {
-      IX[d] = 0;
-      if(dX[d] < -CYCLE / 2) IX[d]--;
-      if(dX[d] >  CYCLE / 2) IX[d]++;
-      dX[d] -= IX[d] * CYCLE;
+      if(dX[d] < -CYCLE / 2) iX[d]--;
+      if(dX[d] >  CYCLE / 2) iX[d]++;
+      dX[d] -= iX[d] * CYCLE;
     }
     real_t R = std::sqrt(norm(dX));
     if (R - Ci->R - Cj->R < sqrtf(3) * CUTOFF) {
-      if(Cj->numChilds == 0) realP2P(Ci, Cj);
+      if(Cj->numChilds == 0) realP2P(Ci, Cj, iX);
       for (Cell * cj=Cj->child; cj!=Cj->child+Cj->numChilds; cj++) {
         neighbor(Ci, cj);
       }

@@ -25,7 +25,7 @@ namespace exafmm {
     cell->numBodies = end - begin;
     cell->numChilds = 0;
     cell->X = X;
-    cell->R = R / (1 << level);
+    cell->R = R;
     //! If cell is a leaf
     if (end - begin <= NCRIT) {
       if (direction) {
@@ -68,13 +68,13 @@ namespace exafmm {
     cell->child = child;
     for (int i=0, c=0; i<4; i++) {
       Xchild = X;
-      real_t r = R / (1 << (level + 1));
+      real_t Rchild = R / 2;
       for (int d=0; d<2; d++) {
-        Xchild[d] += r * (((i & 1 << d) >> d) * 2 - 1);
+        Xchild[d] += Rchild * (((i & 1 << d) >> d) * 2 - 1);
       }
       if (size[i]) {
         buildCells(buffer, bodies, offsets[i], offsets[i] + size[i],
-                   &child[c++], cells, Xchild, R, level+1, !direction);
+                   &child[c++], cells, Xchild, Rchild, level+1, !direction);
       }
     }
   }
