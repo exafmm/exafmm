@@ -1,15 +1,14 @@
-#include "mpi_utils.h"
 #include "args.h"
 #include "build_tree.h"
 #include <cassert>
 #include "dataset.h"
+#include "local_essential_tree.h"
 #include "partition.h"
 #include "test.h"
 using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
-  startMPI();
   THETA = args.theta;
   NCRIT = args.ncrit;
   LEVEL = args.level;
@@ -24,7 +23,13 @@ int main(int argc, char ** argv) {
 
   partition(bodies);
   Cells cells = buildTree(bodies);
+  initKernel();
   upwardPass(&cells[0]);
+  localEssentialTree(bodies, cells);
+  upwardPassLET(&cells[0]);
+  for (int i=0; i<int(cells.size()); i++) {
+    assert(cells[i].numBodies == std::real(cells[i].M[0]));
+  }
   if (IMAGES == 0) {
     horizontalPass(&cells[0], &cells[0]);
   } else {
@@ -46,6 +51,5 @@ int main(int argc, char ** argv) {
   print("bodies[0].p", bodies[0].p);
   for (size_t b=0; b<bodies.size(); b++) assert(imageBodies == bodies[b].p);
   print("Assertion passed");
-  stopMPI();
   return 0;
 }

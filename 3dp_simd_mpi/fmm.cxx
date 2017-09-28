@@ -4,6 +4,7 @@
 #include "dataset.h"
 #include "ewald.h"
 #include "kernel.h"
+#include "local_essential_tree.h"
 #include "partition.h"
 #include "timer.h"
 #if EXAFMM_EAGER
@@ -16,7 +17,6 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
-  startMPI();
   P = args.P;
   THETA = args.theta;
   NCRIT = args.ncrit;
@@ -35,7 +35,7 @@ int main(int argc, char ** argv) {
   double totalFMM = 0;
   print("FMM Profiling");
   start("Initialize bodies");
-  Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
+  Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE, 4/MPISIZE);
   stop("Initialize bodies");
   start("Total FMM");
   start("Partition");
@@ -48,6 +48,10 @@ int main(int argc, char ** argv) {
   initKernel();
   upwardPass(cells);
   stop("P2M & M2M");
+  start("Local essential tree");
+  localEssentialTree(bodies, cells);
+  upwardPassLET(&cells[0]);
+  stop("Local essential tree");
   start("M2L & P2P");
   horizontalPass(cells, cells);
   stop("M2L & P2P");
@@ -110,6 +114,5 @@ int main(int argc, char ** argv) {
   print("FMM vs. direct");
   print("Rel. L2 Error (p)", pRel, false);
   print("Rel. L2 Error (F)", FRel, false);
-  stopMPI();
   return 0;
 }

@@ -1,5 +1,6 @@
 #ifndef args_h
 #define args_h
+#include "mpi_utils.h"
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -75,7 +76,7 @@ namespace exafmm {
         case 'p': return "plummer";
         case 's': return "sphere";
         default:
-          fprintf(stderr, "invalid distribution %s\n", arg);
+          if (MPIRANK == 0) fprintf(stderr, "invalid distribution %s\n", arg);
           abort();
       }
       return "";
@@ -90,7 +91,7 @@ namespace exafmm {
         case 'p': return 3;
         case 's': return 4;
         default:
-          fprintf(stderr, "invalid distribution %s\n", _distribution);
+          if (MPIRANK == 0) fprintf(stderr, "invalid distribution %s\n", _distribution);
           abort();
       }
       return 0;
@@ -108,6 +109,7 @@ namespace exafmm {
         P(10),
         theta(.4),
         verbose(1) {
+      startMPI();
       while (1) {
         int option_index;
         int c = getopt_long(argc, argv, "c:d:hi:l:n:p:P:t:v:",
@@ -151,8 +153,12 @@ namespace exafmm {
       }
       if (strcmp(distribution, "cube") != 0) {
         images = 0;
-        printf("Setting images to 0 for distribution != cube\n");
+        if (MPIRANK == 0) fprintf(stderr,"Setting images to 0 for distribution != cube\n");
       }
+    }
+
+    ~Args() {
+      stopMPI();
     }
 
     //! Print formatted output for arguments

@@ -24,6 +24,7 @@ int main(int argc, char ** argv) {
 
   partition(bodies);
   Cells cells = buildTree(bodies);
+  initKernel();
   upwardPass(&cells[0]);
   if (IMAGES == 0) {
     horizontalPass(&cells[0], &cells[0]);

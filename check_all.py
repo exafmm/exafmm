@@ -33,6 +33,11 @@ for exedir in exedir_list:
             args_list = list(itertools.chain(*zip(dash_params, values)))
             # insert executable at the beginning of args list
             args_list.insert(0, os.path.join(exedir, test))
+            # make regression test for mpi
+            if "mpi" in exedir:
+                args_list.insert(0, "4")
+                args_list.insert(0, "-np")
+                args_list.insert(0, "mpirun")
             # make regression test for fmm executable
             if test is "fmm":
                 args_list.insert(0, "regression.py")

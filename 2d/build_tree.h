@@ -66,8 +66,7 @@ namespace exafmm {
     cells.resize(cells.size()+cell->numChilds);
     Cell * child = &cells.back() - cell->numChilds + 1;
     cell->child = child;
-    int c = 0;
-    for (int i=0; i<4; i++) {
+    for (int i=0, c=0; i<4; i++) {
       Xchild = X;
       real_t r = R / (1 << (level + 1));
       for (int d=0; d<2; d++) {
@@ -75,8 +74,7 @@ namespace exafmm {
       }
       if (size[i]) {
         buildCells(buffer, bodies, offsets[i], offsets[i] + size[i],
-                   &child[c], cells, Xchild, R, level+1, !direction);
-        c++;
+                   &child[c++], cells, Xchild, R, level+1, !direction);
       }
     }
   }

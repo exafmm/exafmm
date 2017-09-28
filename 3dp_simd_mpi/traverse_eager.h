@@ -24,6 +24,23 @@ namespace exafmm {
     upwardPass(&cells[0]);
   }
 
+  //! Upward pass to fill in missing numBodies and M
+  void upwardPassLET(Cell * Ci) {
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
+      upwardPassLET(Cj);
+    }
+    real_t M = 0;
+    for (int n=0; n<NTERM; n++) M += std::abs(Ci->M[n]);
+    if (Ci->numChilds==0) {
+      if (M < EPS) {
+        P2M(Ci);
+      }
+    } else {
+      for (int n=0; n<NTERM; n++) Ci->M[n] = 0;
+      M2M(Ci);
+    }
+  }
+
   //! Recursive call to dual tree traversal for horizontal pass
   void horizontalPass(Cell * Ci, Cell * Cj) {
     vec3 dX;

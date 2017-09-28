@@ -4,11 +4,11 @@
 
 namespace exafmm {
   void P2M(Cell * C) {
-    for (Body * B=C->body; B!=C->body+C->numBodies; ++B) C->M[0] += B->q;
+    for (Body * B=C->body; B!=C->body+C->numBodies; B++) C->M[0] += B->q;
   }
 
   void M2M(Cell * Ci) {
-    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; ++Cj) Ci->M[0] += Cj->M[0];
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) Ci->M[0] += Cj->M[0];
   }
 
   inline void M2L(Cell * Ci, Cell * Cj) {
@@ -16,11 +16,11 @@ namespace exafmm {
   }
 
   void L2L(Cell * Cj) {
-    for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; ++Ci) Ci->L[0] += Cj->L[0];
+    for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) Ci->L[0] += Cj->L[0];
   }
 
   void L2P(Cell * C) {
-    for (Body * B=C->body; B!=C->body+C->numBodies; ++B) B->p += std::real(C->L[0]);
+    for (Body * B=C->body; B!=C->body+C->numBodies; B++) B->p += std::real(C->L[0]);
   }
 
   void P2P(Cell * Ci, Cell * Cj) {
@@ -36,7 +36,7 @@ namespace exafmm {
   }
 
   void upwardPass(Cell * Ci) {
-    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; ++Cj) {
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
       upwardPass(Cj);
     }
     Ci->M.resize(1, 0.0);
@@ -66,7 +66,7 @@ namespace exafmm {
   void downwardPass(Cell * Cj) {
     L2L(Cj);
     if (Cj->numChilds==0) L2P(Cj);
-    for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; ++Ci) {
+    for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
       downwardPass(Ci);
     }
   }

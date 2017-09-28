@@ -1,4 +1,3 @@
-#include "mpi_utils.h"
 #include "args.h"
 #include "kernel.h"
 #include "verify.h"

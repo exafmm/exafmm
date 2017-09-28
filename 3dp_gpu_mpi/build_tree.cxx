@@ -21,6 +21,7 @@ int main(int argc, char ** argv) {
 
   partition(bodies);
   Cells cells = buildTree(bodies);
+  initKernel();
   upwardPass(&cells[0]);
 
   print("numBodies", bodies.size());
