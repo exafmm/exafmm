@@ -82,21 +82,6 @@ namespace exafmm {
       return "";
     }
 
-    //! Get the integer (value) mapped to body distribution (key)
-    uint64_t getDistNum(const char * _distribution) {
-      switch (_distribution[0]) {
-        case 'c': return 0;
-        case 'l': return 1;
-        case 'o': return 2;
-        case 'p': return 3;
-        case 's': return 4;
-        default:
-          if (MPIRANK == 0) fprintf(stderr, "invalid distribution %s\n", _distribution);
-          abort();
-      }
-      return 0;
-    }
-
   public:
     //! Set default values to FMM parameters and parse argv for user-defined options
     Args(int argc=0, char ** argv=NULL)
