@@ -2,8 +2,6 @@
 #define traverse_eager_h
 #include "exafmm.h"
 #include "kernel.h"
-#include "stdio.h"
-#include "omp.h"
 
 namespace exafmm {
   //! Recursive call to post-order tree traversal for upward pass

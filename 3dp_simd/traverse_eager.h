@@ -35,6 +35,7 @@ namespace exafmm {
       P2P(Ci, Cj);
     } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
       for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
+#pragma omp task untied if(ci->numBodies > 100) firstprivate(IX)
         horizontalPass(ci, Cj);
       }
     } else {
@@ -42,6 +43,7 @@ namespace exafmm {
         horizontalPass(Ci, cj);
       }
     }
+#pragma omp taskwait
   }
 
   //! Horizontal pass for periodic images
@@ -95,6 +97,8 @@ namespace exafmm {
 
   //! Horizontal pass interface
   void horizontalPass(Cells & icells, Cells & jcells) {
+#pragma omp parallel
+#pragma omp single
     if (IMAGES == 0) {
       horizontalPass(&icells[0], &jcells[0]);
     } else {
@@ -139,7 +143,6 @@ namespace exafmm {
     Cj->body = &jbodies[0];
     Cj->numBodies = jbodies.size();
     int prange = (std::pow(3,IMAGES) - 1) / 2;
-#pragma omp parallel for collapse(3)
     for (int ix=-prange; ix<=prange; ix++) {
       for (int iy=-prange; iy<=prange; iy++) {
         for (int iz=-prange; iz<=prange; iz++) {
