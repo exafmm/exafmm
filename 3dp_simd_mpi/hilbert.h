@@ -113,7 +113,7 @@ namespace exafmm {
     real_t dx = 2 * R0 / (1 << level);
     vec3 X;
     for (int d=0; d<3; d++) {
-      X[d] = iX[d] * dx + Xmin[d];
+      X[d] = (iX[d] + 0.5) * dx + Xmin[d];
     }
     return X;
   }

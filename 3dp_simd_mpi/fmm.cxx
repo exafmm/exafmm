@@ -35,7 +35,7 @@ int main(int argc, char ** argv) {
   double totalFMM = 0;
   print("FMM Profiling");
   start("Initialize bodies");
-  Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE, 4/MPISIZE);
+  Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
   stop("Initialize bodies");
   start("Total FMM");
   start("Partition");

@@ -47,7 +47,7 @@ if __name__ == "__main__":
     indices = [ idx for idx, line in enumerate(lines) if line.startswith('---') ]
     # FMM Parameter section
     params = parse(lines[indices[0]+1:indices[1]])
-    max_error = numpy.array([2e-4, 5e-5])
+    max_error = numpy.array([5e-4, 5e-5])
     if map(int, [ value for (key, value) in params if key in 'numBodies']) < [10]:
         max_error = numpy.array([1e-3, 1e-2])
     args = [ [key, value] for (key, value) in params if key not in excludes ]
