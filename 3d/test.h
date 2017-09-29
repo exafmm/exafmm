@@ -49,6 +49,10 @@ namespace exafmm {
     M2M(Ci);
   }
 
+  void upwardPass(Cells & cells) {
+    upwardPass(&cells[0]);
+  }
+
   void horizontalPass(Cell * Ci, Cell * Cj) {
     vec3 dX = Ci->X - Cj->X;
     real_t R2 = norm(dX) * THETA * THETA;
@@ -67,12 +71,20 @@ namespace exafmm {
     }
   }
 
+  void horizontalPass(Cells & icells, Cells & jcells) {
+    horizontalPass(&icells[0], &jcells[0]);
+  }
+
   void downwardPass(Cell * Cj) {
     L2L(Cj);
     if (Cj->numChilds==0) L2P(Cj);
     for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
       downwardPass(Ci);
     }
+  }
+
+  void downwardPass(Cells & cells) {
+    downwardPass(&cells[0]);
   }
 }
 #endif

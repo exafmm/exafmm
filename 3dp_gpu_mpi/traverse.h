@@ -27,8 +27,10 @@ namespace exafmm {
   //! Upward pass to fill in missing numBodies and M
   void upwardPassLET(Cell * Ci) {
     for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
+#pragma omp task untied if(Cj->numBodies > 100)
       upwardPassLET(Cj);
     }
+#pragma omp taskwait
     real_t M = 0;
     for (int n=0; n<NTERM; n++) M += std::abs(Ci->M[n]);
     if (Ci->numChilds==0) {
@@ -39,6 +41,13 @@ namespace exafmm {
       for (int n=0; n<NTERM; n++) Ci->M[n] = 0;
       M2M(Ci);
     }
+  }
+
+  //! Upward pass LET interface
+  void upwardPassLET(Cells & cells) {
+#pragma omp parallel
+#pragma omp single nowait
+    upwardPassLET(&cells[0]);
   }
 
   //! Recursive call to dual tree traversal for horizontal pass

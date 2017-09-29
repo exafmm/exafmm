@@ -19,22 +19,9 @@ int main(int argc, char ** argv) {
 
   Cells cells = buildTree(bodies);
   initKernel();
-  upwardPass(&cells[0]);
-  if (IMAGES == 0) {
-    horizontalPass(&cells[0], &cells[0]);
-  } else {
-    for (IX[0]=-1; IX[0]<=1; IX[0]++) {
-      for (IX[1]=-1; IX[1]<=1; IX[1]++) {
-        for (IX[2]=-1; IX[2]<=1; IX[2]++) {
-          horizontalPass(&cells[0], &cells[0]);
-        }
-      }
-    }
-    real_t saveCycle = CYCLE;
-    periodic(&cells[0], &cells[0]);
-    CYCLE = saveCycle;
-  }
-  downwardPass(&cells[0]);
+  upwardPass(cells);
+  horizontalPass(cells, cells);
+  downwardPass(cells);
 
   uint64_t imageBodies = std::pow(3,3*IMAGES) * bodies.size();
   print("numBodies", imageBodies);

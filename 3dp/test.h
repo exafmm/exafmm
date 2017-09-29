@@ -49,6 +49,10 @@ namespace exafmm {
     M2M(Ci);
   }
 
+  void upwardPass(Cells & cells) {
+    upwardPass(&cells[0]);
+  }
+
   void horizontalPass(Cell * Ci, Cell * Cj) {
     vec3 dX;
     for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
@@ -68,7 +72,6 @@ namespace exafmm {
     }
   }
 
-  //! Horizontal pass for periodic images
   void periodic(Cell * Ci0, Cell * Cj0) {
     Cells pcells(27);
     for (size_t c=0; c<pcells.size(); c++) {
@@ -117,12 +120,33 @@ namespace exafmm {
     }
   }
 
+  void horizontalPass(Cells & icells, Cells & jcells) {
+    if (IMAGES == 0) {
+      horizontalPass(&icells[0], &jcells[0]);
+    } else {
+      for (IX[0]=-1; IX[0]<=1; IX[0]++) {
+        for (IX[1]=-1; IX[1]<=1; IX[1]++) {
+          for (IX[2]=-1; IX[2]<=1; IX[2]++) {
+            horizontalPass(&icells[0], &jcells[0]);
+          }
+        }
+      }
+      real_t saveCycle = CYCLE;
+      periodic(&icells[0], &jcells[0]);
+      CYCLE = saveCycle;
+    }
+  }
+
   void downwardPass(Cell * Cj) {
     L2L(Cj);
     if (Cj->numChilds==0) L2P(Cj);
     for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
       downwardPass(Ci);
     }
+  }
+
+  void downwardPass(Cells & cells) {
+    downwardPass(&cells[0]);
   }
 }
 #endif

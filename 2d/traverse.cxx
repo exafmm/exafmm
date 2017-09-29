@@ -16,9 +16,9 @@ int main(int argc, char ** argv) {
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
   Cells cells = buildTree(bodies);
-  upwardPass(&cells[0]);
-  horizontalPass(&cells[0], &cells[0]);
-  downwardPass(&cells[0]);
+  upwardPass(cells);
+  horizontalPass(cells, cells);
+  downwardPass(cells);
 
   print("numBodies", bodies.size());
   print("bodies[0].p", bodies[0].p);

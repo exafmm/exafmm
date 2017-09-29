@@ -49,6 +49,10 @@ namespace exafmm {
     M2M(Ci);
   }
 
+  void upwardPass(Cells & cells) {
+    upwardPass(&cells[0]);
+  }
+
   void upwardPassLET(Cell * Ci) {
     for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
       upwardPassLET(Cj);
@@ -62,6 +66,10 @@ namespace exafmm {
       M2M(Ci);
     }
     assert(Ci->numBodies == std::real(Ci->M[0]));
+  }
+
+  void upwardPassLET(Cells & cells) {
+    upwardPassLET(&cells[0]);
   }
 
   void horizontalPass(Cell * Ci, Cell * Cj) {
@@ -132,12 +140,33 @@ namespace exafmm {
     }
   }
 
+  void horizontalPass(Cells & icells, Cells & jcells) {
+    if (IMAGES == 0) {
+      horizontalPass(&icells[0], &jcells[0]);
+    } else {
+      for (IX[0]=-1; IX[0]<=1; IX[0]++) {
+        for (IX[1]=-1; IX[1]<=1; IX[1]++) {
+          for (IX[2]=-1; IX[2]<=1; IX[2]++) {
+            horizontalPass(&icells[0], &jcells[0]);
+          }
+        }
+      }
+      real_t saveCycle = CYCLE;
+      periodic(&icells[0], &jcells[0]);
+      CYCLE = saveCycle;
+    }
+  }
+
   void downwardPass(Cell * Cj) {
     L2L(Cj);
     if (Cj->numChilds==0) L2P(Cj);
     for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
       downwardPass(Ci);
     }
+  }
+
+  void downwardPass(Cells & cells) {
+    downwardPass(&cells[0]);
   }
 }
 #endif
