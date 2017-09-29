@@ -1,5 +1,5 @@
-#ifndef traverse_eager_h
-#define traverse_eager_h
+#ifndef traverse_h
+#define traverse_h
 #include "exafmm.h"
 #include "kernel.h"
 

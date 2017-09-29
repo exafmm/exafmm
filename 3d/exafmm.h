@@ -47,10 +47,6 @@ namespace exafmm {
     Body * body;                                //!< Pointer of first body
     vec3 X;                                     //!< Cell center
     real_t R;                                   //!< Cell radius
-#if EXAFMM_LAZY
-    std::vector<Cell*> listM2L;                 //!< M2L interaction list
-    std::vector<Cell*> listP2P;                 //!< P2P interaction list
-#endif
     std::vector<complex_t> M;                   //!< Multipole expansion coefs
     std::vector<complex_t> L;                   //!< Local expansion coefs
   };

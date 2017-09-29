@@ -3,11 +3,7 @@
 #include "dataset.h"
 #include "kernel.h"
 #include "timer.h"
-#if EXAFMM_EAGER
-#include "traverse_eager.h"
-#elif EXAFMM_LAZY
-#include "traverse_lazy.h"
-#endif
+#include "traverse.h"
 #include "verify.h"
 using namespace exafmm;
 
