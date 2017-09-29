@@ -8,6 +8,7 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
+  P = 1;
   THETA = args.theta;
   NCRIT = args.ncrit;
   LEVEL = args.level;
@@ -21,8 +22,8 @@ int main(int argc, char ** argv) {
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
   partition(bodies);
-  Cells cells = buildTree(bodies);
   initKernel();
+  Cells cells = buildTree(bodies);
   upwardPass(cells);
   localEssentialTree(bodies, cells);
   upwardPassLET(cells);

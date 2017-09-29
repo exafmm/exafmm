@@ -11,8 +11,6 @@ namespace exafmm {
       upwardPass(Cj);
     }
 #pragma omp taskwait
-    Ci->M.resize(NTERM, 0.0);
-    Ci->L.resize(NTERM, 0.0);
     if(Ci->numChilds==0) P2M(Ci);
     M2M(Ci);
   }

@@ -1,6 +1,5 @@
 #ifndef helmholtz_h
 #define helmholtz_h
-#include <complex>
 #include "exafmm.h"
 
 namespace exafmm {

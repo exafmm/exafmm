@@ -38,10 +38,10 @@ int main(int argc, char ** argv) {
   partition(bodies);
   stop("Partition");
   start("Build tree");
+  initKernel();
   Cells cells = buildTree(bodies);
   stop("Build tree");
   start("P2M & M2M");
-  initKernel();
   upwardPass(cells);
   stop("P2M & M2M");
   start("Local essential tree");

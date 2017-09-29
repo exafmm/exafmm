@@ -26,6 +26,8 @@ namespace exafmm {
     cell->numChilds = 0;
     cell->X = X;
     cell->R = R;
+    cell->M.resize(P, 0.0);
+    cell->L.resize(P, 0.0);
     //! If cell is a leaf
     if (end - begin <= NCRIT) {
       if (direction) {

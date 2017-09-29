@@ -8,6 +8,7 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
+  P = 1;
   NCRIT = args.ncrit;
   LEVEL = args.level;
   VERBOSE = args.verbose;
@@ -18,8 +19,8 @@ int main(int argc, char ** argv) {
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
   partition(bodies);
-  Cells cells = buildTree(bodies);
   initKernel();
+  Cells cells = buildTree(bodies);
   upwardPass(&cells[0]);
   localEssentialTree(bodies, cells);
   upwardPassLET(&cells[0]);

@@ -39,8 +39,6 @@ namespace exafmm {
     for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
       upwardPass(Cj);
     }
-    Ci->M.resize(1, 0.0);
-    Ci->L.resize(1, 0.0);
     if (Ci->numChilds==0) P2M(Ci);
     M2M(Ci);
   }

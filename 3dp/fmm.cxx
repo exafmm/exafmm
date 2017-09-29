@@ -31,10 +31,10 @@ int main(int argc, char ** argv) {
   stop("Initialize bodies");
   start("Total FMM");
   start("Build tree");
+  initKernel();
   Cells cells = buildTree(bodies);
   stop("Build tree");
   start("P2M & M2M");
-  initKernel();
   upwardPass(cells);
   stop("P2M & M2M");
   start("M2L & P2P");

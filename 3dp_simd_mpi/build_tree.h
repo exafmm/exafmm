@@ -29,6 +29,8 @@ namespace exafmm {
     cell->R = R;
     ivec3 iX = get3DIndex(X, level);
     cell->key = getKey(iX, level);
+    cell->M.resize(NTERM, 0.0);
+    cell->L.resize(NTERM, 0.0);
     //! If cell is a leaf
     if (end - begin <= NCRIT) {
       if (direction) {

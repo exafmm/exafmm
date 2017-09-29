@@ -6,6 +6,7 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
+  P = 1;
   NCRIT = args.ncrit;
   VERBOSE = args.verbose;
   const int numBodies = args.numBodies;
