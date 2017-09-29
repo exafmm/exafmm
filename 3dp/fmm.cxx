@@ -30,8 +30,10 @@ int main(int argc, char ** argv) {
   Bodies bodies = initBodies(args.numBodies, args.distribution);
   stop("Initialize bodies");
   start("Total FMM");
-  start("Build tree");
+  start("Precalculation");
   initKernel();
+  stop("Precalculation");
+  start("Build tree");
   Cells cells = buildTree(bodies);
   stop("Build tree");
   start("P2M & M2M");

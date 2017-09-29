@@ -37,8 +37,10 @@ int main(int argc, char ** argv) {
   start("Partition");
   partition(bodies);
   stop("Partition");
-  start("Build tree");
+  start("Precalculation");
   initKernel();
+  stop("Precalculation");
+  start("Build tree");
   Cells cells = buildTree(bodies);
   stop("Build tree");
   start("P2M & M2M");
