@@ -1,14 +1,11 @@
 #ifndef args_h
 #define args_h
-#include <cmath>
+#include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
-#include <iostream>
-#include <iomanip>
 #include "print.h"
-#include <stdint.h>
 
 namespace exafmm {
   static struct option long_options[] = {

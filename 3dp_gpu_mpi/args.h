@@ -1,14 +1,12 @@
 #ifndef args_h
 #define args_h
-#include <cmath>
+#include "mpi_utils.h"
+#include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
-#include <iostream>
-#include <iomanip>
 #include "print.h"
-#include <stdint.h>
 
 namespace exafmm {
   static struct option long_options[] = {
@@ -75,7 +73,7 @@ namespace exafmm {
         case 'p': return "plummer";
         case 's': return "sphere";
         default:
-          fprintf(stderr, "invalid distribution %s\n", arg);
+          if (MPIRANK == 0) fprintf(stderr, "invalid distribution %s\n", arg);
           abort();
       }
       return "";
@@ -93,6 +91,7 @@ namespace exafmm {
         P(10),
         theta(.4),
         verbose(1) {
+      startMPI();
       while (1) {
         int option_index;
         int c = getopt_long(argc, argv, "c:d:hi:l:n:p:P:t:v:",
@@ -136,8 +135,12 @@ namespace exafmm {
       }
       if (strcmp(distribution, "cube") != 0) {
         images = 0;
-        printf("Setting images to 0 for distribution != cube\n");
+        if (MPIRANK == 0) fprintf(stderr,"Setting images to 0 for distribution != cube\n");
       }
+    }
+
+    ~Args() {
+      stopMPI();
     }
 
     //! Print formatted output for arguments

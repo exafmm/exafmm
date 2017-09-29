@@ -1,6 +1,5 @@
 #include "args.h"
 #include "build_tree.h"
-#include <cassert>
 #include "dataset.h"
 #include "local_essential_tree.h"
 #include "partition.h"

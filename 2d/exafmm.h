@@ -1,8 +1,10 @@
 #ifndef exafmm_h
 #define exafmm_h
+#include <cmath>
 #include <complex>
-#include <cstdio>
 #include <cstdlib>
+#include <cstdio>
+#include <stdint.h>
 #include <vector>
 #include "vec.h"
 

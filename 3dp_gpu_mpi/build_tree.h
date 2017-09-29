@@ -1,8 +1,22 @@
 #ifndef buildtree_h
 #define buildtree_h
 #include "exafmm.h"
+#include "hilbert.h"
 
 namespace exafmm {
+  //! Get bounding box of bodies
+  void getBounds(Bodies & bodies) {
+    vec3 Xmin = bodies[0].X;
+    vec3 Xmax = bodies[0].X;
+    for (size_t b=0; b<bodies.size(); b++) {
+      Xmin = min(bodies[b].X, Xmin);
+      Xmax = max(bodies[b].X, Xmax);
+    }
+    X0 = (Xmax + Xmin) / 2;
+    R0 = fmax(max(X0-Xmin), max(Xmax-X0));
+    R0 *= 1.00001;
+  }
+
   //! Build cells of tree adaptively using a top-down approach based on recursion
   void buildCells(Body * bodies, Body * buffer, int begin, int end, Cell * cell, Cells & cells,
                   const vec3 & X, real_t R, int level=0, bool direction=false) {
@@ -13,6 +27,8 @@ namespace exafmm {
     cell->numChilds = 0;
     cell->X = X;
     cell->R = R;
+    ivec3 iX = get3DIndex(X, level);
+    cell->key = getKey(iX, level);
     //! If cell is a leaf
     if (end - begin <= NCRIT) {
       if (direction) {
@@ -71,6 +87,11 @@ namespace exafmm {
     Cells cells(1);
     cells.reserve(bodies.size());
     buildCells(&bodies[0], &buffer[0], 0, bodies.size(), &cells[0], cells, X0, R0);
+    for (size_t i=0; i<cells.size(); i++) {
+      if (cells[i].numChilds == 0) {
+        for (int b=0; b<cells[i].numBodies; b++) cells[i].body[b].key = cells[i].key;
+      }
+    }
     return cells;
   }
 }

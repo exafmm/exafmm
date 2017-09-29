@@ -1,5 +1,6 @@
 #ifndef exafmm_h
 #define exafmm_h
+#include <cmath>
 #include <complex>
 #include <cstdlib>
 #include <cstdio>

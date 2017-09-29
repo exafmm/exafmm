@@ -4,7 +4,7 @@
 
 namespace exafmm {
   void initKernel() {
-    NTERM = P * (P + 1) / 2;
+    NTERM = 1;
   }
 
   void P2M(Cell * C) {
@@ -47,6 +47,21 @@ namespace exafmm {
     Ci->L.resize(1, 0.0);
     if (Ci->numChilds==0) P2M(Ci);
     M2M(Ci);
+  }
+
+  void upwardPassLET(Cell * Ci) {
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
+      upwardPassLET(Cj);
+    }
+    if (Ci->numChilds==0) {
+      if (std::abs(Ci->M[0]) < EPS) {
+        P2M(Ci);
+      }
+    } else {
+      Ci->M[0] = 0;
+      M2M(Ci);
+    }
+    assert(Ci->numBodies == std::real(Ci->M[0]));
   }
 
   void horizontalPass(Cell * Ci, Cell * Cj) {

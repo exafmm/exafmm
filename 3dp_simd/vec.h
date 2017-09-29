@@ -1,6 +1,7 @@
 #ifndef vec_h
 #define vec_h
 #include <ostream>
+
 namespace exafmm {
   template<int N, typename T>
   class vec {

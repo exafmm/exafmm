@@ -1,8 +1,5 @@
 #ifndef dataset_h
 #define dataset_h
-#include <cassert>
-#include <cmath>
-#include <cstdlib>
 #include "exafmm.h"
 #include <fstream>
 #include <sstream>
