@@ -31,16 +31,6 @@ namespace exafmm {
     cell->key = getKey(iX, level);
     cell->M.resize(NTERM, 0.0);
     cell->L.resize(NTERM, 0.0);
-    //! If cell is a leaf
-    if (end - begin <= NCRIT) {
-      if (direction) {
-        for (int i=begin; i<end; i++) {
-          buffer[i].X = bodies[i].X;
-          buffer[i].q = bodies[i].q;
-        }
-      }
-      return;
-    }
     //! Count number of bodies in each octant
     int size[8] = {0,0,0,0,0,0,0,0};
     vec3 x;
@@ -57,6 +47,17 @@ namespace exafmm {
       offset += size[i];
       if (size[i]) cell->numChilds++;
     }
+    //! If cell is a leaf
+    if (end - begin <= NCRIT) {
+      cell->numChilds = 0;
+      if (direction) {
+        for (int i=begin; i<end; i++) {
+          buffer[i].X = bodies[i].X;
+          buffer[i].q = bodies[i].q;
+        }
+      }
+      return;
+    }
     //! Sort bodies by octant
     for (int i=0; i<8; i++) counter[i] = offsets[i];
     for (int i=begin; i<end; i++) {
@@ -68,6 +69,7 @@ namespace exafmm {
     }
     //! Loop over children and recurse
     vec3 Xchild;
+    assert(cells.capacity() >= cells.size()+cell->numChilds);
     cells.resize(cells.size()+cell->numChilds);
     Cell * child = &cells.back() - cell->numChilds + 1;
     cell->child = child;

@@ -14,7 +14,7 @@ int main(int argc, char ** argv) {
 
   initKernel();
   Cells cells = buildTree(bodies);
-  upwardPass(&cells[0]);
+  upwardPass(cells);
 
   print("numBodies", bodies.size());
   print("cells[0].M[0]", cells[0].M[0]);

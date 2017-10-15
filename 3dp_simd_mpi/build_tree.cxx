@@ -18,9 +18,9 @@ int main(int argc, char ** argv) {
   partition(bodies);
   initKernel();
   Cells cells = buildTree(bodies);
-  upwardPass(&cells[0]);
+  upwardPass(cells);
   localEssentialTree(bodies, cells);
-  upwardPassLET(&cells[0]);
+  upwardPassLET(cells);
 
   int numBodies, numBodiesLocal = args.numBodies;
   MPI_Allreduce(&numBodiesLocal, &numBodies, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);

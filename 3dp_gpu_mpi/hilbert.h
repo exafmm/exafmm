@@ -22,10 +22,16 @@ namespace exafmm {
     return level;
   }
 
+  //! Get parent's Hilbert key
+  uint64_t getParent(uint64_t i) {
+    int level = getLevel(i);
+    return (i - levelOffset(level)) / 8 + levelOffset(level-1);
+  }
+
   //! Get first child's Hilbert key
   uint64_t getChild(uint64_t i) {
     int level = getLevel(i);
-    return 8 * (i - levelOffset(level)) + levelOffset(level+1);
+    return (i - levelOffset(level)) * 8 + levelOffset(level+1);
   }
 
   //! Determine which octant the key belongs to
@@ -67,9 +73,37 @@ namespace exafmm {
   }
 
   //! Get 3-D index from Hilbert key
-  ivec3 get3DIndex(uint64_t i, bool offset=true) {
+  ivec3 get3DIndex(uint64_t i) {
     int level = getLevel(i);
-    if (offset) i -= levelOffset(level);
+    i -= levelOffset(level);
+    ivec3 iX = 0;
+    for (int l=0; l<level; l++) {
+      iX[2] |= (i & (uint64_t)1 << 3*l) >> 2*l;
+      iX[1] |= (i & (uint64_t)1 << (3*l + 1)) >> (2*l + 1);
+      iX[0] |= (i & (uint64_t)1 << (3*l + 2)) >> (2*l + 2);
+    }
+#if EXAFMM_HILBERT
+    int N = 2 << (level - 1);
+    int t = iX[2] >> 1;
+    for (int d=2; d>0; d--) iX[d] ^= iX[d-1];
+    iX[0] ^= t;
+    for (int Q=2; Q!=N; Q<<=1) {
+      int R = Q - 1;
+      for (int d=2; d>=0; d--) {
+        if (iX[d] & Q) iX[0] ^= R;
+        else {
+          t = (iX[0] ^ iX[d]) & R;
+          iX[0] ^= t;
+          iX[d] ^= t;
+        }
+      }
+    }
+#endif
+    return iX;
+  }
+
+  //! Get 3-D index from Hilbert key without level offset
+  ivec3 get3DIndex(uint64_t i, int level) {
     ivec3 iX = 0;
     for (int l=0; l<level; l++) {
       iX[2] |= (i & (uint64_t)1 << 3*l) >> 2*l;
