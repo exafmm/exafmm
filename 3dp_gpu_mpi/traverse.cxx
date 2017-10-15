@@ -8,7 +8,6 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
-  P = 1;
   THETA = args.theta;
   NCRIT = args.ncrit;
   LEVEL = args.level;

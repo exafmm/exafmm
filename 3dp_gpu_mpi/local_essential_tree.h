@@ -10,7 +10,8 @@ namespace exafmm {
 
   void whatToSend(Cells & cells, Bodies & bodyBuffer, std::vector<int> & sendBodyCount,
                   Cells & cellBuffer, std::vector<int> & sendCellCount) {
-#if 1 //! Send everything
+#if 0 //! Send local essential tree
+#else //! Send everything
     for (int irank=0; irank<MPISIZE; irank++) {
       sendCellCount[irank] = cells.size();
       for (size_t i=0; i<cells.size(); i++) {
@@ -192,7 +193,7 @@ namespace exafmm {
     Cells sendCells, recvCells;
     //! Decide which cells & bodies to send
     whatToSend(cells, sendBodies, sendBodyCount, sendCells, sendCellCount);
-    //! Use alltoall to get recv count and calculate displacement from it
+    //! Use alltoall to get recv count and calculate displacement (defined in alltoall.h)
     getCountAndDispl(sendBodyCount, sendBodyDispl, recvBodyCount, recvBodyDispl);
     getCountAndDispl(sendCellCount, sendCellDispl, recvCellCount, recvCellDispl);
     //! Alltoallv for cells (defined in alltoall.h)

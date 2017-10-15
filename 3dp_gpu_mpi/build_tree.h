@@ -87,7 +87,7 @@ namespace exafmm {
   Cells buildTree(Bodies & bodies) {
     Bodies buffer = bodies;
     Cells cells(1);
-    cells.reserve(bodies.size());
+    cells.reserve(bodies.size()*(32/NCRIT+1));
     buildCells(&bodies[0], &buffer[0], 0, bodies.size(), &cells[0], cells, X0, R0);
     for (size_t i=0; i<cells.size(); i++) {
       if (cells[i].numChilds == 0) {
