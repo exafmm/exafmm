@@ -351,6 +351,7 @@ namespace exafmm {
   }
 
   void initKernel() {
+    NTERM = P * P;
     XQUAD.resize(P);
     XQUAD2.resize(2*P);
     WQUAD.resize(P);
