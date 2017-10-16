@@ -9,14 +9,12 @@ int main(int argc, char ** argv) {
   P = 1;
   NCRIT = args.ncrit;
   VERBOSE = args.verbose;
-  const int numBodies = args.numBodies;
-  const char * distribution = args.distribution;
 
-  Bodies bodies = initBodies(numBodies, distribution);
+  Bodies bodies = initBodies(args.numBodies, args.distribution);
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
   Cells cells = buildTree(bodies);
-  upwardPass(&cells[0]);
+  upwardPass(cells);
 
   print("numBodies", bodies.size());
   print("cells[0].M[0]", cells[0].M[0]);

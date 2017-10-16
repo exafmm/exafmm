@@ -3,14 +3,71 @@
 #include "alltoall.h"
 #include "hilbert.h"
 #include <map>
+#include "timer.h"
+#define SEND_ALL 1 //! Set to 1 for debugging
 
 namespace exafmm {
   typedef std::multimap<uint64_t, Body> BodyMap;
   typedef std::map<uint64_t, Cell> CellMap;
+  int LEVEL;                                    //!< Octree level used for partitioning
+  std::vector<int> OFFSET;                      //!< Offset of Hilbert index for partitions
+
+  //! Distance between cell center and edge of a remote domain
+  real_t getDistance(Cell * C, int irank) {
+    real_t distance = R0;
+    real_t R = R0 / (1 << LEVEL);
+    for (int key=OFFSET[irank]; key<OFFSET[irank+1]; key++) {
+      ivec3 iX = get3DIndex(key, LEVEL);
+      vec3 X = getCoordinates(iX, LEVEL);
+      vec3 Xmin = X - R;
+      vec3 Xmax = X + R;
+      vec3 dX;
+      if (IMAGES == 0) {
+        for (int d=0; d<3; d++) {
+          dX[d] = (C->X[d] > Xmax[d]) * (C->X[d] - Xmax[d]) + (C->X[d] < Xmin[d]) * (C->X[d] - Xmin[d]);
+        }
+        distance = std::min(distance, norm(dX));
+      } else {
+        for (iX[0]=-1; iX[0]<=1; iX[0]++) {
+          for (iX[1]=-1; iX[1]<=1; iX[1]++) {
+            for (iX[2]=-1; iX[2]<=1; iX[2]++) {
+              for (int d=0; d<3; d++) {
+                dX[d] = (C->X[d] + iX[d] * CYCLE > Xmax[d]) * (C->X[d] + iX[d] * CYCLE - Xmax[d]) +
+                  (C->X[d] + iX[d] * CYCLE < Xmin[d]) * (C->X[d] + iX[d] * CYCLE - Xmin[d]);
+              }
+              distance = std::min(distance, norm(dX));
+            }
+          }
+        }
+      }
+    }
+    return distance;
+  }
+
+  //! Recursive call to pre-order tree traversal for selecting cells to send
+  void selectCells(Cell * Cj, int irank, Bodies & bodyBuffer, std::vector<int> & sendBodyCount,
+                   Cells & cellBuffer, std::vector<int> & sendCellCount) {
+    real_t R = getDistance(Cj, irank);
+    real_t R2 = R * R * THETA * THETA;
+    sendCellCount[irank]++;
+    cellBuffer.push_back(*Cj);
+    if (R2 <= (Cj->R + Cj->R) * (Cj->R + Cj->R)) {
+      if (Cj->numChilds == 0) {
+        sendBodyCount[irank] += Cj->numBodies;
+        for (int b=0; b<Cj->numBodies; b++) {
+          bodyBuffer.push_back(Cj->body[b]);
+        }
+      } else {
+        for (Cell * Ci=Cj->child; Ci!=Cj->child+Cj->numChilds; Ci++) {
+          selectCells(Ci, irank, bodyBuffer, sendBodyCount, cellBuffer, sendCellCount);
+        }
+      }
+    }
+  }
 
   void whatToSend(Cells & cells, Bodies & bodyBuffer, std::vector<int> & sendBodyCount,
                   Cells & cellBuffer, std::vector<int> & sendCellCount) {
-#if 1 //! Send everything
+#if SEND_ALL //! Send everything (for debugging)
     for (int irank=0; irank<MPISIZE; irank++) {
       sendCellCount[irank] = cells.size();
       for (size_t i=0; i<cells.size(); i++) {
@@ -23,12 +80,24 @@ namespace exafmm {
       }
       cellBuffer.insert(cellBuffer.end(), cells.begin(), cells.end());
     }
+#else //! Send only necessary cells
+    for (int irank=0; irank<MPISIZE; irank++) {
+      selectCells(&cells[0], irank, bodyBuffer, sendBodyCount, cellBuffer, sendCellCount);
+    }
 #endif
   }
 
   //! Reapply Ncrit recursively to account for bodies from other ranks
   void reapplyNcrit(BodyMap & bodyMap, CellMap & cellMap, uint64_t key) {
-    if (cellMap[key].numBodies <= NCRIT) return;
+    bool noChildSent = true;
+    for (int i=0; i<8; i++) {
+      uint64_t childKey = getChild(key) + i;
+      if (cellMap.find(childKey) != cellMap.end()) noChildSent = false;
+    }
+    if (cellMap[key].numBodies <= NCRIT && noChildSent) {
+      cellMap[key].numChilds = 0;
+      return;
+    }
     int level = getLevel(key);
     int counter[8] = {0};
     //! Assign key of child to bodyMap
@@ -81,7 +150,7 @@ namespace exafmm {
         numChilds++;
       }
     }
-    cellMap[key].numBodies = numBodies;
+    if (numChilds != 0) cellMap[key].numBodies = numBodies;
     cellMap[key].numChilds = numChilds;
   }
 
@@ -192,7 +261,7 @@ namespace exafmm {
     Cells sendCells, recvCells;
     //! Decide which cells & bodies to send
     whatToSend(cells, sendBodies, sendBodyCount, sendCells, sendCellCount);
-    //! Use alltoall to get recv count and calculate displacement from it
+    //! Use alltoall to get recv count and calculate displacement (defined in alltoall.h)
     getCountAndDispl(sendBodyCount, sendBodyDispl, recvBodyCount, recvBodyDispl);
     getCountAndDispl(sendCellCount, sendCellDispl, recvCellCount, recvCellDispl);
     //! Alltoallv for cells (defined in alltoall.h)

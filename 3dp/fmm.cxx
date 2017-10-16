@@ -30,8 +30,10 @@ int main(int argc, char ** argv) {
   Bodies bodies = initBodies(args.numBodies, args.distribution);
   stop("Initialize bodies");
   start("Total FMM");
-  start("Build tree");
+  start("Precalculation");
   initKernel();
+  stop("Precalculation");
+  start("Build tree");
   Cells cells = buildTree(bodies);
   stop("Build tree");
   start("P2M & M2M");
@@ -59,9 +61,9 @@ int main(int argc, char ** argv) {
     vec3 dipole = 0;
     for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q;
     real_t coef = 4 * M_PI / (3 * CYCLE * CYCLE * CYCLE);
+    real_t dnorm = norm(dipole) / bodies.size();
     for (size_t b=0; b<bodies.size(); b++) {
-      real_t dnorm = norm(dipole);
-      bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;
+      bodies[b].p -= coef * dnorm / bodies[b].q;
       bodies[b].F -= dipole * coef;
     }
     stop("Dipole correction");

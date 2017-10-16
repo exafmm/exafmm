@@ -4,7 +4,7 @@
 
 namespace exafmm {
   void initKernel() {
-    NTERM = P * (P + 1) / 2;
+    NTERM = 1;
   }
 
   void P2M(Cell * C) {

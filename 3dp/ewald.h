@@ -154,7 +154,7 @@ namespace exafmm {
   //! Subtract self term
   void selfTerm(Bodies & bodies) {
     for (size_t b=0; b<bodies.size(); b++) {
-      bodies[b].p -= M_2_SQRTPI * bodies[b].q * ALPHA;
+      bodies[b].p -= M_2_SQRTPI * (bodies[b].q * ALPHA);
     }
   }
 }

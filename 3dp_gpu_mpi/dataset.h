@@ -17,7 +17,7 @@ namespace exafmm {
   }
 
   //! Uniform distribution on [-1,1]^3 lattice
-  Bodies lattice(int numBodies, int mpirank, int mpisize) {
+  Bodies lattice(int & numBodies, int mpirank, int mpisize) {
     int nx = ceil(std::pow(numBodies*mpisize, 1./3));
     if (nx < MPISIZE) nx = MPISIZE;
     int ny = nx;
@@ -38,6 +38,7 @@ namespace exafmm {
         }
       }
     }
+    numBodies = numLattice;
     return bodies;
   }
 
@@ -155,29 +156,29 @@ namespace exafmm {
   }
 
   //! Initialize dsitribution, source & target value of bodies
-  Bodies initBodies(int numBodies, const char * distribution,
+  Bodies initBodies(int & numBodies, const char * distribution,
                     int mpirank=0, int mpisize=1, int numSplit=1) {
     Bodies bodies;
     switch (distribution[0]) {
       case 'l':
-        bodies = lattice(numBodies,mpirank,mpisize);
+        bodies = lattice(numBodies, mpirank, mpisize);
         break;
       case 'c':
-        bodies = cube(numBodies,mpirank,numSplit);
+        bodies = cube(numBodies, mpirank, numSplit);
         break;
       case 's':
-        bodies = sphere(numBodies,mpirank,numSplit);
+        bodies = sphere(numBodies, mpirank, numSplit);
         break;
       case 'o':
-        bodies = octant(numBodies,mpirank,numSplit);
+        bodies = octant(numBodies, mpirank, numSplit);
         break;
       case 'p':
-        bodies = plummer(numBodies,mpirank,numSplit);
+        bodies = plummer(numBodies, mpirank, numSplit);
         break;
       default:
         if (MPIRANK==0) fprintf(stderr, "Unknown data distribution %s\n", distribution);
     }
-    initSource(bodies,mpirank,numSplit);
+    initSource(bodies, mpirank, numSplit);
     initTarget(bodies);
     return bodies;
   }
