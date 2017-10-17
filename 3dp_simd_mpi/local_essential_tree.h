@@ -4,7 +4,7 @@
 #include "hilbert.h"
 #include <map>
 #include "timer.h"
-#define SEND_ALL 1 //! Set to 1 for debugging
+#define SEND_ALL 0 //! Set to 1 for debugging
 
 namespace exafmm {
   typedef std::multimap<uint64_t, Body> BodyMap;
@@ -96,6 +96,7 @@ namespace exafmm {
     }
     if (cellMap[key].numBodies <= NCRIT && noChildSent) {
       cellMap[key].numChilds = 0;
+      cellMap[key].numBodies = bodyMap.count(key);
       return;
     }
     int level = getLevel(key);
@@ -150,7 +151,8 @@ namespace exafmm {
         numChilds++;
       }
     }
-    if (numChilds != 0) cellMap[key].numBodies = numBodies;
+    if (numChilds == 0) numBodies = bodyMap.count(key);
+    cellMap[key].numBodies = numBodies;
     cellMap[key].numChilds = numChilds;
   }
 
@@ -158,8 +160,8 @@ namespace exafmm {
   void sanityCheck(BodyMap & bodyMap, CellMap & cellMap, uint64_t key) {
     Cell cell = cellMap[key];
     assert(cell.key == key);
+    if (cell.numChilds == 0) assert(cell.numBodies == int(bodyMap.count(key)));
     if (bodyMap.count(key) != 0) {
-      assert(cell.numBodies == int(bodyMap.count(key)));
       assert(cell.numChilds == 0);
       std::pair<BodyMap::iterator,BodyMap::iterator> range = bodyMap.equal_range(key);
       for (BodyMap::iterator B=range.first; B!=range.second; B++) {
