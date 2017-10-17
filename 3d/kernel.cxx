@@ -7,6 +7,9 @@ int main(int argc, char ** argv) {
   Args args(argc, argv);
   P = args.P;
   VERBOSE = args.verbose;
+#if EXAFMM_HELMHOLTZ
+  WAVEK = complex_t(1,.1) / real_t(2*M_PI);
+#endif 
   initKernel();
 
   //! P2M
