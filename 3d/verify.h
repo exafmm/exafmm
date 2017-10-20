@@ -6,7 +6,11 @@ namespace exafmm {
   double getSumScalar(const Bodies & bodies) {
     double v = 0;
     for (size_t b=0; b<bodies.size(); b++) {
+#if EXAFMM_LAPLACE
+      v += bodies[b].p * bodies[b].q;
+#elif EXAFMM_HELMHOLTZ
       v += std::abs(bodies[b].p * bodies[b].q);
+#endif
     }
     return v;
   }
