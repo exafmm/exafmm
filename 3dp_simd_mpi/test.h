@@ -76,9 +76,11 @@ namespace exafmm {
     vec3 dX;
     for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
     real_t R2 = norm(dX) * THETA * THETA;
+    //if(MPIRANK==0) std::cout << Ci->key << " " << Cj->key << std::endl;
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
+      assert(Ci->numBodies != 0 && Cj->numBodies != 0);
       P2P(Ci, Cj);
     } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
       for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {

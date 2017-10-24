@@ -31,83 +31,86 @@ int main(int argc, char ** argv) {
   double totalFMM = 0;
   print("FMM Profiling");
   start("Initialize bodies");
-  Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
+  Bodies ibodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
   stop("Initialize bodies");
   start("Total FMM");
   start("Partition");
-  partition(bodies);
+  partition(ibodies);
   stop("Partition");
   start("Precalculation");
   initKernel();
   stop("Precalculation");
   start("Build tree");
-  Cells cells = buildTree(bodies);
+  Cells icells = buildTree(ibodies);
+  Bodies jbodies = ibodies;
+  Cells jcells = buildTree(jbodies);
   stop("Build tree");
   start("P2M & M2M");
-  upwardPass(cells);
+  upwardPass(jcells);
   stop("P2M & M2M");
   start("Local essential tree");
-  localEssentialTree(bodies, cells);
-  upwardPassLET(&cells[0]);
+  localEssentialTree(jbodies, jcells);
+  upwardPassLET(jcells);
   stop("Local essential tree");
   start("M2L & P2P");
-  horizontalPass(cells, cells);
+  horizontalPass(icells, jcells);
   stop("M2L & P2P");
   start("L2L & L2P");
-  downwardPass(cells);
+  downwardPass(icells);
   stop("L2L & L2P");
   totalFMM += stop("Total FMM");
-  Bodies bodies2;
-  if ((IMAGES == 0) | (bodies.size() < 1000)) {
+  Bodies ibodies2;
+  if ((IMAGES == 0) | (args.numBodies < 1000)) {
     start("Direct N-Body");
     const int numTargets = 10;
-    Bodies jbodies = bodies;
-    sampleBodies(bodies, numTargets);
-    bodies2 = bodies;
-    initTarget(bodies);
-    direct(bodies, jbodies);
+    jbodies = ibodies;
+    sampleBodies(ibodies, numTargets);
+    ibodies2 = ibodies;
+    initTarget(ibodies);
+    direct(ibodies, jbodies);
     stop("Direct N-Body");
   } else {
     start("Dipole correction");
-    vec3 dipole = 0;
-    for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q;
+    vec3 localDipole = 0, globalDipole = 0;
+    for (size_t b=0; b<ibodies.size(); b++) localDipole += ibodies[b].X * ibodies[b].q;
+    MPI_Allreduce(&localDipole[0], &globalDipole[0], 3, MPI_REAL_T, MPI_SUM, MPI_COMM_WORLD);
     real_t coef = 4 * M_PI / (3 * CYCLE * CYCLE * CYCLE);
-    for (size_t b=0; b<bodies.size(); b++) {
-      real_t dnorm = norm(dipole);
-      bodies[b].p -= coef * dnorm / bodies.size() / bodies[b].q;
-      bodies[b].F -= dipole * coef;
+    for (size_t b=0; b<ibodies.size(); b++) {
+      real_t dnorm = norm(globalDipole);
+      ibodies[b].p -= coef * dnorm / ibodies.size() / ibodies[b].q;
+      ibodies[b].F -= globalDipole * coef;
     }
     stop("Dipole correction");
 
     print("Ewald Profiling");
     start("Build tree");
-    bodies2 = bodies;
-    initTarget(bodies);
-    Bodies jbodies = bodies;
-    Cells  jcells = buildTree(jbodies);
+    ibodies2 = ibodies;
+    initTarget(ibodies);
+    jbodies = ibodies;
+    jcells = buildTree(jbodies);
     stop("Build tree");
     start("Wave part");
-    wavePart(bodies, jbodies);
+    wavePart(ibodies, jbodies);
     stop("Wave part");
     start("Real part");
-    realPart(cells, jcells);
-    selfTerm(bodies);
+    realPart(icells, jcells);
+    selfTerm(ibodies);
     stop("Real part");
   }
 
   double pDif, pNrm;
   if (IMAGES == 0) {
-    pDif = getDifScalar(bodies, bodies2);
-    pNrm = getNrmScalar(bodies2);
+    pDif = getDifScalar(ibodies, ibodies2);
+    pNrm = getNrmScalar(ibodies2);
   } else {
-    double pSum = getSumScalar(bodies);
-    double pSum2 = getSumScalar(bodies2);
+    double pSum = getSumScalar(ibodies);
+    double pSum2 = getSumScalar(ibodies2);
     pDif = (pSum - pSum2) * (pSum - pSum2);
     pNrm = pSum * pSum;
   }
   double pRel = std::sqrt(pDif/pNrm);
-  double FDif = getDifVector(bodies, bodies2);
-  double FNrm = getNrmVector(bodies2);
+  double FDif = getDifVector(ibodies, ibodies2);
+  double FNrm = getNrmVector(ibodies2);
   double FRel = std::sqrt(FDif/FNrm);
   print("FMM vs. direct");
   print("Rel. L2 Error (p)", pRel, false);

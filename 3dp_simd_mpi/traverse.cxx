@@ -8,7 +8,6 @@ using namespace exafmm;
 
 int main(int argc, char ** argv) {
   Args args(argc, argv);
-  P = 1;
   THETA = args.theta;
   NCRIT = args.ncrit;
   LEVEL = args.level;
@@ -18,22 +17,24 @@ int main(int argc, char ** argv) {
   CYCLE = 2 * M_PI;
   IMAGES = args.images;
 
-  Bodies bodies = initBodies(numBodies, distribution, MPIRANK, MPISIZE);
-  for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
+  Bodies ibodies = initBodies(numBodies, distribution, MPIRANK, MPISIZE);
+  for (size_t b=0; b<ibodies.size(); b++) ibodies[b].q = 1;
 
-  partition(bodies);
+  partition(ibodies);
   initKernel();
-  Cells cells = buildTree(bodies);
-  upwardPass(cells);
-  localEssentialTree(bodies, cells);
-  upwardPassLET(cells);
-  horizontalPass(cells, cells);
-  downwardPass(cells);
+  Cells icells = buildTree(ibodies);
+  Bodies jbodies = ibodies;
+  Cells jcells = buildTree(jbodies);
+  upwardPass(jcells);
+  localEssentialTree(jbodies, jcells);
+  upwardPassLET(jcells);
+  horizontalPass(icells, jcells);
+  downwardPass(icells);
 
-  uint64_t imageBodies = std::pow(3,3*IMAGES) * bodies.size();
+  uint64_t imageBodies = std::pow(3,3*IMAGES) * numBodies * MPISIZE;
   print("numBodies", imageBodies);
-  print("bodies[0].p", bodies[0].p);
-  for (size_t b=0; b<bodies.size(); b++) assert(imageBodies == bodies[b].p);
+  print("bodies[0].p", ibodies[0].p);
+  for (size_t b=0; b<ibodies.size(); b++) assert(imageBodies == ibodies[b].p);
   print("Assertion passed");
   return 0;
 }

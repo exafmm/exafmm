@@ -4,9 +4,6 @@
 #include "hilbert.h"
 
 namespace exafmm {
-  int LEVEL;                                    //!< Octree level used for partitioning
-  std::vector<int> OFFSET;                      //!< Offset of Hilbert index for partitions
-
   //! Allreduce local bounds to get global bounds
   void allreduceBounds(Bodies & bodies) {
     vec3 localXmin, localXmax, globalXmin, globalXmax;
@@ -82,23 +79,23 @@ namespace exafmm {
     std::vector<int> globalHist(numBins);
     MPI_Allreduce(&localHist[0], &globalHist[0], numBins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     //! Calculate offset of global histogram for each rank
-    std::vector<int> offset(MPISIZE+1);
-    offset[0] = 0;
+    OFFSET.resize(MPISIZE+1);
+    OFFSET[0] = 0;
     for (int i=0, irank=0, count=0; i<numBins; i++) {
       count += globalHist[i];
       if (irank * numBodies < count) {
-        offset[irank] = i;
+        OFFSET[irank] = i;
         irank++;
       }
     }
-    offset[MPISIZE] = numBins;
+    OFFSET[MPISIZE] = numBins;
     std::vector<int> sendBodyCount(MPISIZE, 0);
     std::vector<int> recvBodyCount(MPISIZE, 0);
     std::vector<int> sendBodyDispl(MPISIZE, 0);
     std::vector<int> recvBodyDispl(MPISIZE, 0);
     //! Use the offset as the splitter for partitioning
     for (int irank=0, b=0; irank<MPISIZE; irank++) {
-      while (b < int(bodies.size()) && key[b] < offset[irank+1]) {
+      while (b < int(bodies.size()) && key[b] < OFFSET[irank+1]) {
         sendBodyCount[irank]++;
         b++;
       }

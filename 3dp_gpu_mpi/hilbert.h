@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <stdint.h>
 #include "vec.h"
-#define EXAFMM_HILBERT 1
+#define EXAFMM_HILBERT 1 //! Set this to 0 for Morton
 
 namespace exafmm {
   //! Levelwise offset of Hilbert key
