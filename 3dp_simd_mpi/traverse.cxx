@@ -18,13 +18,14 @@ int main(int argc, char ** argv) {
   Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
-  partition(ibodies);
+  partition(bodies);
   initKernel();
   Cells cells = buildTree(bodies);
   Bodies jbodies = bodies;
   Cells jcells = buildTree(jbodies);
   upwardPass(jcells);
   localEssentialTree(jbodies, jcells);
+  printMPI(jbodies.size());
   upwardPassLET(jcells);
   horizontalPass(cells, jcells);
   downwardPass(cells);
@@ -33,8 +34,8 @@ int main(int argc, char ** argv) {
   MPI_Allreduce(&numBodiesLocal, &numBodies, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   uint64_t imageBodies = std::pow(3,3*IMAGES) * numBodies;
   print("numBodies", imageBodies);
-  print("bodies[0].p", ibodies[0].p);
-  for (size_t b=0; b<ibodies.size(); b++) assert(imageBodies == ibodies[b].p);
+  print("bodies[0].p", bodies[0].p);
+  for (size_t b=0; b<bodies.size(); b++) assert(imageBodies == bodies[b].p);
   print("Assertion passed");
   return 0;
 }

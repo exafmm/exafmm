@@ -31,11 +31,11 @@ int main(int argc, char ** argv) {
   double totalFMM = 0;
   print("FMM Profiling");
   start("Initialize bodies");
-  Bodies ibodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
+  Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
   stop("Initialize bodies");
   start("Total FMM");
   start("Partition");
-  partition(ibodies);
+  partition(bodies);
   stop("Partition");
   start("Precalculation");
   initKernel();
@@ -56,7 +56,7 @@ int main(int argc, char ** argv) {
   horizontalPass(cells, jcells);
   stop("M2L & P2P");
   start("L2L & L2P");
-  downwardPass(icells);
+  downwardPass(cells);
   stop("L2L & L2P");
   totalFMM += stop("Total FMM");
   Bodies bodies2;
@@ -96,7 +96,7 @@ int main(int argc, char ** argv) {
     Cells jcells2 = buildTree(jbodies);
     stop("Build tree");
     start("Wave part");
-    wavePart(ibodies, jbodies);
+    wavePart(bodies, jbodies);
     stop("Wave part");
     start("Real part");
     realPart(cells, jcells2);

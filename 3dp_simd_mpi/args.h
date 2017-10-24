@@ -85,7 +85,7 @@ namespace exafmm {
       : ncrit(64),
         distribution("cube"),
         images(4),
-        level(6),
+        level(4),
         numBodies(10000),
         path("./"),
         P(10),
