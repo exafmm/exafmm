@@ -56,7 +56,11 @@ namespace exafmm {
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
-      P2P(Ci, Cj);
+      if (Cj->numBodies == 0) {
+        M2L(Ci, Cj);
+      } else {
+        P2P(Ci, Cj);
+      }
     } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
       for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
 #pragma omp task untied if(ci->numBodies > 100) firstprivate(IX)

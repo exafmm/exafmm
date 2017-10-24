@@ -13,6 +13,9 @@ int main(int argc, char ** argv) {
   THETA = args.theta;
   NCRIT = args.ncrit;
   VERBOSE = args.verbose;
+#if EXAFMM_HELMHOLTZ
+  WAVEK = complex_t(1,.1) / real_t(2*M_PI);
+#endif 
   print("FMM Parameter");
   args.show();
 

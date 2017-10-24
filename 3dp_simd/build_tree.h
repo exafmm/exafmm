@@ -44,13 +44,8 @@ namespace exafmm {
       offset += size[i];
       if (size[i]) cell->numChilds++;
     }
-    bool singleBodyCloseToCenter = false;
-    if (end - begin == 1) {
-      real_t R2 = norm(bodies[begin].X - cell->X);
-      singleBodyCloseToCenter = R2 < (R * R / 4);
-    }
-    //! If cell is a leaf (modified to prevent large leafs with bodies clustered in one octant)
-    if ((end - begin <= NCRIT && cell->numChilds > 1) || singleBodyCloseToCenter) {
+    //! If cell is a leaf
+    if (end - begin <= NCRIT) {
       cell->numChilds = 0;
       if (direction) {
         for (int i=begin; i<end; i++) {
@@ -94,7 +89,7 @@ namespace exafmm {
     getBounds(bodies, R0, X0);
     Bodies buffer = bodies;
     Cells cells(1);
-    cells.reserve(bodies.size());
+    cells.reserve(bodies.size()*(32/NCRIT+1));
     buildCells(&bodies[0], &buffer[0], 0, bodies.size(), &cells[0], cells, X0, R0);
     return cells;
   }

@@ -4,9 +4,6 @@
 #include "hilbert.h"
 
 namespace exafmm {
-  int LEVEL;                                    //!< Octree level used for partitioning
-  std::vector<int> OFFSET;                      //!< Offset of Hilbert index for partitions
-
   //! Allreduce local bounds to get global bounds
   void allreduceBounds(Bodies & bodies) {
     vec3 localXmin, localXmax, globalXmin, globalXmax;
@@ -82,23 +79,23 @@ namespace exafmm {
     std::vector<int> globalHist(numBins);
     MPI_Allreduce(&localHist[0], &globalHist[0], numBins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     //! Calculate offset of global histogram for each rank
-    std::vector<int> offset(MPISIZE+1);
-    offset[0] = 0;
+    OFFSET.resize(MPISIZE+1);
+    OFFSET[0] = 0;
     for (int i=0, irank=0, count=0; i<numBins; i++) {
       count += globalHist[i];
       if (irank * numBodies < count) {
-        offset[irank] = i;
+        OFFSET[irank] = i;
         irank++;
       }
     }
-    offset[MPISIZE] = numBins;
+    OFFSET[MPISIZE] = numBins;
     std::vector<int> sendBodyCount(MPISIZE, 0);
     std::vector<int> recvBodyCount(MPISIZE, 0);
     std::vector<int> sendBodyDispl(MPISIZE, 0);
     std::vector<int> recvBodyDispl(MPISIZE, 0);
     //! Use the offset as the splitter for partitioning
     for (int irank=0, b=0; irank<MPISIZE; irank++) {
-      while (b < int(bodies.size()) && key[b] < offset[irank+1]) {
+      while (b < int(bodies.size()) && key[b] < OFFSET[irank+1]) {
         sendBodyCount[irank]++;
         b++;
       }
@@ -109,6 +106,46 @@ namespace exafmm {
     //! Alltoallv for bodies (defined in alltoall.h)
     alltoallBodies(bodies, sendBodyCount, sendBodyDispl, buffer, recvBodyCount, recvBodyDispl);
     bodies = buffer;
+  }
+
+  //! Shift bodies among MPI rank round robin
+  void shiftBodies(Bodies & bodies) {
+    int newSize;
+    int oldSize = bodies.size();
+    const int isend = (MPIRANK + 1          ) % MPISIZE;
+    const int irecv = (MPIRANK - 1 + MPISIZE) % MPISIZE;
+    MPI_Request sreq,rreq;
+    MPI_Datatype MPI_BODY;
+    MPI_Type_contiguous(sizeof(bodies[0]), MPI_CHAR, &MPI_BODY);
+    MPI_Type_commit(&MPI_BODY);
+    MPI_Isend(&oldSize, 1, MPI_INT, irecv, 0, MPI_COMM_WORLD, &sreq);
+    MPI_Irecv(&newSize, 1, MPI_INT, isend, 0, MPI_COMM_WORLD, &rreq);
+    MPI_Wait(&sreq, MPI_STATUS_IGNORE);
+    MPI_Wait(&rreq, MPI_STATUS_IGNORE);
+    Bodies buffer = bodies;
+    bodies.resize(newSize);
+    MPI_Isend(&buffer[0], oldSize, MPI_BODY, irecv, 1, MPI_COMM_WORLD, &sreq);
+    MPI_Irecv(&bodies[0], newSize, MPI_BODY, isend, 1, MPI_COMM_WORLD, &rreq);
+    MPI_Wait(&sreq, MPI_STATUS_IGNORE);
+    MPI_Wait(&rreq, MPI_STATUS_IGNORE);
+  }
+
+  //! Allgather bodies
+  void gatherBodies(Bodies & bodies) {
+    std::vector<int> recvCount(MPISIZE, 0);
+    std::vector<int> recvDispl(MPISIZE, 0);
+    int sendCount = bodies.size();
+    MPI_Datatype MPI_BODY;
+    MPI_Type_contiguous(sizeof(bodies[0]), MPI_CHAR, &MPI_BODY);
+    MPI_Type_commit(&MPI_BODY);
+    MPI_Allgather(&sendCount, 1, MPI_INT, &recvCount[0], 1, MPI_INT, MPI_COMM_WORLD);
+    for (int irank=0; irank<MPISIZE-1; irank++) {
+      recvDispl[irank+1] = recvDispl[irank] + recvCount[irank];
+    }
+    Bodies buffer = bodies;
+    bodies.resize(recvDispl[MPISIZE-1]+recvCount[MPISIZE-1]);
+    MPI_Allgatherv(&buffer[0], sendCount, MPI_BODY,
+                   &bodies[0], &recvCount[0], &recvDispl[0], MPI_BODY, MPI_COMM_WORLD);
   }
 }
 #endif

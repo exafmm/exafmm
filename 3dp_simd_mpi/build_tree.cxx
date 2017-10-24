@@ -11,22 +11,22 @@ int main(int argc, char ** argv) {
   NCRIT = args.ncrit;
   LEVEL = args.level;
   VERBOSE = args.verbose;
-  const int numBodies = args.numBodies;
-  const char * distribution = args.distribution;
 
-  Bodies bodies = initBodies(numBodies, distribution, MPIRANK, MPISIZE);
+  Bodies bodies = initBodies(args.numBodies, args.distribution, MPIRANK, MPISIZE);
   for (size_t b=0; b<bodies.size(); b++) bodies[b].q = 1;
 
   partition(bodies);
   initKernel();
   Cells cells = buildTree(bodies);
-  upwardPass(&cells[0]);
+  upwardPass(cells);
   localEssentialTree(bodies, cells);
-  upwardPassLET(&cells[0]);
+  upwardPassLET(cells);
 
-  print("numBodies", numBodies * MPISIZE);
+  int numBodies, numBodiesLocal = args.numBodies;
+  MPI_Allreduce(&numBodiesLocal, &numBodies, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  print("numBodies", numBodies);
   print("cells[0].M[0]", cells[0].M[0]);
-  assert(numBodies * MPISIZE == std::real(cells[0].M[0]));
+  assert(numBodies == std::real(cells[0].M[0]));
   print("Assertion passed");
   return 0;
 }

@@ -243,10 +243,10 @@ namespace exafmm {
     }
   }
 
-  void L2P(Cell * Ci) {
+  void L2P(Cell * C) {
     complex_t Ynm[P*P], YnmTheta[P*P];
-    for (Body * B=Ci->body; B!=Ci->body+Ci->numBodies; B++) {
-      vec3 dX = B->X - Ci->X;
+    for (Body * B=C->body; B!=C->body+C->numBodies; B++) {
+      vec3 dX = B->X - C->X;
       vec3 spherical = 0;
       vec3 cartesian = 0;
       real_t r, theta, phi;
@@ -255,16 +255,16 @@ namespace exafmm {
       for (int n=0; n<P; n++) {
         int nm  = n * n + n;
         int nms = n * (n + 1) / 2;
-        B->p += std::real(Ci->L[nms] * Ynm[nm]);
-        spherical[0] += std::real(Ci->L[nms] * Ynm[nm]) / r * n;
-        spherical[1] += std::real(Ci->L[nms] * YnmTheta[nm]);
+        B->p += std::real(C->L[nms] * Ynm[nm]);
+        spherical[0] += std::real(C->L[nms] * Ynm[nm]) / r * n;
+        spherical[1] += std::real(C->L[nms] * YnmTheta[nm]);
         for (int m=1; m<=n; m++) {
           nm  = n * n + n + m;
           nms = n * (n + 1) / 2 + m;
-          B->p += 2 * std::real(Ci->L[nms] * Ynm[nm]);
-          spherical[0] += 2 * std::real(Ci->L[nms] * Ynm[nm]) / r * n;
-          spherical[1] += 2 * std::real(Ci->L[nms] * YnmTheta[nm]);
-          spherical[2] += 2 * std::real(Ci->L[nms] * Ynm[nm] * I) * m;
+          B->p += 2 * std::real(C->L[nms] * Ynm[nm]);
+          spherical[0] += 2 * std::real(C->L[nms] * Ynm[nm]) / r * n;
+          spherical[1] += 2 * std::real(C->L[nms] * YnmTheta[nm]);
+          spherical[2] += 2 * std::real(C->L[nms] * Ynm[nm] * I) * m;
         }
       }
       sph2cart(r, theta, phi, spherical, cartesian);
