@@ -6,7 +6,7 @@ namespace exafmm {
   double getSumScalar(const Bodies & bodies) {
     double v = 0;
     for (size_t b=0; b<bodies.size(); b++) {
-#if EXAFMM_LAPLACE
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
       v += bodies[b].p * bodies[b].q;
 #elif EXAFMM_HELMHOLTZ
       v += std::abs(bodies[b].p * bodies[b].q);
@@ -34,7 +34,7 @@ namespace exafmm {
   double getNrmVector(const Bodies & bodies) {
     double v = 0;
     for (size_t b=0; b<bodies.size(); b++) {
-#if EXAFMM_LAPLACE
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
       v += norm(bodies[b].F);
 #elif EXAFMM_HELMHOLTZ
       for (int d=0; d<3; d++) v+= std::norm(bodies[b].F[d]);
@@ -46,7 +46,7 @@ namespace exafmm {
   double getDifVector(const Bodies & bodies, const Bodies & bodies2) {
     double v = 0;
     for (size_t b=0; b<bodies.size(); b++) {
-#if EXAFMM_LAPLACE
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
       v += norm(bodies[b].F - bodies2[b].F);
 #elif EXAFMM_HELMHOLTZ
       for (int d=0; d<3; d++) v+= std::norm(bodies[b].F[d] - bodies2[b].F[d]);

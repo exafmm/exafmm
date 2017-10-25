@@ -27,7 +27,7 @@ namespace exafmm {
   //! Structure of bodies
   struct Body {
     vec3 X;                                     //!< Position
-#if EXAFMM_LAPLACE
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
     real_t q;                                   //!< Charge
     real_t p;                                   //!< Potential
     vec3 F;                                     //!< Force

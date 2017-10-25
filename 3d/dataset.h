@@ -132,7 +132,7 @@ namespace exafmm {
       int end = bodies.size();
       splitRange(begin, end, i, numSplit);
       srand48(seed);
-#if EXAFMM_LAPLACE
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
       real_t average = 0;
       for (int b=begin; b<end; b++) {
         bodies[b].q = drand48() - .5;
@@ -154,7 +154,7 @@ namespace exafmm {
   void initTarget(Bodies & bodies) {
     for (size_t b=0; b<bodies.size(); b++) {
       bodies[b].p = 0;
-#if EXAFMM_LAPLACE
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
       bodies[b].F = 0;
 #elif EXAFMM_HELMHOLTZ
       bodies[b].F = complex_t(0.,0.);
