@@ -13,6 +13,6 @@ for file in glob.glob("bodies*.dat"):
     x = data[:,0]
     y = data[:,1]
     z = data[:,2]
-    ran = range(0, len(x), 100)
+    ran = range(0, len(x), 1)
     ax.scatter(x[ran], y[ran], z[ran], c=colors[int(file[6:10])])
 plt.show()

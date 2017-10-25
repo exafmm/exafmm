@@ -31,15 +31,18 @@ for exedir in exedir_list:
             dash_params = [ '-'+param for param in params]
             # interleave parameter character list and their value list
             args_list = list(itertools.chain(*zip(dash_params, values)))
+            # for 3d directory
+            if exedir is "3d" and test is "fmm":
+                test = "laplace"
             # insert executable at the beginning of args list
             args_list.insert(0, os.path.join(exedir, test))
-            # make regression test for mpi
+            # for *mpi directories
             if "mpi" in exedir:
                 args_list.insert(0, "4")
                 args_list.insert(0, "-np")
                 args_list.insert(0, "mpirun")
-            # make regression test for fmm executable
-            if test is "fmm":
+            # for fmm executable
+            if test is "fmm" or test is "laplace":
                 args_list.insert(0, "regression.py")
                 args_list.insert(0, "python")
             # print args string and write to log file

@@ -57,6 +57,7 @@ namespace exafmm {
       M2L(Ci, Cj);
     } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
       if (Cj->numBodies == 0) {
+        std::cout << MPIRANK << " " << Ci->key << " " << getLevel(Ci->key) << " " << Cj->key << " " << getLevel(Cj->key) << std::endl;
         M2L(Ci, Cj);
       } else {
         P2P(Ci, Cj);
