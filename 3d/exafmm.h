@@ -21,8 +21,8 @@ namespace exafmm {
   typedef vec<3,real_t> vec3;                   //!< Vector of 3 real_t types
 #if EXAFMM_HELMHOLTZ
   typedef vec<3,complex_t> cvec3;               //!< Vector of 3 complex_t types
-  const complex_t I(0.,1.);                     //!< Imaginary unit
 #endif
+  const complex_t I(0.,1.);                     //!< Imaginary unit
 
   //! Structure of bodies
   struct Body {
