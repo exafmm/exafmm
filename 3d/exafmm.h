@@ -35,6 +35,9 @@ namespace exafmm {
     complex_t q;                                //!< Charge
     complex_t p;                                //!< Potential
     cvec3 F;                                    //!< Force
+#elif EXAFMM_STOKES
+    vec3 q;                                     //!< Charge
+    vec3 p;                                     //!< Potential
 #endif
   };
   typedef std::vector<Body> Bodies;             //!< Vector of bodies
