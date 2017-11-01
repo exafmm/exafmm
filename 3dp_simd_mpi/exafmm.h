@@ -4,6 +4,8 @@
 #include <complex>
 #include <cstdlib>
 #include <cstdio>
+#include <fstream>
+#include <sstream>
 #include <stdint.h>
 #include <vector>
 #include "vec.h"

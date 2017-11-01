@@ -17,6 +17,7 @@ namespace exafmm {
 
   inline void M2L(Cell * Ci, Cell * Cj) {
     Ci->L[0] += Cj->M[0];
+    Cj->L[0] += 1;
   }
 
   void L2L(Cell * Cj) {
@@ -37,6 +38,7 @@ namespace exafmm {
         Bi[i].p += Bj[j].q;
       }
     }
+    Cj->L[0] += 1;
   }
 
   void upwardPass(Cell * Ci) {
@@ -79,11 +81,8 @@ namespace exafmm {
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
-      if (Cj->numBodies == 0) {
-        M2L(Ci, Cj);
-      } else {
-        P2P(Ci, Cj);
-      }
+      assert(Cj->numBodies != 0);
+      P2P(Ci, Cj);
     } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
       for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
         horizontalPass(ci, Cj);

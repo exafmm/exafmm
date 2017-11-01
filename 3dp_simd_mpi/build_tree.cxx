@@ -18,6 +18,7 @@ int main(int argc, char ** argv) {
   partition(bodies);
   initKernel();
   Cells cells = buildTree(bodies);
+  writeCells(cells);
   upwardPass(cells);
   localEssentialTree(bodies, cells);
   upwardPassLET(cells);
