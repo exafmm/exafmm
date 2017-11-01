@@ -159,11 +159,14 @@ namespace exafmm {
   //! Initialize target values
   void initTarget(Bodies & bodies) {
     for (size_t b=0; b<bodies.size(); b++) {
-      bodies[b].p = 0;
 #if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
+      bodies[b].p = 0;
       bodies[b].F = 0;
 #elif EXAFMM_HELMHOLTZ
+      bodies[b].p = complex_t(0.,0.);
       bodies[b].F = complex_t(0.,0.);
+#elif EXAFMM_STOKES
+      bodies[b].F = 0;
 #endif
     }
   }

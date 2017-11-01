@@ -37,7 +37,7 @@ namespace exafmm {
     cvec3 F;                                    //!< Force
 #elif EXAFMM_STOKES
     vec3 q;                                     //!< Charge
-    vec3 p;                                     //!< Potential
+    vec3 F;                                     //!< Field
 #endif
   };
   typedef std::vector<Body> Bodies;             //!< Vector of bodies
@@ -61,5 +61,6 @@ namespace exafmm {
   int NCRIT;                                    //!< Number of bodies per leaf cell
   real_t THETA;                                 //!< Multipole acceptance criterion
   complex_t WAVEK;                              //!< Wave number
+  vec<4,int> OFFSET;                            //!< Index offset for the 4 terms in Stokes kernel 
 }
 #endif
