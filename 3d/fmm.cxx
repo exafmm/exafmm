@@ -51,14 +51,16 @@ int main(int argc, char ** argv) {
   direct(bodies, jbodies);
   stop("Direct N-Body");
 
+  print("FMM vs. direct");
+#if !EXAFMM_STOKES
   double pDif = getDifScalar(bodies, bodies2);
   double pNrm = getNrmScalar(bodies2);
   double pRel = std::sqrt(pDif/pNrm);
+  print("Rel. L2 Error (p)", pRel, false);
+#endif
   double FDif = getDifVector(bodies, bodies2);
   double FNrm = getNrmVector(bodies2);
   double FRel = std::sqrt(FDif/FNrm);
-  print("FMM vs. direct");
-  print("Rel. L2 Error (p)", pRel, false);
   print("Rel. L2 Error (F)", FRel, false);
   return 0;
 }
