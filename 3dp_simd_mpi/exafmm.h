@@ -4,6 +4,8 @@
 #include <complex>
 #include <cstdlib>
 #include <cstdio>
+#include <fstream>
+#include <sstream>
 #include <stdint.h>
 #include <vector>
 #include "vec.h"
@@ -22,6 +24,7 @@ namespace exafmm {
   typedef std::complex<real_t> complex_t;       //!< Complex type
   typedef vec<3,int> ivec3;                     //!< Vector of 3 int types
   typedef vec<3,real_t> vec3;                   //!< Vector of 3 real_t types
+  const complex_t I(0.,1.);                     //!< Imaginary unit
 
   //! Structure of bodies
   struct Body {

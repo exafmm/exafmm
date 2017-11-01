@@ -146,6 +146,12 @@ namespace exafmm {
       for (int b=begin; b<end; b++) {
         bodies[b].q = bodies[b].X[0] + I * bodies[b].X[1];
       }
+#elif EXAFMM_STOKES
+      for (int b=begin; b<end; b++) {
+        for (int d=0; d<3; d++) {
+          bodies[b].q[d] = drand48();
+        }
+      }
 #endif
     }
   }

@@ -4,4 +4,6 @@
 #include "laplace_ki.h"
 #elif EXAFMM_HELMHOLTZ
 #include "helmholtz.h"
+#elif EXAFMM_STOKES
+#include "stokes.h"
 #endif

@@ -98,5 +98,15 @@ namespace exafmm {
     }
     return cells;
   }
+
+  void writeCells(Cells & cells) {
+    std::stringstream name;
+    name << "cells" << std::setfill('0') << std::setw(4) << MPIRANK << ".dat";
+    std::ofstream file(name.str().c_str());
+    for (size_t i=0; i<cells.size(); i++) {
+      file << cells[i].X << cells[i].R << " " << cells[i].numChilds << std::endl;
+    }
+    file.close();
+  }
 }
 #endif

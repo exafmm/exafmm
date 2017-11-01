@@ -21,8 +21,8 @@ namespace exafmm {
   typedef vec<3,real_t> vec3;                   //!< Vector of 3 real_t types
 #if EXAFMM_HELMHOLTZ
   typedef vec<3,complex_t> cvec3;               //!< Vector of 3 complex_t types
-  const complex_t I(0.,1.);                     //!< Imaginary unit
 #endif
+  const complex_t I(0.,1.);                     //!< Imaginary unit
 
   //! Structure of bodies
   struct Body {
@@ -35,6 +35,9 @@ namespace exafmm {
     complex_t q;                                //!< Charge
     complex_t p;                                //!< Potential
     cvec3 F;                                    //!< Force
+#elif EXAFMM_STOKES
+    vec3 q;                                     //!< Charge
+    vec3 p;                                     //!< Potential
 #endif
   };
   typedef std::vector<Body> Bodies;             //!< Vector of bodies

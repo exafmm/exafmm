@@ -3,8 +3,6 @@
 #include "exafmm.h"
 
 namespace exafmm {
-  const complex_t I(0.,1.);
-
   inline int oddOrEven(int n) {
     return (((n) & 1) == 1) ? -1 : 1;
   }

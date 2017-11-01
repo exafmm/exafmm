@@ -1,8 +1,6 @@
 #ifndef dataset_h
 #define dataset_h
 #include "exafmm.h"
-#include <fstream>
-#include <sstream>
 
 namespace exafmm {
   //! Split range and return partial range
