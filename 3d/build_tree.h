@@ -26,8 +26,13 @@ namespace exafmm {
     cell->numChilds = 0;
     cell->X = X;
     cell->R = R;
+#if EXAFMM_STOKES
+    cell->M.resize(4*NTERM, 0.0);
+    cell->L.resize(4*NTERM, 0.0);
+#else
     cell->M.resize(NTERM, 0.0);
     cell->L.resize(NTERM, 0.0);
+#endif
     //! Count number of bodies in each octant
     int size[8] = {0,0,0,0,0,0,0,0};
     vec3 x;

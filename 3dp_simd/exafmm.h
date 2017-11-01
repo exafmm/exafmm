@@ -19,6 +19,7 @@ namespace exafmm {
 #endif
   typedef std::complex<real_t> complex_t;       //!< Complex type
   typedef vec<3,real_t> vec3;                   //!< Vector of 3 real_t types
+  const complex_t I(0.,1.);                     //!< Imaginary unit
 
   //! Structure of bodies
   struct Body {
