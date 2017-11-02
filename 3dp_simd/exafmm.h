@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <vector>
 #include "vec.h"
+#include "macros.h"
 
 namespace exafmm {
   //! Basic type definitions
@@ -20,6 +21,10 @@ namespace exafmm {
   typedef std::complex<real_t> complex_t;       //!< Complex type
   typedef vec<3,real_t> vec3;                   //!< Vector of 3 real_t types
   const complex_t I(0.,1.);                     //!< Imaginary unit
+
+  // SIMD vector types for AVX512, AVX, and SSE
+  const int NSIMD = SIMD_BYTES / int(sizeof(real_t));           //!< SIMD vector length (SIMD_BYTES defined in macros.h)
+  typedef vec<NSIMD,real_t> simdvec;                            //!< SIMD vector type
 
   //! Structure of bodies
   struct Body {

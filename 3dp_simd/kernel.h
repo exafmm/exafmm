@@ -1,7 +1,6 @@
 #ifndef kernel_h
 #define kernel_h
 #include "exafmm.h"
-#include "types.h"
 #include "vec.h"
 
 namespace exafmm {
