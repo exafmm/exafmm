@@ -114,11 +114,8 @@ namespace exafmm {
     Body * Bi = Ci->body;
     Body * Bj = Cj->body;
     int i, j, num = Ci->numBodies;
-    if (num >= NSIMD) {
-#if EXAFMM_SIMD
-      int remain = num % NSIMD;
 #pragma omp parallel for private(j)
-      for (i = 0; i < num - remain; i += NSIMD) {
+      for (i = 0; i < num; i += NSIMD) {
         simdvec zero((real_t)0);
         simdvec pi(zero);
         simdvec axi(zero);
@@ -172,104 +169,43 @@ namespace exafmm {
         invR = rsqrt(R2);
         invR &= R2 > zero;
         R2 = zero;
-        x2 = x2 - xi + IX[0] * CYCLE;
-        y2 = y2 - yi + IX[1] * CYCLE;
-        z2 = z2 - zi + IX[2] * CYCLE;
         mj = mj * invR;
         pi = pi + mj;
         invR = invR * invR * mj;
         mj = Bj[Cj->numBodies-1].q;
         axi = axi + xj * invR;
-        xj = x2;
-        R2 = R2 + x2 * x2;
         ayi = ayi + yj * invR;
-        yj = y2;
-        R2 = R2 + y2 * y2;
         azi = azi + zj * invR;
-        zj = z2;
-        R2 = R2 + z2 * z2;
-        invR = rsqrt(R2);
-        invR &= R2 > zero;
-        mj = mj * invR;
-        pi = pi + mj;
-        invR = invR * invR;
-        invR = invR * mj;
-        xj = xj * invR;
-        axi = axi + xj;
-        yj = yj * invR;
-        ayi = ayi + yj;
-        zj = zj * invR;
-        azi = azi + zj;
-
-        for (int k = 0; k < NSIMD; k++) {
+        if(Cj->numBodies > 1) {
+          x2 = x2 - xi + IX[0] * CYCLE;
+          y2 = y2 - yi + IX[1] * CYCLE;
+          z2 = z2 - zi + IX[2] * CYCLE;
+          R2 = R2 + x2 * x2;
+          R2 = R2 + y2 * y2;
+          R2 = R2 + z2 * z2;
+          xj = x2;
+          yj = y2;
+          zj = z2;
+          invR = rsqrt(R2);
+          invR &= R2 > zero;
+          mj = mj * invR;
+          pi = pi + mj;
+          invR = invR * invR;
+          invR = invR * mj;
+          xj = xj * invR;
+          axi = axi + xj;
+          yj = yj * invR;
+          ayi = ayi + yj;
+          zj = zj * invR;
+          azi = azi + zj;
+        } 
+        for (int k = 0; k < NSIMD && i+k < num; k++) {
           Bi[i + k].p += pi[k];
           Bi[i + k].F[0] += axi[k];
           Bi[i + k].F[1] += ayi[k];
           Bi[i + k].F[2] += azi[k];
         }
       }
-      for(i = Ci->numBodies - remain; i < Ci->numBodies; i++) {
-        real_t p = 0;
-        vec3 F = 0;
-        for(j = 0; j < Cj->numBodies; j++) {
-          vec3 dX;
-          for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d] - IX[d] * CYCLE;
-          real_t R2 = norm(dX);
-          if (R2 != 0) {
-            real_t invR2 = 1.0 / R2;
-            real_t invR = Bj[j].q * sqrt(invR2);
-            p += invR;
-            F += dX * invR2 * invR;
-          }
-        }
-        Bi[i].p += p;
-        for (int d=0; d<3; d++) {
-          Bi[i].F[d] -= F[d];
-        }
-      }
-#else
-      for(i = 0; i < Ci->numBodies; i++) {
-        real_t p = 0;
-        vec3 F = 0;
-        for(j = 0; j < Cj->numBodies; j++) {
-          vec3 dX;
-          for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d] - IX[d] * CYCLE;
-          real_t R2 = norm(dX);
-          if (R2 != 0) {
-            real_t invR2 = 1.0 / R2;
-            real_t invR = Bj[j].q * sqrt(invR2);
-            p += invR;
-            F += dX * invR2 * invR;
-          }
-        }
-        Bi[i].p += p;
-        for (int d=0; d<3; d++) {
-          Bi[i].F[d] -= F[d];
-        }
-      }
-#endif
-    }
-    else {
-      for(i = 0; i < Ci->numBodies; i++) {
-        real_t p = 0;
-        vec3 F = 0;
-        for(j = 0; j < Cj->numBodies; j++) {
-          vec3 dX;
-          for (int d=0; d<3; d++) dX[d] = Bi[i].X[d] - Bj[j].X[d] - IX[d] * CYCLE;
-          real_t R2 = norm(dX);
-          if (R2 != 0) {
-            real_t invR2 = 1.0 / R2;
-            real_t invR = Bj[j].q * sqrt(invR2);
-            p += invR;
-            F += dX * invR2 * invR;
-          }
-        }
-        Bi[i].p += p;
-        for (int d=0; d<3; d++) {
-          Bi[i].F[d] -= F[d];
-        }
-      }
-    }
   }
 
   void P2M(Cell * C) {
