@@ -105,14 +105,15 @@ namespace exafmm {
   }
 
   void initKernel() {
-    NTERM = P * (P + 1) / 2;
+    NTERM = 4 * P * (P + 1) / 2;
+    for (int d=0; d<4; d++) OFFSET[d] = NTERM * d / 4;
   }
 
   void P2P(Cell * Ci, Cell * Cj) {
     Body * Bi = Ci->body;
     Body * Bj = Cj->body;
     for (int i=0; i<Ci->numBodies; i++) {
-      vec3 p = 0;
+      vec3 F = 0;
       for (int j=0; j<Cj->numBodies; j++) {
         vec3 dX = Bi[i].X - Bj[j].X;
         real_t R2 = norm(dX);
@@ -120,11 +121,11 @@ namespace exafmm {
           real_t fdX = Bj[j].q[0] * dX[0] + Bj[j].q[1] * dX[1] + Bj[j].q[2] * dX[2];
           real_t invR = 1.0 / std::sqrt(R2);
           real_t invR3 = invR / R2;
-          p += Bj[j].q * invR;
-          p += dX * invR3 * fdX;
+          F += Bj[j].q * invR;
+          F += dX * invR3 * fdX;
         }
       }
-      Bi[i].p += p;
+      Bi[i].F += F;
     }
   }
   
@@ -141,9 +142,9 @@ namespace exafmm {
           int nm  = n * n + n + m;
           int nms = n * (n + 1) / 2 + m;
           for (int d=0; d<3; d++) {
-            C->M[nms+d*NTERM] += B->q[d] * Ynm[nm];
+            C->M[nms+OFFSET[d]] += B->q[d] * Ynm[nm];
           }
-          C->M[nms+3*NTERM] += fX * Ynm[nm];
+          C->M[nms+OFFSET[3]] += fX * Ynm[nm];
         }
       }
     }
@@ -165,19 +166,19 @@ namespace exafmm {
               int jnkms = (j - n) * (j - n + 1) / 2 + k - m;
               int nm    = n * n + n - m;
               for (int d=0; d<4; d++) {
-                M[d] += Cj->M[jnkms+d*NTERM] * Ynm[nm] * real_t(ipow2n(m) * oddOrEven(n));
+                M[d] += Cj->M[jnkms+OFFSET[d]] * Ynm[nm] * real_t(ipow2n(m) * oddOrEven(n));
               }
             }
             for (int m=k; m<=std::min(n,j+k-n); m++) {
               int jnkms = (j - n) * (j - n + 1) / 2 - k + m;
               int nm    = n * n + n - m;
               for (int d=0; d<4; d++) {
-                M[d] += std::conj(Cj->M[jnkms+d*NTERM]) * Ynm[nm] * real_t(oddOrEven(k+n+m));
+                M[d] += std::conj(Cj->M[jnkms+OFFSET[d]]) * Ynm[nm] * real_t(oddOrEven(k+n+m));
               }
             }
           }
           for (int d=0; d<4; d++) {
-            Ci->M[jks+d*NTERM] += M[d];
+            Ci->M[jks+OFFSET[d]] += M[d];
           }
         }
       }
@@ -200,7 +201,7 @@ namespace exafmm {
             int nms  = n * (n + 1) / 2 - m;
             int jnkm = (j + n) * (j + n) + j + n + m - k;
             for (int d=0; d<4; d++) {
-              L[d] += std::conj(Cj->M[nms+d*NTERM]) * Cnm * Ynm2[jnkm];
+              L[d] += std::conj(Cj->M[nms+OFFSET[d]]) * Cnm * Ynm2[jnkm];
             }
           }
           for (int m=0; m<=n; m++) {
@@ -208,12 +209,12 @@ namespace exafmm {
             int jnkm = (j + n) * (j + n) + j + n + m - k;
             real_t Cnm2 = Cnm * oddOrEven((k-m)*(k<m)+m);
             for (int d=0; d<4; d++) {
-              L[d] += Cj->M[nms+d*NTERM] * Cnm2 * Ynm2[jnkm];
+              L[d] += Cj->M[nms+OFFSET[d]] * Cnm2 * Ynm2[jnkm];
             }
           }
         }
         for (int d=0; d<4; d++) {
-          Ci->L[jks+d*NTERM] += L[d];
+          Ci->L[jks+OFFSET[d]] += L[d];
         }
       }
     }
@@ -235,7 +236,7 @@ namespace exafmm {
               int jnkm = (n - j) * (n - j) + n - j + m - k;
               int nms  = n * (n + 1) / 2 - m;
               for (int d=0; d<4; d++) {
-                L[d] += std::conj(Cj->L[nms+d*NTERM]) * Ynm[jnkm] * real_t(oddOrEven(k));
+                L[d] += std::conj(Cj->L[nms+OFFSET[d]]) * Ynm[jnkm] * real_t(oddOrEven(k));
               }
             }
             for (int m=0; m<=n; m++) {
@@ -243,13 +244,13 @@ namespace exafmm {
                 int jnkm = (n - j) * (n - j) + n - j + m - k;
                 int nms  = n * (n + 1) / 2 + m;
                 for (int d=0; d<4; d++) {
-                  L[d] += Cj->L[nms+d*NTERM] * Ynm[jnkm] * real_t(oddOrEven((m-k)*(m<k)));
+                  L[d] += Cj->L[nms+OFFSET[d]] * Ynm[jnkm] * real_t(oddOrEven((m-k)*(m<k)));
                 }
               }
             }
           }
           for (int d=0; d<4; d++) {
-            Ci->L[jks+d*NTERM] += L[d];
+            Ci->L[jks+OFFSET[d]] += L[d];
           }
         }
       }
@@ -269,20 +270,20 @@ namespace exafmm {
         int nm  = n * n + n;
         int nms = n * (n + 1) / 2;
         for (int d=0; d<4; d++) {
-          if (d<3) B->p[d] += std::real(C->L[nms] * Ynm[nm]);
+          if (d<3) B->F[d] += std::real(C->L[nms] * Ynm[nm]);
           gradient[d][0] += std::real(C->L[nms] * Ynm[nm]) / r * n;
           gradient[d][1] += std::real(C->L[nms] * YnmTheta[nm]);
-          nms += NTERM;
+          nms += int(NTERM/4);
         }
         for (int m=1; m<=n; m++) {
           nm  = n * n + n + m;
           nms = n * (n + 1) / 2 + m;
           for (int d=0; d<4; d++) {
-            if (d<3) B->p[d] += 2 * std::real(C->L[nms] * Ynm[nm]);
+            if (d<3) B->F[d] += 2 * std::real(C->L[nms] * Ynm[nm]);
             gradient[d][0] += 2 * std::real(C->L[nms] * Ynm[nm]) / r * n;
             gradient[d][1] += 2 * std::real(C->L[nms] * YnmTheta[nm]);
             gradient[d][2] += 2 * std::real(C->L[nms] * Ynm[nm] * I) * m;
-            nms += NTERM;
+            nms += int(NTERM/4);
           }
         }
       }
@@ -291,9 +292,9 @@ namespace exafmm {
         if (d<3) cartesian *= -B->X[d];
         gradient[d] = cartesian;
       }
-      B->p[0] += gradient[0][0] + gradient[1][0] + gradient[2][0] + gradient[3][0];
-      B->p[1] += gradient[0][1] + gradient[1][1] + gradient[2][1] + gradient[3][1];
-      B->p[2] += gradient[0][2] + gradient[1][2] + gradient[2][2] + gradient[3][2];
+      B->F[0] += gradient[0][0] + gradient[1][0] + gradient[2][0] + gradient[3][0];
+      B->F[1] += gradient[0][1] + gradient[1][1] + gradient[2][1] + gradient[3][1];
+      B->F[2] += gradient[0][2] + gradient[1][2] + gradient[2][2] + gradient[3][2];
     }
   }
 }

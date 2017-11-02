@@ -3,6 +3,7 @@
 #include "exafmm.h"
 
 namespace exafmm {
+#if !EXAFMM_STOKES
   double getSumScalar(const Bodies & bodies) {
     double v = 0;
     for (size_t b=0; b<bodies.size(); b++) {
@@ -30,11 +31,12 @@ namespace exafmm {
     }
     return v;
   }
+#endif
 
   double getNrmVector(const Bodies & bodies) {
     double v = 0;
     for (size_t b=0; b<bodies.size(); b++) {
-#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI || EXAFMM_STOKES
       v += norm(bodies[b].F);
 #elif EXAFMM_HELMHOLTZ
       for (int d=0; d<3; d++) v+= std::norm(bodies[b].F[d]);
@@ -46,7 +48,7 @@ namespace exafmm {
   double getDifVector(const Bodies & bodies, const Bodies & bodies2) {
     double v = 0;
     for (size_t b=0; b<bodies.size(); b++) {
-#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI || EXAFMM_STOKES
       v += norm(bodies[b].F - bodies2[b].F);
 #elif EXAFMM_HELMHOLTZ
       for (int d=0; d<3; d++) v+= std::norm(bodies[b].F[d] - bodies2[b].F[d]);
