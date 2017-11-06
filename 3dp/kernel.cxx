@@ -1,4 +1,5 @@
 #include "args.h"
+#include "dataset.h"
 #include "kernel.h"
 #include "verify.h"
 using namespace exafmm;
@@ -7,6 +8,9 @@ int main(int argc, char ** argv) {
   Args args(argc, argv);
   P = args.P;
   VERBOSE = args.verbose;
+#if EXAFMM_HELMHOLTZ
+  WAVEK = complex_t(1,.1) / real_t(2*M_PI);
+#endif 
   initKernel();
 
   //! P2M
@@ -61,32 +65,29 @@ int main(int argc, char ** argv) {
   bodies[0].X[1] = 2;
   bodies[0].X[2] = 2;
   bodies[0].q = 1;
-  bodies[0].p = 0;
-  bodies[0].F = 0;
+  initTarget(bodies);
   Ci->body = &bodies[0];
   Ci->numBodies = bodies.size();
   L2P(Ci);
 
   //! P2P
-  Bodies bodies2(1);
-  for (size_t b=0; b<bodies2.size(); b++) {
-    bodies2[b] = bodies[b];
-    bodies2[b].p = 0;
-    bodies2[b].F = 0;
-  }
+  Bodies bodies2 = bodies;
+  initTarget(bodies2);
   Cj->numBodies = jbodies.size();
   Ci->numBodies = bodies2.size();
   Ci->body = &bodies2[0];
   P2P(Ci, Cj);
 
   //! Verify results
+#if !EXAFMM_STOKES
   double pDif = getDifScalar(bodies, bodies2);
   double pNrm = getNrmScalar(bodies2);
   double pRel = std::sqrt(pDif/pNrm);
+  print("Rel. L2 Error (p)", pRel, false);
+#endif
   double FDif = getDifVector(bodies, bodies2);
   double FNrm = getNrmVector(bodies2);
   double FRel = std::sqrt(FDif/FNrm);
-  print("Rel. L2 Error (p)", pRel, false);
   print("Rel. L2 Error (F)", FRel, false);
   return 0;
 }

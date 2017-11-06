@@ -132,7 +132,7 @@ namespace exafmm {
       int end = bodies.size();
       splitRange(begin, end, i, numSplit);
       srand48(seed);
-
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
       real_t average = 0;
       for (int b=begin; b<end; b++) {
         bodies[b].q = drand48() - .5;
@@ -142,14 +142,32 @@ namespace exafmm {
       for (int b=begin; b<end; b++) {
         bodies[b].q -= average;
       }
+#elif EXAFMM_HELMHOLTZ
+      for (int b=begin; b<end; b++) {
+        bodies[b].q = bodies[b].X[0] + I * bodies[b].X[1];
+      }
+#elif EXAFMM_STOKES
+      for (int b=begin; b<end; b++) {
+        for (int d=0; d<3; d++) {
+          bodies[b].q[d] = drand48();
+        }
+      }
+#endif
     }
   }
 
   //! Initialize target values
   void initTarget(Bodies & bodies) {
     for (size_t b=0; b<bodies.size(); b++) {
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
       bodies[b].p = 0;
       bodies[b].F = 0;
+#elif EXAFMM_HELMHOLTZ
+      bodies[b].p = complex_t(0.,0.);
+      bodies[b].F = complex_t(0.,0.);
+#elif EXAFMM_STOKES
+      bodies[b].F = 0;
+#endif
     }
   }
 

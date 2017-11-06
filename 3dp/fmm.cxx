@@ -1,7 +1,9 @@
 #include "args.h"
 #include "build_tree.h"
 #include "dataset.h"
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
 #include "ewald.h"
+#endif
 #include "kernel.h"
 #include "timer.h"
 #include "traverse.h"
@@ -14,13 +16,20 @@ int main(int argc, char ** argv) {
   THETA = args.theta;
   NCRIT = args.ncrit;
   VERBOSE = args.verbose;
-  IMAGES = args.images;
   CYCLE = 2 * M_PI;
+#if EXAFMM_HELMHOLTZ
+  WAVEK = complex_t(1,.1) / real_t(2*M_PI);
+#endif 
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
   KSIZE = 11;
   ALPHA = KSIZE / CYCLE;
   SIGMA = .25 / M_PI;
   CUTOFF = CYCLE / 2;
-
+#else
+  args.images = 0;
+  printf("Setting images to 0 for Helmholtz and Stokes kernel\n");
+#endif
+  IMAGES = args.images;
   print("FMM Parameter");
   args.show();
 
@@ -57,6 +66,7 @@ int main(int argc, char ** argv) {
     direct(bodies, jbodies);
     stop("Direct N-Body");
   } else {
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
     start("Dipole correction");
     vec3 dipole = 0;
     for (size_t b=0; b<bodies.size(); b++) dipole += bodies[b].X * bodies[b].q;
@@ -82,8 +92,11 @@ int main(int argc, char ** argv) {
     realPart(cells, jcells);
     selfTerm(bodies);
     stop("Real part");
+#endif
   }
 
+  print("FMM vs. direct");
+#if !EXAFMM_STOKES
   double pDif, pNrm;
   if (IMAGES == 0) {
     pDif = getDifScalar(bodies, bodies2);
@@ -95,11 +108,11 @@ int main(int argc, char ** argv) {
     pNrm = pSum * pSum;
   }
   double pRel = std::sqrt(pDif/pNrm);
+  print("Rel. L2 Error (p)", pRel, false);
+#endif
   double FDif = getDifVector(bodies, bodies2);
   double FNrm = getNrmVector(bodies2);
   double FRel = std::sqrt(FDif/FNrm);
-  print("FMM vs. direct");
-  print("Rel. L2 Error (p)", pRel, false);
   print("Rel. L2 Error (F)", FRel, false);
   return 0;
 }

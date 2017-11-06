@@ -19,14 +19,26 @@ namespace exafmm {
 #endif
   typedef std::complex<real_t> complex_t;       //!< Complex type
   typedef vec<3,real_t> vec3;                   //!< Vector of 3 real_t types
+#if EXAFMM_HELMHOLTZ
+  typedef vec<3,complex_t> cvec3;               //!< Vector of 3 complex_t types
+#endif
   const complex_t I(0.,1.);                     //!< Imaginary unit
 
   //! Structure of bodies
   struct Body {
     vec3 X;                                     //!< Position
+#if EXAFMM_LAPLACE || EXAFMM_LAPLACE_KI
     real_t q;                                   //!< Charge
     real_t p;                                   //!< Potential
     vec3 F;                                     //!< Force
+#elif EXAFMM_HELMHOLTZ
+    complex_t q;                                //!< Charge
+    complex_t p;                                //!< Potential
+    cvec3 F;                                    //!< Force
+#elif EXAFMM_STOKES
+    vec3 q;                                     //!< Charge
+    vec3 F;                                     //!< Field
+#endif
   };
   typedef std::vector<Body> Bodies;             //!< Vector of bodies
 
@@ -51,5 +63,7 @@ namespace exafmm {
   int IX[3];                                    //!< 3-D periodic index
   real_t CYCLE;                                 //!< Cycle of periodic boundary condition
   real_t THETA;                                 //!< Multipole acceptance criterion
+  complex_t WAVEK;                              //!< Wave number
+  vec<4,int> OFFSET;                            //!< Index offset for the 4 terms in Stokes kernel 
 }
 #endif

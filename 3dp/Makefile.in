@@ -110,8 +110,11 @@ host_triplet = @host@
 # Use all possible debugging flags
 @EXAFMM_DEBUG_TRUE@am__append_11 = $(COMPILER_CXXFLAGS) -DEXAFMM_DEBUG
 @EXAFMM_DEBUG_TRUE@am__append_12 = $(COMPILER_FCFLAGS) -DEXAFMM_DEBUG
-bin_PROGRAMS = build_tree$(EXEEXT) traverse$(EXEEXT) kernel$(EXEEXT) \
-	fmm$(EXEEXT)
+bin_PROGRAMS = build_tree$(EXEEXT) traverse$(EXEEXT) \
+	laplace_kernel$(EXEEXT) laplace_ki_kernel$(EXEEXT) \
+	helmholtz_kernel$(EXEEXT) stokes_kernel$(EXEEXT) \
+	laplace$(EXEEXT) laplace_ki$(EXEEXT) helmholtz$(EXEEXT) \
+	stokes$(EXEEXT)
 subdir = 3dp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -135,12 +138,30 @@ PROGRAMS = $(bin_PROGRAMS)
 am_build_tree_OBJECTS = build_tree-build_tree.$(OBJEXT)
 build_tree_OBJECTS = $(am_build_tree_OBJECTS)
 build_tree_LDADD = $(LDADD)
-am_fmm_OBJECTS = fmm-fmm.$(OBJEXT)
-fmm_OBJECTS = $(am_fmm_OBJECTS)
-fmm_LDADD = $(LDADD)
-am_kernel_OBJECTS = kernel-kernel.$(OBJEXT)
-kernel_OBJECTS = $(am_kernel_OBJECTS)
-kernel_LDADD = $(LDADD)
+am_helmholtz_OBJECTS = helmholtz-fmm.$(OBJEXT)
+helmholtz_OBJECTS = $(am_helmholtz_OBJECTS)
+helmholtz_LDADD = $(LDADD)
+am_helmholtz_kernel_OBJECTS = helmholtz_kernel-kernel.$(OBJEXT)
+helmholtz_kernel_OBJECTS = $(am_helmholtz_kernel_OBJECTS)
+helmholtz_kernel_LDADD = $(LDADD)
+am_laplace_OBJECTS = laplace-fmm.$(OBJEXT)
+laplace_OBJECTS = $(am_laplace_OBJECTS)
+laplace_LDADD = $(LDADD)
+am_laplace_kernel_OBJECTS = laplace_kernel-kernel.$(OBJEXT)
+laplace_kernel_OBJECTS = $(am_laplace_kernel_OBJECTS)
+laplace_kernel_LDADD = $(LDADD)
+am_laplace_ki_OBJECTS = laplace_ki-fmm.$(OBJEXT)
+laplace_ki_OBJECTS = $(am_laplace_ki_OBJECTS)
+laplace_ki_LDADD = $(LDADD)
+am_laplace_ki_kernel_OBJECTS = laplace_ki_kernel-kernel.$(OBJEXT)
+laplace_ki_kernel_OBJECTS = $(am_laplace_ki_kernel_OBJECTS)
+laplace_ki_kernel_LDADD = $(LDADD)
+am_stokes_OBJECTS = stokes-fmm.$(OBJEXT)
+stokes_OBJECTS = $(am_stokes_OBJECTS)
+stokes_LDADD = $(LDADD)
+am_stokes_kernel_OBJECTS = stokes_kernel-kernel.$(OBJEXT)
+stokes_kernel_OBJECTS = $(am_stokes_kernel_OBJECTS)
+stokes_kernel_LDADD = $(LDADD)
 am_traverse_OBJECTS = traverse-traverse.$(OBJEXT)
 traverse_OBJECTS = $(am_traverse_OBJECTS)
 traverse_LDADD = $(LDADD)
@@ -177,10 +198,16 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(build_tree_SOURCES) $(fmm_SOURCES) $(kernel_SOURCES) \
-	$(traverse_SOURCES)
-DIST_SOURCES = $(build_tree_SOURCES) $(fmm_SOURCES) $(kernel_SOURCES) \
-	$(traverse_SOURCES)
+SOURCES = $(build_tree_SOURCES) $(helmholtz_SOURCES) \
+	$(helmholtz_kernel_SOURCES) $(laplace_SOURCES) \
+	$(laplace_kernel_SOURCES) $(laplace_ki_SOURCES) \
+	$(laplace_ki_kernel_SOURCES) $(stokes_SOURCES) \
+	$(stokes_kernel_SOURCES) $(traverse_SOURCES)
+DIST_SOURCES = $(build_tree_SOURCES) $(helmholtz_SOURCES) \
+	$(helmholtz_kernel_SOURCES) $(laplace_SOURCES) \
+	$(laplace_kernel_SOURCES) $(laplace_ki_SOURCES) \
+	$(laplace_ki_kernel_SOURCES) $(stokes_SOURCES) \
+	$(stokes_kernel_SOURCES) $(traverse_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -578,14 +605,27 @@ AM_CPPFLAGS = $(am__append_5) $(am__append_8) $(SIMD_FLAGS) \
 @EXAFMM_HAVE_CRAY_TRUE@	$(am__append_4) $(am__append_7) \
 @EXAFMM_HAVE_CRAY_TRUE@	$(am__append_12)
 AM_MAKEFLAGS = -s
+KERNEL = -DEXAFMM_LAPLACE
 build_tree_SOURCES = build_tree.cxx
-build_tree_CPPFLAGS = $(AM_CPPFLAGS)
+build_tree_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_LAPLACE
 traverse_SOURCES = traverse.cxx
-traverse_CPPFLAGS = $(AM_CPPFLAGS)
-kernel_SOURCES = kernel.cxx
-kernel_CPPFLAGS = $(AM_CPPFLAGS)
-fmm_SOURCES = fmm.cxx
-fmm_CPPFLAGS = $(AM_CPPFLAGS)
+traverse_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_LAPLACE
+laplace_kernel_SOURCES = kernel.cxx
+laplace_kernel_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_LAPLACE
+laplace_ki_kernel_SOURCES = kernel.cxx
+laplace_ki_kernel_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_LAPLACE_KI
+helmholtz_kernel_SOURCES = kernel.cxx
+helmholtz_kernel_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_HELMHOLTZ
+stokes_kernel_SOURCES = kernel.cxx
+stokes_kernel_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_STOKES
+laplace_SOURCES = fmm.cxx
+laplace_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_LAPLACE
+laplace_ki_SOURCES = fmm.cxx
+laplace_ki_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_LAPLACE_KI
+helmholtz_SOURCES = fmm.cxx
+helmholtz_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_HELMHOLTZ
+stokes_SOURCES = fmm.cxx
+stokes_CPPFLAGS = $(AM_CPPFLAGS) -DEXAFMM_STOKES
 TESTS = $(bin_PROGRAMS)
 all: all-am
 
@@ -668,13 +708,37 @@ build_tree$(EXEEXT): $(build_tree_OBJECTS) $(build_tree_DEPENDENCIES) $(EXTRA_bu
 	@rm -f build_tree$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(build_tree_OBJECTS) $(build_tree_LDADD) $(LIBS)
 
-fmm$(EXEEXT): $(fmm_OBJECTS) $(fmm_DEPENDENCIES) $(EXTRA_fmm_DEPENDENCIES) 
-	@rm -f fmm$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(fmm_OBJECTS) $(fmm_LDADD) $(LIBS)
+helmholtz$(EXEEXT): $(helmholtz_OBJECTS) $(helmholtz_DEPENDENCIES) $(EXTRA_helmholtz_DEPENDENCIES) 
+	@rm -f helmholtz$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(helmholtz_OBJECTS) $(helmholtz_LDADD) $(LIBS)
 
-kernel$(EXEEXT): $(kernel_OBJECTS) $(kernel_DEPENDENCIES) $(EXTRA_kernel_DEPENDENCIES) 
-	@rm -f kernel$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(kernel_OBJECTS) $(kernel_LDADD) $(LIBS)
+helmholtz_kernel$(EXEEXT): $(helmholtz_kernel_OBJECTS) $(helmholtz_kernel_DEPENDENCIES) $(EXTRA_helmholtz_kernel_DEPENDENCIES) 
+	@rm -f helmholtz_kernel$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(helmholtz_kernel_OBJECTS) $(helmholtz_kernel_LDADD) $(LIBS)
+
+laplace$(EXEEXT): $(laplace_OBJECTS) $(laplace_DEPENDENCIES) $(EXTRA_laplace_DEPENDENCIES) 
+	@rm -f laplace$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(laplace_OBJECTS) $(laplace_LDADD) $(LIBS)
+
+laplace_kernel$(EXEEXT): $(laplace_kernel_OBJECTS) $(laplace_kernel_DEPENDENCIES) $(EXTRA_laplace_kernel_DEPENDENCIES) 
+	@rm -f laplace_kernel$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(laplace_kernel_OBJECTS) $(laplace_kernel_LDADD) $(LIBS)
+
+laplace_ki$(EXEEXT): $(laplace_ki_OBJECTS) $(laplace_ki_DEPENDENCIES) $(EXTRA_laplace_ki_DEPENDENCIES) 
+	@rm -f laplace_ki$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(laplace_ki_OBJECTS) $(laplace_ki_LDADD) $(LIBS)
+
+laplace_ki_kernel$(EXEEXT): $(laplace_ki_kernel_OBJECTS) $(laplace_ki_kernel_DEPENDENCIES) $(EXTRA_laplace_ki_kernel_DEPENDENCIES) 
+	@rm -f laplace_ki_kernel$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(laplace_ki_kernel_OBJECTS) $(laplace_ki_kernel_LDADD) $(LIBS)
+
+stokes$(EXEEXT): $(stokes_OBJECTS) $(stokes_DEPENDENCIES) $(EXTRA_stokes_DEPENDENCIES) 
+	@rm -f stokes$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(stokes_OBJECTS) $(stokes_LDADD) $(LIBS)
+
+stokes_kernel$(EXEEXT): $(stokes_kernel_OBJECTS) $(stokes_kernel_DEPENDENCIES) $(EXTRA_stokes_kernel_DEPENDENCIES) 
+	@rm -f stokes_kernel$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(stokes_kernel_OBJECTS) $(stokes_kernel_LDADD) $(LIBS)
 
 traverse$(EXEEXT): $(traverse_OBJECTS) $(traverse_DEPENDENCIES) $(EXTRA_traverse_DEPENDENCIES) 
 	@rm -f traverse$(EXEEXT)
@@ -687,8 +751,14 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_tree-build_tree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmm-fmm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kernel-kernel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helmholtz-fmm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helmholtz_kernel-kernel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace-fmm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace_kernel-kernel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace_ki-fmm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laplace_ki_kernel-kernel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stokes-fmm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stokes_kernel-kernel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/traverse-traverse.Po@am__quote@
 
 .cxx.o:
@@ -721,33 +791,117 @@ build_tree-build_tree.obj: build_tree.cxx
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(build_tree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_tree-build_tree.obj `if test -f 'build_tree.cxx'; then $(CYGPATH_W) 'build_tree.cxx'; else $(CYGPATH_W) '$(srcdir)/build_tree.cxx'; fi`
 
-fmm-fmm.o: fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fmm_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fmm-fmm.o -MD -MP -MF $(DEPDIR)/fmm-fmm.Tpo -c -o fmm-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fmm-fmm.Tpo $(DEPDIR)/fmm-fmm.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='fmm-fmm.o' libtool=no @AMDEPBACKSLASH@
+helmholtz-fmm.o: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz-fmm.o -MD -MP -MF $(DEPDIR)/helmholtz-fmm.Tpo -c -o helmholtz-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz-fmm.Tpo $(DEPDIR)/helmholtz-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='helmholtz-fmm.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fmm_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fmm-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
 
-fmm-fmm.obj: fmm.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fmm_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fmm-fmm.obj -MD -MP -MF $(DEPDIR)/fmm-fmm.Tpo -c -o fmm-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fmm-fmm.Tpo $(DEPDIR)/fmm-fmm.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='fmm-fmm.obj' libtool=no @AMDEPBACKSLASH@
+helmholtz-fmm.obj: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz-fmm.obj -MD -MP -MF $(DEPDIR)/helmholtz-fmm.Tpo -c -o helmholtz-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz-fmm.Tpo $(DEPDIR)/helmholtz-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='helmholtz-fmm.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(fmm_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fmm-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
 
-kernel-kernel.o: kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT kernel-kernel.o -MD -MP -MF $(DEPDIR)/kernel-kernel.Tpo -c -o kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/kernel-kernel.Tpo $(DEPDIR)/kernel-kernel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='kernel-kernel.o' libtool=no @AMDEPBACKSLASH@
+helmholtz_kernel-kernel.o: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz_kernel-kernel.o -MD -MP -MF $(DEPDIR)/helmholtz_kernel-kernel.Tpo -c -o helmholtz_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz_kernel-kernel.Tpo $(DEPDIR)/helmholtz_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='helmholtz_kernel-kernel.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
 
-kernel-kernel.obj: kernel.cxx
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT kernel-kernel.obj -MD -MP -MF $(DEPDIR)/kernel-kernel.Tpo -c -o kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/kernel-kernel.Tpo $(DEPDIR)/kernel-kernel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
+helmholtz_kernel-kernel.obj: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT helmholtz_kernel-kernel.obj -MD -MP -MF $(DEPDIR)/helmholtz_kernel-kernel.Tpo -c -o helmholtz_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/helmholtz_kernel-kernel.Tpo $(DEPDIR)/helmholtz_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='helmholtz_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(helmholtz_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o helmholtz_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+
+laplace-fmm.o: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace-fmm.o -MD -MP -MF $(DEPDIR)/laplace-fmm.Tpo -c -o laplace-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace-fmm.Tpo $(DEPDIR)/laplace-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='laplace-fmm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+
+laplace-fmm.obj: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace-fmm.obj -MD -MP -MF $(DEPDIR)/laplace-fmm.Tpo -c -o laplace-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace-fmm.Tpo $(DEPDIR)/laplace-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='laplace-fmm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+
+laplace_kernel-kernel.o: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_kernel-kernel.o -MD -MP -MF $(DEPDIR)/laplace_kernel-kernel.Tpo -c -o laplace_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_kernel-kernel.Tpo $(DEPDIR)/laplace_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='laplace_kernel-kernel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+
+laplace_kernel-kernel.obj: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_kernel-kernel.obj -MD -MP -MF $(DEPDIR)/laplace_kernel-kernel.Tpo -c -o laplace_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_kernel-kernel.Tpo $(DEPDIR)/laplace_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='laplace_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+
+laplace_ki-fmm.o: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_ki-fmm.o -MD -MP -MF $(DEPDIR)/laplace_ki-fmm.Tpo -c -o laplace_ki-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_ki-fmm.Tpo $(DEPDIR)/laplace_ki-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='laplace_ki-fmm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_ki-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+
+laplace_ki-fmm.obj: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_ki-fmm.obj -MD -MP -MF $(DEPDIR)/laplace_ki-fmm.Tpo -c -o laplace_ki-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_ki-fmm.Tpo $(DEPDIR)/laplace_ki-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='laplace_ki-fmm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_ki-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+
+laplace_ki_kernel-kernel.o: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_ki_kernel-kernel.o -MD -MP -MF $(DEPDIR)/laplace_ki_kernel-kernel.Tpo -c -o laplace_ki_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_ki_kernel-kernel.Tpo $(DEPDIR)/laplace_ki_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='laplace_ki_kernel-kernel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_ki_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+
+laplace_ki_kernel-kernel.obj: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT laplace_ki_kernel-kernel.obj -MD -MP -MF $(DEPDIR)/laplace_ki_kernel-kernel.Tpo -c -o laplace_ki_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/laplace_ki_kernel-kernel.Tpo $(DEPDIR)/laplace_ki_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='laplace_ki_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(laplace_ki_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o laplace_ki_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+
+stokes-fmm.o: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT stokes-fmm.o -MD -MP -MF $(DEPDIR)/stokes-fmm.Tpo -c -o stokes-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/stokes-fmm.Tpo $(DEPDIR)/stokes-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='stokes-fmm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o stokes-fmm.o `test -f 'fmm.cxx' || echo '$(srcdir)/'`fmm.cxx
+
+stokes-fmm.obj: fmm.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT stokes-fmm.obj -MD -MP -MF $(DEPDIR)/stokes-fmm.Tpo -c -o stokes-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/stokes-fmm.Tpo $(DEPDIR)/stokes-fmm.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fmm.cxx' object='stokes-fmm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o stokes-fmm.obj `if test -f 'fmm.cxx'; then $(CYGPATH_W) 'fmm.cxx'; else $(CYGPATH_W) '$(srcdir)/fmm.cxx'; fi`
+
+stokes_kernel-kernel.o: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT stokes_kernel-kernel.o -MD -MP -MF $(DEPDIR)/stokes_kernel-kernel.Tpo -c -o stokes_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/stokes_kernel-kernel.Tpo $(DEPDIR)/stokes_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='stokes_kernel-kernel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o stokes_kernel-kernel.o `test -f 'kernel.cxx' || echo '$(srcdir)/'`kernel.cxx
+
+stokes_kernel-kernel.obj: kernel.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT stokes_kernel-kernel.obj -MD -MP -MF $(DEPDIR)/stokes_kernel-kernel.Tpo -c -o stokes_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/stokes_kernel-kernel.Tpo $(DEPDIR)/stokes_kernel-kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='kernel.cxx' object='stokes_kernel-kernel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stokes_kernel_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o stokes_kernel-kernel.obj `if test -f 'kernel.cxx'; then $(CYGPATH_W) 'kernel.cxx'; else $(CYGPATH_W) '$(srcdir)/kernel.cxx'; fi`
 
 traverse-traverse.o: traverse.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(traverse_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT traverse-traverse.o -MD -MP -MF $(DEPDIR)/traverse-traverse.Tpo -c -o traverse-traverse.o `test -f 'traverse.cxx' || echo '$(srcdir)/'`traverse.cxx
@@ -970,16 +1124,58 @@ traverse.log: traverse$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-kernel.log: kernel$(EXEEXT)
-	@p='kernel$(EXEEXT)'; \
-	b='kernel'; \
+laplace_kernel.log: laplace_kernel$(EXEEXT)
+	@p='laplace_kernel$(EXEEXT)'; \
+	b='laplace_kernel'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-fmm.log: fmm$(EXEEXT)
-	@p='fmm$(EXEEXT)'; \
-	b='fmm'; \
+laplace_ki_kernel.log: laplace_ki_kernel$(EXEEXT)
+	@p='laplace_ki_kernel$(EXEEXT)'; \
+	b='laplace_ki_kernel'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+helmholtz_kernel.log: helmholtz_kernel$(EXEEXT)
+	@p='helmholtz_kernel$(EXEEXT)'; \
+	b='helmholtz_kernel'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+stokes_kernel.log: stokes_kernel$(EXEEXT)
+	@p='stokes_kernel$(EXEEXT)'; \
+	b='stokes_kernel'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+laplace.log: laplace$(EXEEXT)
+	@p='laplace$(EXEEXT)'; \
+	b='laplace'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+laplace_ki.log: laplace_ki$(EXEEXT)
+	@p='laplace_ki$(EXEEXT)'; \
+	b='laplace_ki'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+helmholtz.log: helmholtz$(EXEEXT)
+	@p='helmholtz$(EXEEXT)'; \
+	b='helmholtz'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+stokes.log: stokes$(EXEEXT)
+	@p='stokes$(EXEEXT)'; \
+	b='stokes'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
