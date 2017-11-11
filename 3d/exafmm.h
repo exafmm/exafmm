@@ -61,6 +61,5 @@ namespace exafmm {
   int NCRIT;                                    //!< Number of bodies per leaf cell
   real_t THETA;                                 //!< Multipole acceptance criterion
   complex_t WAVEK;                              //!< Wave number
-  vec<4,int> OFFSET;                            //!< Index offset for the 4 terms in Stokes kernel 
 }
 #endif
