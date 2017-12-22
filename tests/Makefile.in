@@ -115,7 +115,7 @@ bin_PROGRAMS = build_tree$(EXEEXT) traverse$(EXEEXT) \
 	helmholtz_kernel$(EXEEXT) stokes_kernel$(EXEEXT) \
 	laplace$(EXEEXT) laplace_ki$(EXEEXT) helmholtz$(EXEEXT) \
 	stokes$(EXEEXT)
-subdir = 3dp
+subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_check_cuda.m4 \
@@ -564,8 +564,8 @@ top_srcdir = @top_srcdir@
 # Optimization flags
 
 # SIMD
-AM_CPPFLAGS = $(am__append_5) $(am__append_8) $(SIMD_FLAGS) \
-	$(am__append_10)
+AM_CPPFLAGS = -I../include -I../kernels $(am__append_5) \
+	$(am__append_8) $(SIMD_FLAGS) $(am__append_10)
 @EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@AM_CXXFLAGS = $(am__append_6) \
 @EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_GNU_FALSE@@EXAFMM_HAVE_INTEL_FALSE@	$(am__append_11)
 @EXAFMM_HAVE_CLANG_FALSE@@EXAFMM_HAVE_CRAY_FALSE@@EXAFMM_HAVE_GNU_TRUE@@EXAFMM_HAVE_INTEL_FALSE@AM_CXXFLAGS = -ffast-math \
@@ -641,9 +641,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign 3dp/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign tests/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign 3dp/Makefile
+	  $(AUTOMAKE) --foreign tests/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

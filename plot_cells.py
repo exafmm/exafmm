@@ -5,7 +5,7 @@ import numpy as np
 import glob, math, os
 
 ax = Axes3D(plt.figure())
-os.chdir('3dp_simd_mpi')
+os.chdir('tests')
 norm = plt.Normalize()
 nfiles = len(glob.glob("cells*.dat"))
 colors = plt.cm.jet(norm(range(0,nfiles)))

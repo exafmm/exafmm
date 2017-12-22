@@ -1,5 +1,5 @@
 # Optimization flags
-AM_CPPFLAGS =
+AM_CPPFLAGS = -I../include -I../kernels
 
 if EXAFMM_HAVE_CRAY
 AM_CXXFLAGS = -dynamic

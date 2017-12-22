@@ -11,4 +11,4 @@ Running configure takes awhile. While running, it prints some messages telling w
 
 5. You can remove the program binaries and object files from the source code directory by typing `make clean'. To also remove the files that configure created (so you can compile the package for a different kind of computer), type `make distclean'. There is also a `make maintainer-clean' target, but that is intended mainly for the package's developers. If you use it, you may have to get all sorts of other programs in order to regenerate files that came with the distribution.
 
-5. See README.md for description of directories
+6. See README.md for description of directories
