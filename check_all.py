@@ -10,13 +10,13 @@ param_range = { 'n': ['2', '10', '100', '1000'],
                 'd': ['c', 's', 'p', 'l'] }
 
 # the parameters of each test
-test_params = OrderedDict([('kernel', 'P'),
+test_params = OrderedDict([('laplace_kernel', 'P'),
                            ('build_tree', 'nd'),
                            ('traverse', 'ntd'),
-                           ('fmm', 'nPtd')])
+                           ('laplace', 'nPtd')])
 
 #exedir_list = ['2d', '3d', '3dp', '3dp_gpu', '3dp_gpu_mpi', '3dp_simd', '3dp_simd_mpi']
-exedir_list = ['2d', '3d', '3dp', '3dp_simd_mpi']
+exedir_list = ['3d', '3dp']
 logfile = open('check_all.log', 'w')
 
 # loop over each directory

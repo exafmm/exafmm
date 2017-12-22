@@ -91,7 +91,7 @@ namespace exafmm {
         P(10),
         theta(.4),
         verbose(1) {
-      startMPI();
+      startMPI(argc, argv);
       while (1) {
         int option_index;
         int c = getopt_long(argc, argv, "c:d:hi:l:n:p:P:t:v:",
