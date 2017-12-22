@@ -1,5 +1,6 @@
 #ifndef args_h
 #define args_h
+#include "mpi_utils.h"
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -13,6 +14,7 @@ namespace exafmm {
     {"distribution", required_argument, 0, 'd'},
     {"help",         no_argument,       0, 'h'},
     {"images",       required_argument, 0, 'i'},
+    {"level",        required_argument, 0, 'l'},
     {"numBodies",    required_argument, 0, 'n'},
     {"path",         required_argument, 0, 'p'},
     {"P",            required_argument, 0, 'P'},
@@ -27,6 +29,7 @@ namespace exafmm {
     int ncrit;                                  //!< Number of bodies per leaf cell
     const char * distribution;                  //!< Body Distribution
     int images;                                 //!< Number of periodic images (3^images in each direction)
+    int level;                                  //!< Octree level used for partitioning
     int numBodies;                              //!< Number of bodies
     const char * path;                          //!< Path to save files
     int P;                                      //!< Order of expansions
@@ -43,6 +46,7 @@ namespace exafmm {
               " --distribution (-d) [l/c/s/o/p] : lattice, cube, sphere, octant, plummer (%s)\n"
               " --help (-h)                     : Show this help document\n"
               " --images (-i)                   : Number of images (3^images in each direction) (%d)\n"
+              " --level (-l)                    : Octree level used for partitioning (%d)\n"
               " --numBodies (-n)                : Number of bodies (%d)\n"
               " --path (-p)                     : Path to save files (%s)\n"
               " --P (-P)                        : Order of expansion (%d)\n"
@@ -52,6 +56,7 @@ namespace exafmm {
               ncrit,
               distribution,
               images,
+              level,
               numBodies,
               path,
               P,
@@ -68,7 +73,7 @@ namespace exafmm {
         case 'p': return "plummer";
         case 's': return "sphere";
         default:
-          fprintf(stderr, "invalid distribution %s\n", arg);
+          if (MPIRANK == 0) fprintf(stderr, "invalid distribution %s\n", arg);
           abort();
       }
       return "";
@@ -80,14 +85,16 @@ namespace exafmm {
       : ncrit(64),
         distribution("cube"),
         images(4),
+        level(4),
         numBodies(10000),
         path("./"),
         P(10),
         theta(.4),
         verbose(1) {
+      startMPI(argc, argv);
       while (1) {
         int option_index;
-        int c = getopt_long(argc, argv, "c:d:hi:n:p:P:t:v:",
+        int c = getopt_long(argc, argv, "c:d:hi:l:n:p:P:t:v:",
                             long_options, &option_index);
         if (c == -1) break;
         switch (c) {
@@ -102,6 +109,9 @@ namespace exafmm {
             abort();
           case 'i':
             images = atoi(optarg);
+            break;
+          case 'l':
+            level = atoi(optarg);
             break;
           case 'n':
             numBodies = atoi(optarg);
@@ -125,8 +135,12 @@ namespace exafmm {
       }
       if (strcmp(distribution, "cube") != 0) {
         images = 0;
-        printf("Setting images to 0 for distribution != cube\n");
+        if (MPIRANK == 0) fprintf(stderr,"Setting images to 0 for distribution != cube\n");
       }
+    }
+
+    ~Args() {
+      stopMPI();
     }
 
     //! Print formatted output for arguments
@@ -135,6 +149,7 @@ namespace exafmm {
         print("ncrit", ncrit);
         print("distribution", distribution);
         print("images", images);
+        print("level", level);
         print("numBodies", numBodies);
         print("path", path);
         print("P", P);

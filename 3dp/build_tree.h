@@ -1,10 +1,11 @@
 #ifndef buildtree_h
 #define buildtree_h
 #include "exafmm.h"
+#include "hilbert.h"
 
 namespace exafmm {
   //! Get bounding box of bodies
-  void getBounds(Bodies & bodies, real_t & R0, vec3 & X0) {
+  void getBounds(Bodies & bodies) {
     vec3 Xmin = bodies[0].X;
     vec3 Xmax = bodies[0].X;
     for (size_t b=0; b<bodies.size(); b++) {
@@ -26,6 +27,8 @@ namespace exafmm {
     cell->numChilds = 0;
     cell->X = X;
     cell->R = R;
+    ivec3 iX = get3DIndex(X, level);
+    cell->key = getKey(iX, level);
     cell->M.resize(NTERM, 0.0);
     cell->L.resize(NTERM, 0.0);
     //! Count number of bodies in each octant
@@ -84,14 +87,26 @@ namespace exafmm {
   }
 
   Cells buildTree(Bodies & bodies) {
-    real_t R0;
-    vec3 X0;
-    getBounds(bodies, R0, X0);
     Bodies buffer = bodies;
     Cells cells(1);
     cells.reserve(bodies.size()*(32/NCRIT+1));
     buildCells(&bodies[0], &buffer[0], 0, bodies.size(), &cells[0], cells, X0, R0);
+    for (size_t i=0; i<cells.size(); i++) {
+      if (cells[i].numChilds == 0) {
+        for (int b=0; b<cells[i].numBodies; b++) cells[i].body[b].key = cells[i].key;
+      }
+    }
     return cells;
+  }
+
+  void writeCells(Cells & cells) {
+    std::stringstream name;
+    name << "cells" << std::setfill('0') << std::setw(4) << MPIRANK << ".dat";
+    std::ofstream file(name.str().c_str());
+    for (size_t i=0; i<cells.size(); i++) {
+      file << cells[i].X << cells[i].R << " " << cells[i].numChilds << std::endl;
+    }
+    file.close();
   }
 }
 #endif

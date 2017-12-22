@@ -22,6 +22,32 @@ namespace exafmm {
     upwardPass(&cells[0]);
   }
 
+  //! Upward pass to fill in missing numBodies and M
+  void upwardPassLET(Cell * Ci) {
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
+#pragma omp task untied if(Cj->numBodies > 100)
+      upwardPassLET(Cj);
+    }
+#pragma omp taskwait
+    real_t M = 0;
+    for (int n=0; n<NTERM; n++) M += std::abs(Ci->M[n]);
+    if (Ci->numChilds==0) {
+      if (M < EPS) {
+        P2M(Ci);
+      }
+    } else {
+      for (int n=0; n<NTERM; n++) Ci->M[n] = 0;
+      M2M(Ci);
+    }
+  }
+
+  //! Upward pass LET interface
+  void upwardPassLET(Cells & cells) {
+#pragma omp parallel
+#pragma omp single nowait
+    upwardPassLET(&cells[0]);
+  }
+
   //! Recursive call to dual tree traversal for horizontal pass
   void horizontalPass(Cell * Ci, Cell * Cj) {
     vec3 dX;
@@ -30,7 +56,12 @@ namespace exafmm {
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
-      P2P(Ci, Cj);
+      if (Cj->numBodies == 0) {
+        std::cout << MPIRANK << " " << Ci->key << " " << getLevel(Ci->key) << " " << Cj->key << " " << getLevel(Cj->key) << std::endl;
+        M2L(Ci, Cj);
+      } else {
+        P2P(Ci, Cj);
+      }
     } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
       for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {
 #pragma omp task untied if(ci->numBodies > 100) firstprivate(IX)

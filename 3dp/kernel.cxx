@@ -10,7 +10,7 @@ int main(int argc, char ** argv) {
   VERBOSE = args.verbose;
 #if EXAFMM_HELMHOLTZ
   WAVEK = complex_t(1,.1) / real_t(2*M_PI);
-#endif 
+#endif
   initKernel();
 
   //! P2M

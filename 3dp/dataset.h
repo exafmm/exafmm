@@ -1,7 +1,6 @@
 #ifndef dataset_h
 #define dataset_h
 #include "exafmm.h"
-#include <fstream>
 
 namespace exafmm {
   //! Split range and return partial range
@@ -212,7 +211,9 @@ namespace exafmm {
 
   //! Write bodies to file
   void writeBodies(Bodies & bodies) {
-    std::ofstream file("bodies0000.dat");
+    std::stringstream name;
+    name << "bodies" << std::setfill('0') << std::setw(4) << MPIRANK << ".dat";
+    std::ofstream file(name.str().c_str());
     for (size_t b=0; b<bodies.size(); b++) {
       file << bodies[b].X << std::endl;
     }

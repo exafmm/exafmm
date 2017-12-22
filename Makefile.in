@@ -334,7 +334,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = 2d 3d 3dp 3dp_gpu 3dp_gpu_mpi 3dp_simd 3dp_simd_mpi
+SUBDIRS = 3dp
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

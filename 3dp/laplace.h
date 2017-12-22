@@ -108,6 +108,105 @@ namespace exafmm {
     NTERM = P * (P + 1) / 2;
   }
 
+#if 1
+  void P2P(Cell * Ci, Cell * Cj) {
+    Body * Bi = Ci->body;
+    Body * Bj = Cj->body;
+    int i, j, num = Ci->numBodies;
+#pragma omp parallel for private(j)
+    for (i=0; i<num; i+=NSIMD) {
+      simdvec zero((real_t)0);
+      simdvec p(zero);
+      simdvec Fx(zero);
+      simdvec Fy(zero);
+      simdvec Fz(zero);
+      simdvec invR(zero);
+      simdvec xi(&Bi[i].X[0], (int)sizeof(Body));
+      simdvec yi(&Bi[i].X[1], (int)sizeof(Body));
+      simdvec zi(&Bi[i].X[2], (int)sizeof(Body));
+      simdvec R2(zero);
+      simdvec x2(Bj[0].X[0]);
+      x2 = x2 - xi + IX[0] * CYCLE;
+      simdvec y2(Bj[0].X[1]);
+      y2 = y2 - yi + IX[1] * CYCLE;
+      simdvec z2(Bj[0].X[2]);
+      z2 = z2 - zi + IX[2] * CYCLE;
+      simdvec q(Bj[0].q);
+      simdvec xj = x2;
+      R2 = R2 + x2 * x2;
+      simdvec yj = y2;
+      R2 = R2 + y2 * y2;
+      simdvec zj = z2;
+      R2 = R2 + z2 * z2;
+      x2 = Bj[1].X[0];
+      y2 = Bj[1].X[1];
+      z2 = Bj[1].X[2];
+      for (j=1; j<Cj->numBodies-1; j++) {
+        invR = rsqrt(R2);
+        invR &= R2 > zero;
+        R2 = zero;
+        x2 = x2 - xi + IX[0] * CYCLE;
+        y2 = y2 - yi + IX[1] * CYCLE;
+        z2 = z2 - zi + IX[2] * CYCLE;
+        q = q * invR;
+        p = p + q;
+        invR = invR * invR * q;
+        q = Bj[j].q;
+        Fx = Fx + xj * invR;
+        xj = x2;
+        R2 = R2 + x2 * x2;
+        x2 = Bj[j+1].X[0];
+        Fy = Fy + yj * invR;
+        yj = y2;
+        R2 = R2 + y2 * y2;
+        y2 = Bj[j+1].X[1];
+        Fz = Fz + zj * invR;
+        zj = z2;
+        R2 = R2 + z2 * z2;
+        z2 = Bj[j+1].X[2];
+      }
+      invR = rsqrt(R2);
+      invR &= R2 > zero;
+      R2 = zero;
+      q = q * invR;
+      p = p + q;
+      invR = invR * invR * q;
+      q = Bj[Cj->numBodies-1].q;
+      Fx = Fx + xj * invR;
+      Fy = Fy + yj * invR;
+      Fz = Fz + zj * invR;
+      if(Cj->numBodies > 1) {
+        x2 = x2 - xi + IX[0] * CYCLE;
+        y2 = y2 - yi + IX[1] * CYCLE;
+        z2 = z2 - zi + IX[2] * CYCLE;
+        R2 = R2 + x2 * x2;
+        R2 = R2 + y2 * y2;
+        R2 = R2 + z2 * z2;
+        xj = x2;
+        yj = y2;
+        zj = z2;
+        invR = rsqrt(R2);
+        invR &= R2 > zero;
+        q = q * invR;
+        p = p + q;
+        invR = invR * invR;
+        invR = invR * q;
+        xj = xj * invR;
+        Fx = Fx + xj;
+        yj = yj * invR;
+        Fy = Fy + yj;
+        zj = zj * invR;
+        Fz = Fz + zj;
+      }
+      for (int k=0; k<NSIMD && i+k<num; k++) {
+        Bi[i+k].p += p[k];
+        Bi[i+k].F[0] += Fx[k];
+        Bi[i+k].F[1] += Fy[k];
+        Bi[i+k].F[2] += Fz[k];
+      }
+    }
+  }
+#else
   void P2P(Cell * Ci, Cell * Cj) {
     Body * Bi = Ci->body;
     Body * Bj = Cj->body;
@@ -133,6 +232,7 @@ namespace exafmm {
       }
     }
   }
+#endif
 
   void P2M(Cell * C) {
     complex_t Ynm[P*P], YnmTheta[P*P];

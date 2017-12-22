@@ -53,6 +53,24 @@ namespace exafmm {
     upwardPass(&cells[0]);
   }
 
+  void upwardPassLET(Cell * Ci) {
+    for (Cell * Cj=Ci->child; Cj!=Ci->child+Ci->numChilds; Cj++) {
+      upwardPassLET(Cj);
+    }
+    if (Ci->numChilds==0) {
+      if (std::abs(Ci->M[0]) < EPS) {
+        P2M(Ci);
+      }
+    } else {
+      Ci->M[0] = 0;
+      M2M(Ci);
+    }
+  }
+
+  void upwardPassLET(Cells & cells) {
+    upwardPassLET(&cells[0]);
+  }
+
   void horizontalPass(Cell * Ci, Cell * Cj) {
     vec3 dX;
     for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
@@ -60,6 +78,7 @@ namespace exafmm {
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
+      assert(Cj->numBodies != 0);
       P2P(Ci, Cj);
     } else if (Cj->numChilds == 0 || (Ci->R >= Cj->R && Ci->numChilds != 0)) {
       for (Cell * ci=Ci->child; ci!=Ci->child+Ci->numChilds; ci++) {

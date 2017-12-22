@@ -2190,7 +2190,7 @@ ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
 ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
-ac_config_files="$ac_config_files Makefile 2d/Makefile 3d/Makefile 3dp/Makefile 3dp_gpu/Makefile 3dp_gpu_mpi/Makefile 3dp_simd/Makefile 3dp_simd_mpi/Makefile"
+ac_config_files="$ac_config_files Makefile 3dp/Makefile"
 
 ac_config_headers="$ac_config_headers config.h"
 
@@ -8102,13 +8102,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "2d/Makefile") CONFIG_FILES="$CONFIG_FILES 2d/Makefile" ;;
-    "3d/Makefile") CONFIG_FILES="$CONFIG_FILES 3d/Makefile" ;;
     "3dp/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp/Makefile" ;;
-    "3dp_gpu/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_gpu/Makefile" ;;
-    "3dp_gpu_mpi/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_gpu_mpi/Makefile" ;;
-    "3dp_simd/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_simd/Makefile" ;;
-    "3dp_simd_mpi/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_simd_mpi/Makefile" ;;
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
 

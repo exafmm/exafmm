@@ -1,7 +1,7 @@
 AC_PREREQ([2.69])
 AC_INIT([exaFMM], [2.0])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_FILES([Makefile 2d/Makefile 3d/Makefile 3dp/Makefile 3dp_gpu/Makefile 3dp_gpu_mpi/Makefile 3dp_simd/Makefile 3dp_simd_mpi/Makefile])
+AC_CONFIG_FILES([Makefile 3dp/Makefile])
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
