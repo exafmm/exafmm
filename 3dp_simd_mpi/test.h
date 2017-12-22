@@ -17,7 +17,6 @@ namespace exafmm {
 
   inline void M2L(Cell * Ci, Cell * Cj) {
     Ci->L[0] += Cj->M[0];
-    Cj->L[0] += 1;
   }
 
   void L2L(Cell * Cj) {
@@ -38,7 +37,6 @@ namespace exafmm {
         Bi[i].p += Bj[j].q;
       }
     }
-    Cj->L[0] += 1;
   }
 
   void upwardPass(Cell * Ci) {
@@ -77,7 +75,6 @@ namespace exafmm {
     vec3 dX;
     for (int d=0; d<3; d++) dX[d] = Ci->X[d] - Cj->X[d] - IX[d] * CYCLE;
     real_t R2 = norm(dX) * THETA * THETA;
-    //if(MPIRANK==0) std::cout << Ci->key << " " << Cj->key << std::endl;
     if (R2 > (Ci->R + Cj->R) * (Ci->R + Cj->R)) {
       M2L(Ci, Cj);
     } else if (Ci->numChilds == 0 && Cj->numChilds == 0) {
