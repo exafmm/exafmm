@@ -17,6 +17,7 @@ namespace exafmm {
   //! Uniform distribution on [-1,1]^3 lattice
   Bodies lattice(int & numBodies, int mpirank, int mpisize) {
     int nx = ceil(std::pow(numBodies*mpisize, 1./3));
+    nx = (nx > mpisize) ? nx : mpisize;
     int ny = nx;
     int nz = nx;
     int begin = 0;

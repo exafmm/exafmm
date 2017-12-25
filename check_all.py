@@ -21,6 +21,7 @@ test_params = OrderedDict([('laplace_kernel', 'P'),
                            ('helmholtz', 'nPtd'),
                            ('stokes', 'nPtd')])
 
+testdir = "tests"
 logfile = open('check_all.log', 'w')
 
 # loop over each test
@@ -34,7 +35,7 @@ for test, params in test_params.iteritems():
         # interleave parameter character list and their value list
         args_list = list(itertools.chain(*zip(dash_params, values)))
         # insert executable at the beginning of args list
-        args_list.insert(0, test)
+        args_list.insert(0, os.path.join(testdir, test))
         args_list.insert(0, "4")
         args_list.insert(0, "-np")
         args_list.insert(0, "mpirun")
