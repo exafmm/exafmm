@@ -31,7 +31,7 @@ int main(int argc, char ** argv) {
   CUTOFF = CYCLE / 2;
 #else
   args.images = 0;
-  printf("Setting images to 0 for Helmholtz and Stokes kernel\n");
+  if (MPIRANK == 0) printf("Setting images to 0 for Helmholtz and Stokes kernel\n");
 #endif
   IMAGES = args.images;
   print("FMM Parameter");
