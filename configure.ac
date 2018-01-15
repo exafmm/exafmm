@@ -1,7 +1,7 @@
 AC_PREREQ([2.69])
 AC_INIT([exaFMM], [2.0])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_FILES([Makefile 2d/Makefile 3d/Makefile 3dp/Makefile 3dp_gpu/Makefile 3dp_gpu_mpi/Makefile 3dp_simd/Makefile 3dp_simd_mpi/Makefile])
+AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
@@ -83,7 +83,7 @@ AC_ARG_ENABLE([assert],
 if test "$enable_assert" = "yes"; then
    AC_DEFINE(EXAFMM_ASSERT,1,[Enable assertion.])
 fi
-AM_CONDITIONAL(EXAFMM_ASSERT, test "$use_assert" = "yes")
+AM_CONDITIONAL(EXAFMM_ASSERT, test "$enable_assert" = "yes")
 
 # Debug
 AC_ARG_ENABLE([debug],

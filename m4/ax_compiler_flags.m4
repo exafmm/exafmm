@@ -79,7 +79,7 @@ AC_DEFUN([AX_COMPILER_FLAGS],[
 	-Wformat-nonliteral dnl
 	-Wformat-security dnl
 	-Winit-self dnl
-	-Winline dnl
+	dnl -Winline dnl
 	-Wmissing-format-attribute dnl
 	-Wmissing-include-dirs dnl
 	-Wmissing-noreturn dnl

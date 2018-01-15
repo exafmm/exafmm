@@ -707,6 +707,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -797,6 +798,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1049,6 +1051,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1186,7 +1197,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1339,6 +1350,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -2178,12 +2190,12 @@ ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
 ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
-ac_config_files="$ac_config_files Makefile 2d/Makefile 3d/Makefile 3dp/Makefile 3dp_gpu/Makefile 3dp_gpu_mpi/Makefile 3dp_simd/Makefile 3dp_simd_mpi/Makefile"
+ac_config_files="$ac_config_files Makefile tests/Makefile"
 
 ac_config_headers="$ac_config_headers config.h"
 
 
-am__api_version='1.14'
+am__api_version='1.15'
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -2355,8 +2367,8 @@ test "$program_suffix" != NONE &&
 ac_script='s/[\\$]/&&/g;s/;s,x,x,$//'
 program_transform_name=`$as_echo "$program_transform_name" | sed "$ac_script"`
 
-# expand $ac_aux_dir to an absolute path
-am_aux_dir=`cd $ac_aux_dir && pwd`
+# Expand $ac_aux_dir to an absolute path.
+am_aux_dir=`cd "$ac_aux_dir" && pwd`
 
 if test x"${MISSING+set}" != xset; then
   case $am_aux_dir in
@@ -2375,7 +2387,7 @@ else
 $as_echo "$as_me: WARNING: 'missing' script is too old or missing" >&2;}
 fi
 
-if test x"${install_sh}" != xset; then
+if test x"${install_sh+set}" != xset; then
   case $am_aux_dir in
   *\ * | *\	*)
     install_sh="\${SHELL} '$am_aux_dir/install-sh'" ;;
@@ -2703,8 +2715,8 @@ MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 # <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
 mkdir_p='$(MKDIR_P)'
 
-# We need awk for the "check" target.  The system "awk" is bad on
-# some platforms.
+# We need awk for the "check" target (and possibly the TAP driver).  The
+# system "awk" is bad on some platforms.
 # Always define AMTAR for backward compatibility.  Yes, it's still used
 # in the wild :-(  We should find a proper way to deprecate it ...
 AMTAR='$${TAR-tar}'
@@ -2761,6 +2773,7 @@ END
     as_fn_error $? "Your 'rm' program is bad, sorry." "$LINENO" 5
   fi
 fi
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
 $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
@@ -6761,7 +6774,7 @@ if test "$enable_assert" = "yes"; then
 $as_echo "#define EXAFMM_ASSERT 1" >>confdefs.h
 
 fi
- if test "$use_assert" = "yes"; then
+ if test "$enable_assert" = "yes"; then
   EXAFMM_ASSERT_TRUE=
   EXAFMM_ASSERT_FALSE='#'
 else
@@ -6920,28 +6933,6 @@ $as_echo "$ac_cv_path_SED" >&6; }
  SED="$ac_cv_path_SED"
   rm -f conftest.sed
 
-if ${CXXFLAGS+:} false; then :
-  case " $CXXFLAGS " in
-    *"  "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : CXXFLAGS already contains "; } >&5
-  (: CXXFLAGS already contains ) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : CXXFLAGS=\"\$CXXFLAGS \""; } >&5
-  (: CXXFLAGS="$CXXFLAGS ") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      CXXFLAGS="$CXXFLAGS "
-      ;;
-   esac
-else
-  CXXFLAGS=""
-fi
-
 
 
 
@@ -7030,6 +7021,8 @@ fi
     # Base flags
 
 
+
+
 for flag in         -O0         -g     ; do
   as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags_$ax_compiler_flags_test_$flag" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $flag" >&5
@@ -7063,26 +7056,36 @@ eval ac_res=\$$as_CACHEVAR
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-  if ${ax_compiler_cxxflags+:} false; then :
-  case " $ax_compiler_cxxflags " in
-    *" $flag "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
+
+if ${ax_compiler_cxxflags+:} false; then :
+
+  case " $ax_compiler_cxxflags " in #(
+  *" $flag "*) :
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
   (: ax_compiler_cxxflags already contains $flag) 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
+  test $ac_status = 0; } ;; #(
+  *) :
+
+     as_fn_append ax_compiler_cxxflags " $flag"
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }
-      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
-      ;;
-   esac
+     ;;
+esac
+
 else
-  ax_compiler_cxxflags="$flag"
+
+  ax_compiler_cxxflags=$flag
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+
 fi
 
 else
@@ -7096,7 +7099,9 @@ done
     # http://stackoverflow.com/questions/5088460/flags-to-enable-thorough-and-verbose-g-warnings
 
 
-for flag in          $ax_compiler_flags_test         "-check all"         "-debug all" 	"-diag-disable remark" 	-fmudflap 	-fno-strict-aliasing 	-fsanitize=address 	-fsanitize=leak 	-fstack-protector 	-ftrapuv 	-ftrapv 	-traceback 		-Wall 	-Warray-bounds         -Wbad-function-cast 		-Wcast-align 	-Wcast-qual 	-Wextra 	-Wfatal-errors 		-Wformat=2 	-Wformat-nonliteral 	-Wformat-security 	-Winit-self 	-Winline 	-Wmissing-format-attribute 	-Wmissing-include-dirs 	-Wmissing-noreturn         -Wnested-externs 	-Wno-missing-field-initializers 	-Wno-overloaded-virtual         -Wno-unused-local-typedefs 	-Wno-unused-parameter         -Wno-unused-variable 		-Wpointer-arith 	-Wredundant-decls 	-Wreturn-type 	-Wshadow 	-Wsign-compare 	-Wstrict-aliasing 	-Wstrict-overflow=5 	-Wstrict-prototype 		-Wswitch-enum 		-Wuninitialized 	-Wunreachable-code 	-Wunused-but-set-variable 	-Wwrite-strings     ; do
+
+
+for flag in          $ax_compiler_flags_test         "-check all"         "-debug all" 	"-diag-disable remark" 	-fmudflap 	-fno-strict-aliasing 	-fsanitize=address 	-fsanitize=leak 	-fstack-protector 	-ftrapuv 	-ftrapv 	-traceback 		-Wall 	-Warray-bounds         -Wbad-function-cast 		-Wcast-align 	-Wcast-qual 	-Wextra 	-Wfatal-errors 		-Wformat=2 	-Wformat-nonliteral 	-Wformat-security 	-Winit-self 		-Wmissing-format-attribute 	-Wmissing-include-dirs 	-Wmissing-noreturn         -Wnested-externs 	-Wno-missing-field-initializers 	-Wno-overloaded-virtual         -Wno-unused-local-typedefs 	-Wno-unused-parameter         -Wno-unused-variable 		-Wpointer-arith 	-Wredundant-decls 	-Wreturn-type 	-Wshadow 	-Wsign-compare 	-Wstrict-aliasing 	-Wstrict-overflow=5 	-Wstrict-prototype 		-Wswitch-enum 		-Wuninitialized 	-Wunreachable-code 	-Wunused-but-set-variable 	-Wwrite-strings     ; do
   as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags_$ax_compiler_flags_test_$flag" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $flag" >&5
 $as_echo_n "checking whether C++ compiler accepts $flag... " >&6; }
@@ -7129,26 +7134,36 @@ eval ac_res=\$$as_CACHEVAR
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-  if ${ax_compiler_cxxflags+:} false; then :
-  case " $ax_compiler_cxxflags " in
-    *" $flag "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
+
+if ${ax_compiler_cxxflags+:} false; then :
+
+  case " $ax_compiler_cxxflags " in #(
+  *" $flag "*) :
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
   (: ax_compiler_cxxflags already contains $flag) 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
+  test $ac_status = 0; } ;; #(
+  *) :
+
+     as_fn_append ax_compiler_cxxflags " $flag"
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }
-      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
-      ;;
-   esac
+     ;;
+esac
+
 else
-  ax_compiler_cxxflags="$flag"
+
+  ax_compiler_cxxflags=$flag
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+
 fi
 
 else
@@ -7167,6 +7182,8 @@ done
   -Wno-*=*) :
      ;; #(
   -Wno-*) :
+
+
 
 
 
@@ -7203,26 +7220,36 @@ eval ac_res=\$$as_CACHEVAR
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-  if ${ax_compiler_cxxflags+:} false; then :
-  case " $ax_compiler_cxxflags " in
-    *" $flag "*)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
+
+if ${ax_compiler_cxxflags+:} false; then :
+
+  case " $ax_compiler_cxxflags " in #(
+  *" $flag "*) :
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags already contains \$flag"; } >&5
   (: ax_compiler_cxxflags already contains $flag) 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-      ;;
-    *)
-      { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags \$flag\""; } >&5
-  (: ax_compiler_cxxflags="$ax_compiler_cxxflags $flag") 2>&5
+  test $ac_status = 0; } ;; #(
+  *) :
+
+     as_fn_append ax_compiler_cxxflags " $flag"
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }
-      ax_compiler_cxxflags="$ax_compiler_cxxflags $flag"
-      ;;
-   esac
+     ;;
+esac
+
 else
-  ax_compiler_cxxflags="$flag"
+
+  ax_compiler_cxxflags=$flag
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: : ax_compiler_cxxflags=\"\$ax_compiler_cxxflags\""; } >&5
+  (: ax_compiler_cxxflags="$ax_compiler_cxxflags") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+
 fi
 
 else
@@ -8075,13 +8102,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "2d/Makefile") CONFIG_FILES="$CONFIG_FILES 2d/Makefile" ;;
-    "3d/Makefile") CONFIG_FILES="$CONFIG_FILES 3d/Makefile" ;;
-    "3dp/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp/Makefile" ;;
-    "3dp_gpu/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_gpu/Makefile" ;;
-    "3dp_gpu_mpi/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_gpu_mpi/Makefile" ;;
-    "3dp_simd/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_simd/Makefile" ;;
-    "3dp_simd_mpi/Makefile") CONFIG_FILES="$CONFIG_FILES 3dp_simd_mpi/Makefile" ;;
+    "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
 

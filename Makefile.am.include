@@ -1,5 +1,5 @@
 # Optimization flags
-AM_CPPFLAGS =
+AM_CPPFLAGS = -I../include -I../kernels
 
 if EXAFMM_HAVE_CRAY
 AM_CXXFLAGS = -dynamic
@@ -74,7 +74,7 @@ cleandat:
 	@make -C .. cleandat
 cleanlib:
 	@make -C .. cleanlib
-cleanreg:
-	@make -C .. cleanreg
+cleanlog:
+	@make -C .. cleanlog
 cleanall:
 	@make -C .. cleanall
