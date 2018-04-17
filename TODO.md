@@ -13,3 +13,5 @@ SIMD Hilbert
 Fix 3dp theta problem for images>1
 Merge SIMD directory
 Compare with FDPS, PVFMM, bonsai, exafmm/uniform
+Use map to merge cells, multimap to merge bodies
+Short list Hilbert keys for setLET by DTT of the two domains
