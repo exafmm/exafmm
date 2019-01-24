@@ -1,3 +1,16 @@
+#### exafmm
+History: 2017/03/03 - Now  
+Branch: dev, learning  
+Kernel: Laplace, LaplaceKI, Helmholtz, Stokes  
+Periodic: yes  
+SIMD: vec.h  
+Thread: OpenMP tasks  
+MPI: HOT (global histogram sort)  
+GPU: no  
+Build: autoconf  
+Wrapper: none  
+Plotting: Python  
+
 --------------------------------------------
 exafmm/ contains the following directories.
 
