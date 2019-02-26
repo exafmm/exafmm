@@ -1,5 +1,5 @@
 # Optimization flags
-AM_CPPFLAGS = -I../include -I../kernels
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/kernels
 
 if EXAFMM_HAVE_CRAY
 AM_CXXFLAGS = -dynamic
@@ -67,14 +67,14 @@ endif
 AM_MAKEFLAGS = -s
 
 buildbot:
-	@make -C .. buildbot
+	@make -C $(top_srcdir) buildbot
 cleanbin:
-	@make -C .. cleanbin
+	@make -C $(top_srcdir) cleanbin
 cleandat:
-	@make -C .. cleandat
+	@make -C $(top_srcdir) cleandat
 cleanlib:
-	@make -C .. cleanlib
+	@make -C $(top_srcdir) cleanlib
 cleanlog:
-	@make -C .. cleanlog
+	@make -C $(top_srcdir) cleanlog
 cleanall:
-	@make -C .. cleanall
+	@make -C $(top_srcdir) cleanall
